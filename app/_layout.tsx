@@ -29,14 +29,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Protected guard={!isLoggedIn}>
-            <Stack.Screen name="login" />
-          </Stack.Protected>
-          <Stack.Protected guard={isLoggedIn}>
-            <Stack.Screen name="private" />
-          </Stack.Protected>
-        </Stack>
+        <Stack screenOptions={{ headerShown: false }} />
         <Toaster />
       </GestureHandlerRootView>
     </QueryClientProvider>

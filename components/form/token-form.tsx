@@ -1,5 +1,5 @@
 import * as Haptics from 'expo-haptics';
-import { useLocalSearchParams } from 'expo-router';
+import { Href, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import {
@@ -28,13 +28,16 @@ export const TokenForm = () => {
   const setDetails = useStoreId((state) => state.setDetails);
   const details = useStoreId((state) => state.details);
   const { token } = useLocalSearchParams<{ token: string }>();
-
+  const router = useRouter();
   const offset = useSharedValue(0);
   const [timeLeft, setTimeLeft] = useState(60);
   const [sending, setSending] = useState(false);
   const [isActive, setIsActive] = useState(true);
   const user = useTempData((state) => state.user);
   const getUser = useAuth((state) => state.getUser);
+  const userData = useAuth((state) => state.user);
+  const path: Href =
+    userData?.variant === 'STUDENT' ? '/(private)/(tabs)' : '/chat';
   const animatedStyle = useAnimatedStyle(() => {
     return { transform: [{ translateX: offset.value }] };
   });
@@ -81,6 +84,7 @@ export const TokenForm = () => {
         }
         getUser(user);
         onSetOnline();
+        router.push(path);
         toast.success('Success', {
           description: 'Welcome back',
         });
@@ -99,7 +103,7 @@ export const TokenForm = () => {
       });
       setTimeout(() => setCode([]), TIME * 2);
     }
-  }, [code, offset, token, user, getUser, details, setDetails]);
+  }, [code, offset, token, user, getUser, details, setDetails, router, path]);
   const resend = async () => {
     if (!user) return;
     setSending(true);
