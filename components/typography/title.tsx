@@ -7,13 +7,18 @@ type Props = {
   textStyle?: StyleProp<TextStyle>;
 };
 export const Title = ({ text, textStyle }: Props) => {
-  return <Text style={[styles.title, textStyle]}>{text}</Text>;
+  return (
+    <Text style={[styles.title, textStyle]} numberOfLines={3}>
+      {text}
+    </Text>
+  );
 };
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: RFPercentage(3),
+    fontSize: RFPercentage(2.5),
     fontFamily: 'NunitoBold',
     color: colors.white,
+    flex: 1,
   },
 });

@@ -7,7 +7,11 @@ type Props = {
   textStyle?: StyleProp<TextStyle>;
 };
 export const SubTitle = ({ text, textStyle }: Props) => {
-  return <Text style={[styles.title, textStyle]}>{text}</Text>;
+  return (
+    <Text style={[styles.title, textStyle]} numberOfLines={5}>
+      {text}
+    </Text>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -15,5 +19,6 @@ const styles = StyleSheet.create({
     fontSize: RFPercentage(1.5),
     fontFamily: 'NunitoBold',
     color: colors.white,
+    flex: 1,
   },
 });
