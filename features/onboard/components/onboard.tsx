@@ -13,7 +13,7 @@ import { Indicators } from './indicators';
 
 export const Onboard = () => {
   const [active, setActive] = useState(0);
-  const { setIsFirstToFalse } = useIsFirst();
+  const setIsFirstToFalse = useIsFirst((state) => state.setIsFirstToFalse);
   const router = useRouter();
   const dataToShow = onboardData[active];
   const onSkip = () => {
