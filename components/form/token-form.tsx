@@ -35,9 +35,9 @@ export const TokenForm = () => {
   const [isActive, setIsActive] = useState(true);
   const user = useTempData((state) => state.user);
   const getUser = useAuth((state) => state.getUser);
-  const userData = useAuth((state) => state.user);
+
   const path: Href =
-    userData?.variant === 'STUDENT' ? '/(private)/(tabs)' : '/chat';
+    user?.variant === 'STUDENT' ? '/(private)/(tabs)' : '/chat';
   const animatedStyle = useAnimatedStyle(() => {
     return { transform: [{ translateX: offset.value }] };
   });
@@ -49,7 +49,7 @@ export const TokenForm = () => {
       setCode((prev) => [...prev, item]);
     }
   };
-  console.log({ token });
+  console.log({ token, variant: user?.variant });
   useEffect(() => {
     let interval: NodeJS.Timeout | null | number = null;
 

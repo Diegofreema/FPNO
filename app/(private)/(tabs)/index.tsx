@@ -5,6 +5,8 @@ import { Text, View } from 'react-native';
 
 const IndexScreen = () => {
   const variant = useAuth((state) => state.user?.variant);
+  console.log({ variant }, 'variant');
+
   if (variant === 'LECTURER') {
     return <Redirect href={'/chat'} />;
   }

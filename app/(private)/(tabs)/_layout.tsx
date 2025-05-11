@@ -13,8 +13,6 @@ import { RFPercentage } from 'react-native-responsive-fontsize';
 export default function TabLayout() {
   const variant = useAuth((state) => state.user?.variant);
 
-  console.log(variant);
-
   const tabs: {
     name: string;
     title: string;
