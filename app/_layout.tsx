@@ -1,11 +1,25 @@
-import { useIsFirst } from '@/lib/zustand/useIsFirst';
-import { Stack, useSegments } from 'expo-router';
+import { useFonts } from 'expo-font';
+import { SplashScreen, Stack, useSegments } from 'expo-router';
+import { useEffect } from 'react';
 
 const isLoggedIn = false;
+SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const segment = useSegments();
-  const isFirst = useIsFirst((state) => state.isFirst);
-  console.log(segment, isFirst);
+
+  console.log(segment);
+  const [loaded] = useFonts({
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    NunitoLight: require('../assets/fonts/NunitoLight.ttf'),
+    NunitoRegular: require('../assets/fonts/NunitoRegular.ttf'),
+    NunitoBold: require('../assets/fonts/NunitoBold.ttf'),
+  });
+
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>

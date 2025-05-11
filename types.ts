@@ -69,3 +69,5 @@ export type PaginateType = {
   loadMore: (numItems: number) => void;
   status: 'LoadingFirstPage' | 'CanLoadMore' | 'LoadingMore' | 'Exhausted';
 };
+
+export type Variants = 'LECTURER' | 'STUDENT';

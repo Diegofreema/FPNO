@@ -13,13 +13,17 @@ import axios from 'axios';
 
 // import { generateFromRandomNumbersOtp, sendEmail } from "@/helper";
 import { mail } from '@/constants';
+import { AccountSwitcher } from '@/features/auth/components/account-switcher';
 import { Helper } from '@/features/auth/components/helper';
 import { useAuth } from '@/lib/zustand/useAuth';
 import { useShowToast } from '@/lib/zustand/useShowToast';
+import { Variants } from '@/types';
 
 export const LoginForm = () => {
   const [secure, setSecure] = useState<boolean>(true);
+  const [variant, setVariant] = useState<Variants>('LECTURER');
   const toggleSecure = () => setSecure(!secure);
+
   // const setDetails = useStoreId((state) => state.setDetails);
   // const getData = useTempData((state) => state.getUser);
   // ! to remove later
@@ -90,7 +94,7 @@ export const LoginForm = () => {
 
   return (
     <AnimatedContainer>
-      <Stack style={{ gap: 20 }}>
+      <Stack style={{ gap: 25 }}>
         <CustomInput
           control={control}
           errors={errors}
@@ -109,7 +113,7 @@ export const LoginForm = () => {
           secureTextEntry={secure}
           toggleSecure={toggleSecure}
         />
-
+        <AccountSwitcher variant={variant} setVariant={setVariant} />
         <Button
           text={'Login'}
           onPress={handleSubmit(onSubmit)}
