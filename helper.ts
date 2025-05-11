@@ -1,6 +1,7 @@
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
+import { userData } from './types';
 
 export const sendEmail = async (email: string, otp: string) => {
   const { data } = await axios.get(
@@ -145,4 +146,19 @@ const saveFile = async (fileUri: string) => {
   } else if (status === 'denied') {
     throw new Error('please allow permissions to download');
   }
+};
+
+export function getName(user: userData): string {
+  if (user.variant === 'STUDENT') {
+    return `${user.fname} ${user.lname}`; // TypeScript knows user is StudentData here
+  }
+
+  return user.fullname;
+}
+
+export const getStudentData = (user: userData) => {
+  if (user.variant === 'STUDENT') {
+    return user;
+  }
+  return null;
 };

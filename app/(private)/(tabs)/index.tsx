@@ -1,20 +1,20 @@
+import { ScrollWrapper } from '@/components/ui/wrapper';
+import Home from '@/features/home/components/home';
 import { useAuth } from '@/lib/zustand/useAuth';
 import { Redirect } from 'expo-router';
 import React from 'react';
-import { Text, View } from 'react-native';
 
-const IndexScreen = () => {
+const HomeScreen = () => {
   const variant = useAuth((state) => state.user?.variant);
-  console.log({ variant }, 'variant');
 
   if (variant === 'LECTURER') {
     return <Redirect href={'/chat'} />;
   }
   return (
-    <View>
-      <Text>IndexScreen</Text>
-    </View>
+    <ScrollWrapper>
+      <Home />
+    </ScrollWrapper>
   );
 };
 
-export default IndexScreen;
+export default HomeScreen;
