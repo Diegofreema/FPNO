@@ -1,9 +1,11 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 
 const isLoggedIn = false;
 SplashScreen.preventAutoHideAsync();
+const queryClient = new QueryClient();
 export default function RootLayout() {
   const segment = useSegments();
 
@@ -22,13 +24,15 @@ export default function RootLayout() {
   }, [loaded]);
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={!isLoggedIn}>
-        <Stack.Screen name="login" />
-      </Stack.Protected>
-      <Stack.Protected guard={isLoggedIn}>
-        <Stack.Screen name="private" />
-      </Stack.Protected>
-    </Stack>
+    <QueryClientProvider client={queryClient}>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Protected guard={!isLoggedIn}>
+          <Stack.Screen name="login" />
+        </Stack.Protected>
+        <Stack.Protected guard={isLoggedIn}>
+          <Stack.Screen name="private" />
+        </Stack.Protected>
+      </Stack>
+    </QueryClientProvider>
   );
 }
