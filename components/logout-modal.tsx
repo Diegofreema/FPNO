@@ -1,15 +1,13 @@
-import { SubTitle } from '@/components/typography/subtitle';
-import { Title } from '@/components/typography/title';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { HStack } from '@/components/ui/h-stack';
 import { colors } from '@/constants';
 import { useAuth } from '@/lib/zustand/useAuth';
-import { useStoreId } from '@/lib/zustand/useStoreId';
 import Modal from 'react-native-modal';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 
 import { useId } from '@/lib/zustand/useId';
+import { Text } from 'react-native';
 
 type Props = {
   visible: boolean;
@@ -18,21 +16,13 @@ type Props = {
 
 export const LogoutModal = ({ onClose, visible }: Props) => {
   const removeUser = useAuth((state) => state.removeUser);
-  const id = useId((state) => state.id);
-  console.log({ id });
-  const removeDetails = useStoreId((state) => state.removeDetails);
 
-  const onClearDetails = useStoreId.persist.clearStorage;
-  const onClearStorage = useAuth.persist.clearStorage;
   const onRemoveId = useId((state) => state.removeId);
 
   const onPress = async () => {
-    if (!id) return;
     removeUser();
-    onClearStorage();
+
     onClose();
-    removeDetails();
-    onClearDetails();
 
     onRemoveId();
   };
@@ -44,26 +34,27 @@ export const LogoutModal = ({ onClose, visible }: Props) => {
       isVisible={visible}
       backdropOpacity={0.8}
       backdropColor="rgba(0, 0, 0, 0.5)"
-      style={{}}
     >
       <Card>
-        <Title
-          text="Logout"
-          textStyle={{
+        <Text
+          style={{
             fontFamily: 'NunitoBold',
             color: colors.black,
             textAlign: 'center',
           }}
-        />
-        <SubTitle
-          text="Are you sure you want to log out?"
-          textStyle={{
+        >
+          Logout
+        </Text>
+        <Text
+          style={{
             fontFamily: 'NunitoRegular',
             color: colors.black,
             textAlign: 'center',
             fontSize: RFPercentage(1.8),
           }}
-        />
+        >
+          Are you sure you want to log out?
+        </Text>
 
         <HStack
           gap={10}
