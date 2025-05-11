@@ -1,38 +1,14 @@
-import { create } from "zustand";
+import { userData } from '@/types';
+import { create } from 'zustand';
 
-type userData = {
-  Department: string;
-  Faculty: string;
-  birthday: string;
-  email: string;
-  fname: string;
-  id: string;
-  lname: string;
-  matricnumber: string;
-  mname: string;
-  phone: string;
-  programtype: string;
-};
 type Store = {
-  user: userData;
+  user: userData | null;
   getUser: (user: userData) => void;
   removeUser: () => void;
 };
 
 export const useTempData = create<Store>()((set) => ({
-  user: {
-    email: "",
-    id: "",
-    birthday: "",
-    fname: "",
-    Department: "",
-    Faculty: "",
-    lname: "",
-    matricnumber: "",
-    mname: "",
-    phone: "",
-    programtype: "",
-  },
+  user: null,
   getUser: (data) =>
     set({
       user: {
@@ -41,18 +17,6 @@ export const useTempData = create<Store>()((set) => ({
     }),
   removeUser: () =>
     set({
-      user: {
-        email: "",
-        id: "",
-        birthday: "",
-        fname: "",
-        Department: "",
-        Faculty: "",
-        lname: "",
-        matricnumber: "",
-        mname: "",
-        phone: "",
-        programtype: "",
-      },
+      user: null,
     }),
 }));

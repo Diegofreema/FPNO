@@ -1,15 +1,16 @@
+import { useAuth } from '@/lib/zustand/useAuth';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 
-const isLoggedIn = false;
 SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
 export default function RootLayout() {
   const segment = useSegments();
-
-  console.log(segment);
+  const user = useAuth((state) => state.user);
+  const isLoggedIn = !!user;
+  console.log(segment, isLoggedIn);
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     NunitoLight: require('../assets/fonts/NunitoLight.ttf'),

@@ -1,11 +1,25 @@
+import { TokenForm } from '@/components/form/token-form';
+import { CustomBackgroundImage } from '@/components/ui/custom-background';
+import { ScrollWrapper } from '@/components/ui/wrapper';
+import { useTempData } from '@/lib/zustand/useTempData';
+import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
-import { Text, View } from 'react-native';
 
 const TokenScreen = () => {
+  const { token } = useLocalSearchParams<{ token: string }>();
+  const user = useTempData((state) => state.user);
+
+  console.log({ token, user });
+
   return (
-    <View>
-      <Text>TokenScreen</Text>
-    </View>
+    <ScrollWrapper styles={{ paddingHorizontal: 0 }}>
+      <CustomBackgroundImage
+        text="E-Mail Address Verification"
+        text2="Enter the 5 Digit Code sent to Johndoe@gmail.com"
+      >
+        <TokenForm />
+      </CustomBackgroundImage>
+    </ScrollWrapper>
   );
 };
 

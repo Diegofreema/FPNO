@@ -1,4 +1,3 @@
-import { IconBackspace } from '@tabler/icons-react-native';
 import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams } from 'expo-router';
 import { MotiView } from 'moti';
@@ -25,6 +24,7 @@ import { useAuth } from '@/lib/zustand/useAuth';
 import { useShowToast } from '@/lib/zustand/useShowToast';
 import { useStoreId } from '@/lib/zustand/useStoreId';
 import { useTempData } from '@/lib/zustand/useTempData';
+import { Ionicons } from '@expo/vector-icons';
 import { AnimatedContainerToken } from '../animated/animated-container';
 import { Resend } from '../resend';
 
@@ -93,6 +93,7 @@ export const TokenForm = () => {
     const isFilled = code.length === pinLength;
     const onSetOnline = async () => {};
     if (isFilled && isValid) {
+      if (!user) return;
       setTimeout(() => {
         if (!details.department) {
           setDetails(user.id);
@@ -123,6 +124,7 @@ export const TokenForm = () => {
     }
   }, [code, offset, token, user, getUser, details, setDetails, onShow]);
   const resend = async () => {
+    if (!user) return;
     setSending(true);
     try {
       await sendEmail(user.email, token);
@@ -181,7 +183,8 @@ export const TokenForm = () => {
                 ]}
               >
                 {item === 'del' ? (
-                  <IconBackspace
+                  <Ionicons
+                    name="backspace"
                     color={colors.black}
                     size={dialPadItemSize * 2}
                     strokeWidth={1}

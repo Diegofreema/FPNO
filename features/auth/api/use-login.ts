@@ -1,20 +1,27 @@
-import { useAuth } from '@/lib/zustand/useAuth';
+import { generateFromRandomNumbersOtp, sendEmail } from '@/helper';
 import { useShowToast } from '@/lib/zustand/useShowToast';
+import { useTempData } from '@/lib/zustand/useTempData';
+import { Variants } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { useRouter } from 'expo-router';
 
-export const useLogin = () => {
+export const useLogin = (variant: Variants) => {
   const { onShow } = useShowToast();
-  const getUser = useAuth((state) => state.getUser);
+  const router = useRouter();
+  const getTempUser = useTempData((state) => state.getUser);
   return useMutation({
     mutationFn: async (values: { email: string; password: string }) => {
+      const baseApi = variant === 'LECTURER' ? 'lecturerlogin' : 'userlogin';
       const { data } = await axios(
-        `https://estate.netpro.software/api.aspx?api=userlogin&email=${values.email}&pasword=${values.password}`
+        `https://estate.netpro.software/api.aspx?api=${baseApi}&email=${
+          values.email
+        }&pasword=${encodeURI(values.password)}`
       );
 
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data.result === 'failed') {
         return onShow({
           message: 'Error',
@@ -29,10 +36,13 @@ export const useLogin = () => {
           type: 'error',
         });
       }
-      getUser(data);
+      const otp = generateFromRandomNumbersOtp();
+      await sendEmail(data.email, otp);
+      router.push(`/token?token=${otp}`);
+      getTempUser({ variant, ...data });
       onShow({
         message: 'Success',
-        description: 'Welcome back',
+        description: 'An otp was sent to your email',
         type: 'success',
       });
     },

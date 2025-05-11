@@ -71,3 +71,28 @@ export type PaginateType = {
 };
 
 export type Variants = 'LECTURER' | 'STUDENT';
+
+export type StudentData = {
+  variant: 'STUDENT';
+  Department: string;
+  Faculty: string;
+  birthday: string;
+  email: string;
+  fname: string;
+  id: string;
+  lname: string;
+  matricnumber: string;
+  mname: string;
+  phone: string;
+  programtype: string;
+};
+
+export type LecturerData = {
+  variant: 'LECTURER';
+  email: string;
+  id: string;
+  fullname: string;
+  phone: string;
+};
+
+export type userData = StudentData | LecturerData;

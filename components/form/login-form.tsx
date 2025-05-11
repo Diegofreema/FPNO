@@ -21,7 +21,7 @@ export const LoginForm = () => {
   const [secure, setSecure] = useState<boolean>(true);
   const [variant, setVariant] = useState<Variants>('LECTURER');
   const toggleSecure = () => setSecure(!secure);
-  const { mutateAsync } = useLogin();
+  const { mutateAsync } = useLogin(variant);
 
   const {
     formState: { errors, isSubmitting },

@@ -1,22 +1,10 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { userData } from '@/types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
-type userData = {
-  Department: string;
-  Faculty: string;
-  birthday: string;
-  email: string;
-  fname: string;
-  id: string;
-  lname: string;
-  matricnumber: string;
-  mname: string;
-  phone: string;
-  programtype: string;
-};
 type Store = {
-  user: userData;
+  user: userData | null;
   getUser: (user: userData) => void;
   removeUser: () => void;
 };
@@ -24,19 +12,7 @@ type Store = {
 export const useAuth = create<Store>()(
   persist(
     (set) => ({
-      user: {
-        email: "",
-        id: "",
-        birthday: "",
-        fname: "",
-        Department: "",
-        Faculty: "",
-        lname: "",
-        matricnumber: "",
-        mname: "",
-        phone: "",
-        programtype: "",
-      },
+      user: null,
       getUser: (data) =>
         set({
           user: {
@@ -45,24 +21,12 @@ export const useAuth = create<Store>()(
         }),
       removeUser: () =>
         set({
-          user: {
-            email: "",
-            id: "",
-            birthday: "",
-            fname: "",
-            Department: "",
-            Faculty: "",
-            lname: "",
-            matricnumber: "",
-            mname: "",
-            phone: "",
-            programtype: "",
-          },
+          user: null,
         }),
     }),
     {
-      name: "auth",
+      name: 'auth',
       storage: createJSONStorage(() => AsyncStorage),
-    },
-  ),
+    }
+  )
 );
