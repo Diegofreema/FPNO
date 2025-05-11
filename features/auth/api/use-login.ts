@@ -1,13 +1,12 @@
 import { generateFromRandomNumbersOtp, sendEmail } from '@/helper';
-import { useShowToast } from '@/lib/zustand/useShowToast';
 import { useTempData } from '@/lib/zustand/useTempData';
 import { Variants } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
+import { toast } from 'sonner-native';
 
 export const useLogin = (variant: Variants) => {
-  const { onShow } = useShowToast();
   const router = useRouter();
   const getTempUser = useTempData((state) => state.getUser);
   return useMutation({
@@ -23,34 +22,26 @@ export const useLogin = (variant: Variants) => {
     },
     onSuccess: async (data) => {
       if (data.result === 'failed') {
-        return onShow({
-          message: 'Error',
+        return toast.error('Error', {
           description: 'Failed to login',
-          type: 'error',
         });
       }
       if (data.result === 'incorrect credentials') {
-        return onShow({
-          message: 'Error',
+        return toast.error('Error', {
           description: 'Incorrect credentials',
-          type: 'error',
         });
       }
       const otp = generateFromRandomNumbersOtp();
       await sendEmail(data.email, otp);
       router.push(`/token?token=${otp}`);
       getTempUser({ variant, ...data });
-      onShow({
-        message: 'Success',
+      toast.success('Success', {
         description: 'An otp was sent to your email',
-        type: 'success',
       });
     },
     onError: () => {
-      onShow({
-        message: 'Error',
+      toast.error('Error', {
         description: 'Failed to login, please try again later',
-        type: 'error',
       });
     },
   });

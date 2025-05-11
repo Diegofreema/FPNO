@@ -1,16 +1,9 @@
 import { TokenForm } from '@/components/form/token-form';
 import { CustomBackgroundImage } from '@/components/ui/custom-background';
 import { ScrollWrapper } from '@/components/ui/wrapper';
-import { useTempData } from '@/lib/zustand/useTempData';
-import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 
 const TokenScreen = () => {
-  const { token } = useLocalSearchParams<{ token: string }>();
-  const user = useTempData((state) => state.user);
-
-  console.log({ token, user });
-
   return (
     <ScrollWrapper styles={{ paddingHorizontal: 0 }}>
       <CustomBackgroundImage
