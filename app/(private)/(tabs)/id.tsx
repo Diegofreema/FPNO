@@ -1,12 +1,16 @@
+import { ScrollWrapper } from '@/components/ui/wrapper';
+import { IDModal } from '@/features/id/components/id-modal';
 import React from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 
-const IdScreen = () => {
+const id = () => {
   return (
-    <View>
-      <Text>IdScreen</Text>
-    </View>
+    <ScrollWrapper>
+      <View style={{ paddingTop: 50 }}>
+        <IDModal />
+      </View>
+    </ScrollWrapper>
   );
 };
 
-export default IdScreen;
+export default id;

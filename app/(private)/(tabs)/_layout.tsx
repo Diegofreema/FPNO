@@ -31,7 +31,7 @@ export default function TabLayout() {
             name: 'academics',
             title: 'Academics',
             icon: 'book',
-            href: '/academics',
+            href: null,
           },
           {
             name: 'payment',
