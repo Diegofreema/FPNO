@@ -2,12 +2,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { colors } from '@/constants';
 import { LecturesType } from '@/types';
-import {
-  IconArticle,
-  IconBuilding,
-  IconClock,
-  IconUser,
-} from '@tabler/icons-react-native';
+
 import { RFPercentage } from 'react-native-responsive-fontsize';
 
 import { Spacer } from '@/components/ui/divider';
@@ -23,23 +18,23 @@ export const InfoCard = ({ item }: { item: LecturesType }) => {
         <View style={styles.subContainer}>
           <View style={{ flex: 1 }}>
             <IconText
-              icon={IconArticle}
+              icon={'newspaper-o'}
               text={item.coursecode}
               textStyle={styles.title}
             />
             <Spacer space={8} />
-            <IconText icon={IconUser} text={item.lecturer.trim()} />
+            <IconText icon={'user'} text={item.lecturer.trim()} />
           </View>
         </View>
         <View>
           <IconText
             text={item.Hall}
-            icon={IconBuilding}
+            icon={'building-o'}
             style={{ alignSelf: 'flex-end' }}
             textStyle={{ fontSize: RFPercentage(1.4), textAlign: 'right' }}
           />
           <Spacer space={8} />
-          <IconText text={item.period} icon={IconClock} />
+          <IconText text={item.period} icon={'clock-o'} />
         </View>
       </View>
     </TouchableOpacity>

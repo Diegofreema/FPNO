@@ -1,5 +1,6 @@
 import { colors } from '@/constants';
-import { Icon } from '@tabler/icons-react-native';
+import { FontAwesome } from '@expo/vector-icons';
+
 import {
   StyleProp,
   StyleSheet,
@@ -11,7 +12,7 @@ import {
 import { RFPercentage } from 'react-native-responsive-fontsize';
 
 type Props = {
-  icon: Icon;
+  icon: React.ComponentProps<typeof FontAwesome>['name'];
   text: string;
   textStyle?: StyleProp<TextStyle>;
 
@@ -20,7 +21,7 @@ type Props = {
 
 export const IconText = ({
   text,
-  icon: Icon,
+  icon,
   textStyle,
 
   style,
@@ -29,7 +30,11 @@ export const IconText = ({
     <View
       style={[{ flexDirection: 'row', alignItems: 'center', gap: 5 }, style]}
     >
-      <Icon color={colors.lightblue} size={RFPercentage(2)} />
+      <FontAwesome
+        name={icon}
+        color={colors.lightblue}
+        size={RFPercentage(2)}
+      />
       <Text
         style={[
           styles.subText,
