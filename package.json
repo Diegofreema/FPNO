@@ -88,5 +88,11 @@
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0"
   },
+  "overrides": {
+    "react-native-appwrite": {
+      "expo-file-system": "18.*.*",
+      "react-native": ">=0.76.7 <1.0.0"
+    }
+  },
   "private": true
 }
