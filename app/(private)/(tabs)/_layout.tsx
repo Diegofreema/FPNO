@@ -7,12 +7,23 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { HapticTab } from '@/components/HapticTab';
+import { ErrorComponent } from '@/components/ui/error-component';
+import { Loading } from '@/components/ui/loading';
+import { useGetUserByUserId } from '@/features/auth/api/use-get-user-by-user-id';
 import { AntDesign } from '@expo/vector-icons';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 
 export default function TabLayout() {
   const variant = useAuth((state) => state.user?.variant);
+  const { isPending, isError, refetch, error } = useGetUserByUserId();
+  console.log(error);
 
+  if (isError) {
+    return <ErrorComponent onPress={refetch} />;
+  }
+  if (isPending) {
+    return <Loading />;
+  }
   const tabs: {
     name: string;
     title: string;

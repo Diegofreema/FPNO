@@ -1,3 +1,4 @@
+import { Models } from 'react-native-appwrite';
 import { upcoming } from './data';
 
 export type DataType = (typeof upcoming)[0];
@@ -96,3 +97,35 @@ export type LecturerData = {
 };
 
 export type userData = StudentData | LecturerData;
+
+export type UserType = Models.Document & {
+  name: string;
+  userId: string;
+  email: string;
+  is_online: boolean;
+  image_url?: string;
+  faculty?: string;
+  department?: string;
+  program_type?: string;
+  matriculation_number?: string;
+};
+
+export type ChatRoomType = Models.Document & {
+  conversation_name: string;
+  type: 'GROUP' | 'SINGLE';
+  creator_id: string;
+  admin_ids: string[];
+  members: string[];
+  last_message: string;
+  last_message_time: number;
+};
+
+export type ChatMessageType = Models.Document & {
+  sender_id: string;
+  conversation_id: string;
+  message: string;
+  seen_ids: string[];
+  sent_to: string[];
+
+  // content_type: 'image' | 'text' | 'pdf';
+};

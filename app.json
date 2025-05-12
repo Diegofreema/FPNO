@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.diegodark.nekede"
+      "bundleIdentifier": "com.diegodark.FPNO"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +18,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.diegodark.nekede"
+      "package": "com.diegodark.FPNO"
     },
     "web": {
       "bundler": "metro",

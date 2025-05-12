@@ -162,3 +162,10 @@ export const getStudentData = (user: userData) => {
   }
   return null;
 };
+
+export const getLecturerData = (user: userData) => {
+  if (user.variant === 'LECTURER') {
+    return user;
+  }
+  return null;
+};
