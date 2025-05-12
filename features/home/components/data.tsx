@@ -1,11 +1,13 @@
 import { Stack } from '@/components/ui/stack';
-import { useGetLectures, useGetNews } from '@/lib/tanstack/query';
+
 import { useAuth } from '@/lib/zustand/useAuth';
 
 import { Href } from 'expo-router';
 
 import { ArticleSkeleton } from '@/components/skeletons/article-skeleton';
 import { ErrorComponent } from '@/components/ui/error-component';
+import { useGetLectures } from '../api/use-get-lectures';
+import { useGetNews } from '../api/use-get-news';
 import { LectureNoScroll } from './lecture-no-scroll';
 import { NewsFlatList } from './news-flatlist';
 
