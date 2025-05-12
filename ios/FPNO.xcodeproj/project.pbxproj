@@ -8,28 +8,28 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		318531DEBFB4A5BB4BE3F115 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB7D1A53A1F21FA257849B8E /* ExpoModulesProvider.swift */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		9B48BDCF484C0144CC3F3A75 /* libPods-FPNO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B0C3DA16AE67BC8539121E88 /* libPods-FPNO.a */; };
+		44364331593EBC6AA6752F7E /* libPods-FPNO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07498727A96C336C5D44D509 /* libPods-FPNO.a */; };
+		4AF431919D800BE0ED12FCA2 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 4244400682582F822D6BC493 /* PrivacyInfo.xcprivacy */; };
+		B1839A6B81CB10735E59ECAD /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F073B9DBB3AFC20D6ABD9A83 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		E19051FAF0E432FDFD1CDC25 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6C52CFAAC48519A9989FBBD8 /* PrivacyInfo.xcprivacy */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		07498727A96C336C5D44D509 /* libPods-FPNO.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-FPNO.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07F961A680F5B00A75B9A /* FPNO.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FPNO.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = FPNO/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = FPNO/Info.plist; sourceTree = "<group>"; };
-		6C52CFAAC48519A9989FBBD8 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = FPNO/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		90F212918AB18D51A526C3F1 /* Pods-FPNO.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FPNO.release.xcconfig"; path = "Target Support Files/Pods-FPNO/Pods-FPNO.release.xcconfig"; sourceTree = "<group>"; };
+		4244400682582F822D6BC493 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = FPNO/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		945F391DBF8D4D6D0B651408 /* Pods-FPNO.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FPNO.debug.xcconfig"; path = "Target Support Files/Pods-FPNO/Pods-FPNO.debug.xcconfig"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = FPNO/SplashScreen.storyboard; sourceTree = "<group>"; };
-		B0C3DA16AE67BC8539121E88 /* libPods-FPNO.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-FPNO.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		DDE15E6ABE05AC3DE5F25B4C /* Pods-FPNO.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FPNO.debug.xcconfig"; path = "Target Support Files/Pods-FPNO/Pods-FPNO.debug.xcconfig"; sourceTree = "<group>"; };
+		DC7B279FE835F9AD525766D8 /* Pods-FPNO.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FPNO.release.xcconfig"; path = "Target Support Files/Pods-FPNO/Pods-FPNO.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F073B9DBB3AFC20D6ABD9A83 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-FPNO/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = FPNO/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* FPNO-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "FPNO-Bridging-Header.h"; path = "FPNO/FPNO-Bridging-Header.h"; sourceTree = "<group>"; };
-		FB7D1A53A1F21FA257849B8E /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-FPNO/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,7 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9B48BDCF484C0144CC3F3A75 /* libPods-FPNO.a in Frameworks */,
+				44364331593EBC6AA6752F7E /* libPods-FPNO.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,7 +53,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				6C52CFAAC48519A9989FBBD8 /* PrivacyInfo.xcprivacy */,
+				4244400682582F822D6BC493 /* PrivacyInfo.xcprivacy */,
 			);
 			name = FPNO;
 			sourceTree = "<group>";
@@ -62,19 +62,27 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				B0C3DA16AE67BC8539121E88 /* libPods-FPNO.a */,
+				07498727A96C336C5D44D509 /* libPods-FPNO.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		3470F69641381AD18494DF90 /* Pods */ = {
+		45F6ABDC0FF46F0036B0D48D /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				DDE15E6ABE05AC3DE5F25B4C /* Pods-FPNO.debug.xcconfig */,
-				90F212918AB18D51A526C3F1 /* Pods-FPNO.release.xcconfig */,
+				945F391DBF8D4D6D0B651408 /* Pods-FPNO.debug.xcconfig */,
+				DC7B279FE835F9AD525766D8 /* Pods-FPNO.release.xcconfig */,
 			);
 			name = Pods;
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		61501F0AC8BAD78C3063C594 /* FPNO */ = {
+			isa = PBXGroup;
+			children = (
+				F073B9DBB3AFC20D6ABD9A83 /* ExpoModulesProvider.swift */,
+			);
+			name = FPNO;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -91,8 +99,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				3470F69641381AD18494DF90 /* Pods */,
-				BAFB05422C6AACD02137D3E6 /* ExpoModulesProviders */,
+				45F6ABDC0FF46F0036B0D48D /* Pods */,
+				ADA461F4EFE0110DEB411BE9 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -107,10 +115,10 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		BAFB05422C6AACD02137D3E6 /* ExpoModulesProviders */ = {
+		ADA461F4EFE0110DEB411BE9 /* ExpoModulesProviders */ = {
 			isa = PBXGroup;
 			children = (
-				CB8D3677E1D8BBED73FB8C84 /* FPNO */,
+				61501F0AC8BAD78C3063C594 /* FPNO */,
 			);
 			name = ExpoModulesProviders;
 			sourceTree = "<group>";
@@ -124,14 +132,6 @@
 			path = FPNO/Supporting;
 			sourceTree = "<group>";
 		};
-		CB8D3677E1D8BBED73FB8C84 /* FPNO */ = {
-			isa = PBXGroup;
-			children = (
-				FB7D1A53A1F21FA257849B8E /* ExpoModulesProvider.swift */,
-			);
-			name = FPNO;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -140,13 +140,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "FPNO" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				0AEBD17FEF371F2550CA89B9 /* [Expo] Configure project */,
+				2912B9302E50FA124E27B77D /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				BC5D1AC0C96EF1F7F9B930D8 /* [CP] Embed Pods Frameworks */,
+				B17F762B0EC3E97918355FAC /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -196,7 +196,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				E19051FAF0E432FDFD1CDC25 /* PrivacyInfo.xcprivacy in Resources */,
+				4AF431919D800BE0ED12FCA2 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -240,7 +240,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		0AEBD17FEF371F2550CA89B9 /* [Expo] Configure project */ = {
+		2912B9302E50FA124E27B77D /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -313,7 +313,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-FPNO/Pods-FPNO-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		BC5D1AC0C96EF1F7F9B930D8 /* [CP] Embed Pods Frameworks */ = {
+		B17F762B0EC3E97918355FAC /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -339,7 +339,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				318531DEBFB4A5BB4BE3F115 /* ExpoModulesProvider.swift in Sources */,
+				B1839A6B81CB10735E59ECAD /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -348,7 +348,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DDE15E6ABE05AC3DE5F25B4C /* Pods-FPNO.debug.xcconfig */;
+			baseConfigurationReference = 945F391DBF8D4D6D0B651408 /* Pods-FPNO.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -384,7 +384,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 90F212918AB18D51A526C3F1 /* Pods-FPNO.release.xcconfig */;
+			baseConfigurationReference = DC7B279FE835F9AD525766D8 /* Pods-FPNO.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
