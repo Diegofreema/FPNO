@@ -1,11 +1,12 @@
+import { Wrapper } from '@/components/ui/wrapper';
+import { Chat } from '@/features/chat/components/chat';
 import React from 'react';
-import { Text, View } from 'react-native';
 
 const ChatScreen = () => {
   return (
-    <View>
-      <Text>ChatScreen</Text>
-    </View>
+    <Wrapper>
+      <Chat />
+    </Wrapper>
   );
 };
 
