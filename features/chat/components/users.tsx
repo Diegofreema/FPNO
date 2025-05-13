@@ -18,7 +18,6 @@ export const Users = ({ total, users, onEndReached }: Props) => {
       renderItem={({ item }) => <User user={item} />}
       keyExtractor={(item) => item.$id}
       recycleItems
-      contentContainerStyle={{ marginTop: 20 }}
       ListEmptyComponent={() => <EmptyText text="No users found" />}
       onEndReached={onEndReached}
       onEndReachedThreshold={0.5}

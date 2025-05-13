@@ -1,3 +1,5 @@
+import { ActionIcon } from '@/components/ui/action-icon';
+import { Spacer } from '@/components/ui/divider';
 import { ErrorComponent } from '@/components/ui/error-component';
 import { Loading } from '@/components/ui/loading';
 import { NavHeader } from '@/components/ui/nav-header';
@@ -6,6 +8,7 @@ import { useGetOtherUsers } from '@/features/chat/api/use-get-users';
 import { SearchInput } from '@/features/chat/components/search-converstion';
 import { Users } from '@/features/chat/components/users';
 import { useAuth } from '@/lib/zustand/useAuth';
+import { useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
@@ -15,7 +18,7 @@ const NewChatScreen = () => {
   const [query] = useDebounce(value, 500);
   const [offset, setOffset] = useState(0);
   const userData = useAuth((state) => state.user);
-
+  const router = useRouter();
   const { data, isPending, isError, refetch, isFetching } = useGetOtherUsers({
     userId: userData?.id!,
     query,
@@ -33,6 +36,9 @@ const NewChatScreen = () => {
   if (isPending) {
     return <Loading />;
   }
+  const onAction = () => {
+    router.push('/new-group');
+  };
 
   return (
     <Wrapper>
@@ -43,6 +49,9 @@ const NewChatScreen = () => {
         onChangeText={setValue}
         placeholder="Search people"
       />
+      <Spacer space={10} />
+      <ActionIcon name="user-secret" onPress={onAction} text={'New group'} />
+      <Spacer space={10} />
       <Users
         users={data.documents}
         total={data.total}
