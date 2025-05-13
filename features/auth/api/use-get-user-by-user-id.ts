@@ -15,43 +15,48 @@ export const useGetUserByUserId = () => {
   return useQuery({
     queryKey: ['get-user', userData?.id],
     queryFn: async () => {
-      if (!userData?.id) return;
-      let user: UserType;
-      const users = await databases.listDocuments<UserType>(
+      const response = await databases.listDocuments<UserType>(
         DATABASE_ID,
         USER_COLLECTION_ID,
-        [Query.equal('userId', userData?.id)]
+        [Query.equal('userId', userData?.id!)]
       );
-      if (users.documents.length === 0) {
+
+      let user: UserType;
+
+      if (response.documents.length === 0) {
+        // Create a new user document
         user = await databases.createDocument<UserType>(
           DATABASE_ID,
           USER_COLLECTION_ID,
           ID.unique(),
           {
-            email: userData?.email,
             userId: userData?.id,
+            email: userData?.email,
             name,
             faculty: studentData?.Faculty,
             matriculation_number: studentData?.matricnumber,
             program_type: studentData?.programtype,
             department: studentData?.Department,
-            image_url: `https://fpn.netpro.software/Uploads/${studentData?.id}.jpeg`,
+            image_url: studentData?.id
+              ? `https://fpn.netpro.software/Uploads/${studentData.id}.jpeg`
+              : undefined,
             is_online: true,
           }
         );
       } else {
+        // Update existing user document to set is_online: true
         user = await databases.updateDocument<UserType>(
           DATABASE_ID,
           USER_COLLECTION_ID,
-          users.documents[0].$id,
-          {
-            is_online: true,
-          }
+          response.documents[0].$id,
+          { is_online: true }
         );
       }
 
-      user = users.documents[0];
       return user;
     },
+    enabled: !!userData?.id,
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
   });
 };

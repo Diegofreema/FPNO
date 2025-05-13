@@ -1,14 +1,13 @@
-import { Title } from '@/components/typography/title';
 import { Button } from '@/components/ui/button';
 import { colors } from '@/constants';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { RFPercentage } from 'react-native-responsive-fontsize';
 
 export const ErrorComponent = ({
   onPress,
   title = 'Something went wrong',
   height,
   btnText = 'Retry',
-  onGoBack,
   textColor = colors.lightblue,
   backgroundColor = 'transparent',
 }: {
@@ -22,46 +21,23 @@ export const ErrorComponent = ({
 }) => {
   return (
     <View style={[styles.container, { height }]}>
-      <Title text={title} textStyle={{ color: 'black', textAlign: 'center' }} />
-      <View
+      <Text style={{ color: 'black', fontSize: RFPercentage(3) }}>{title}</Text>
+      <Button
+        text={btnText}
+        onPress={onPress}
         style={{
-          flexDirection: 'row',
-          width: '90%',
-          marginHorizontal: 'auto',
-          gap: 10,
+          backgroundColor,
+          justifyContent: 'center',
         }}
-      >
-        {onGoBack && (
-          <Button
-            text="Cancel"
-            onPress={onGoBack}
-            style={{
-              backgroundColor: colors.red,
-              justifyContent: 'center',
-              flex: 1,
-            }}
-            textStyle={{ color: colors.white }}
-          />
-        )}
-        <Button
-          text={btnText}
-          onPress={onPress}
-          style={{
-            backgroundColor,
-            justifyContent: 'center',
-            flex: 1,
-          }}
-          textStyle={{ color: textColor }}
-        />
-      </View>
+        textStyle={{ color: textColor }}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    minHeight: 200,
-
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 10,

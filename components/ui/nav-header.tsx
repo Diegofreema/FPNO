@@ -42,7 +42,7 @@ export const NavHeader = ({
         onPress={onPress}
         style={{ padding: 5, flexDirection: 'row', alignItems: 'center' }}
       >
-        <AntDesign name="arrowleft" color={color} size={30} />
+        <AntDesign name="arrowleft" color={color} size={25} />
         {AvatarContent && AvatarContent}
       </TouchableOpacity>
       <SubTitle
