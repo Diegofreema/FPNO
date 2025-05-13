@@ -1,12 +1,20 @@
+import { ProfileBackground } from '@/features/profile/components/profile-background';
+import { ProfileInfo } from '@/features/profile/components/profile-info';
+import { StatusBar } from 'expo-status-bar';
+import { ScrollView } from 'moti';
 import React from 'react';
-import { Text, View } from 'react-native';
 
-const ProfileScreen = () => {
+const Profile = () => {
   return (
-    <View>
-      <Text>ProfileScreen</Text>
-    </View>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 40, backgroundColor: 'white' }}
+    >
+      <ProfileBackground>
+        <StatusBar style={'light'} />
+        <ProfileInfo />
+      </ProfileBackground>
+    </ScrollView>
   );
 };
-
-export default ProfileScreen;
+export default Profile;
