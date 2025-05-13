@@ -6,17 +6,25 @@ import { useGetOtherUsers } from '@/features/chat/api/use-get-users';
 import { SearchInput } from '@/features/chat/components/search-converstion';
 import { Users } from '@/features/chat/components/users';
 import { useAuth } from '@/lib/zustand/useAuth';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 const NewChatScreen = () => {
   const [value, setValue] = useState('');
   const [query] = useDebounce(value, 500);
+  const [offset, setOffset] = useState(0);
   const userData = useAuth((state) => state.user);
 
-  const { data, isPending, isError, refetch } = useGetOtherUsers({
+  const { data, isPending, isError, refetch, isFetching } = useGetOtherUsers({
     userId: userData?.id!,
     query,
+    offSet: offset,
   });
+  const onEndReached = useCallback(() => {
+    if (isFetching || isPending) return;
+    if (data?.total && data.total > offset + 10) {
+      setOffset((prevOffset) => prevOffset + 10);
+    }
+  }, [data, offset, isFetching, isPending]);
   if (isError) {
     return <ErrorComponent onPress={refetch} />;
   }
@@ -32,7 +40,11 @@ const NewChatScreen = () => {
         onChangeText={setValue}
         placeholder="Search people"
       />
-      <Users users={data.documents} total={data.total} />
+      <Users
+        users={data.documents}
+        total={data.total}
+        onEndReached={onEndReached}
+      />
     </Wrapper>
   );
 };

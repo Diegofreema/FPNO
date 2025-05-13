@@ -15,8 +15,7 @@ import { RFPercentage } from 'react-native-responsive-fontsize';
 
 export default function TabLayout() {
   const variant = useAuth((state) => state.user?.variant);
-  const { isPending, isError, refetch, error } = useGetUserByUserId();
-  console.log(error);
+  const { isPending, isError, refetch } = useGetUserByUserId();
 
   if (isError) {
     return <ErrorComponent onPress={refetch} />;

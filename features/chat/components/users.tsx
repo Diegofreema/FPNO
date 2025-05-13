@@ -1,3 +1,4 @@
+import { Loading } from '@/components/ui/loading';
 import { EmptyText } from '@/features/home/components/empty-text';
 import { UserType } from '@/types';
 import { LegendList } from '@legendapp/list';
@@ -7,9 +8,10 @@ import { User } from './user';
 type Props = {
   users: UserType[];
   total: number;
+  onEndReached: () => void;
 };
 
-export const Users = ({ total, users }: Props) => {
+export const Users = ({ total, users, onEndReached }: Props) => {
   return (
     <LegendList
       data={users}
@@ -18,6 +20,9 @@ export const Users = ({ total, users }: Props) => {
       recycleItems
       contentContainerStyle={{ marginTop: 20 }}
       ListEmptyComponent={() => <EmptyText text="No users found" />}
+      onEndReached={onEndReached}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={() => (total > users.length ? <Loading /> : null)}
     />
   );
 };
