@@ -2,8 +2,9 @@ import { Avatar } from '@/components/ui/avatar';
 import { HStack } from '@/components/ui/h-stack';
 import { colors } from '@/constants';
 import { UserType } from '@/types';
+import { useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 
 type Props = {
@@ -11,8 +12,12 @@ type Props = {
 };
 
 export const User = ({ user }: Props) => {
+  const router = useRouter();
+  const onPress = () => {
+    router.push(`/chat/${user.$id}`);
+  };
   return (
-    <TouchableOpacity activeOpacity={0.7}>
+    <TouchableOpacity activeOpacity={0.7} onPress={onPress}>
       <HStack
         justifyContent="flex-start"
         alignItems="center"
@@ -40,7 +45,3 @@ const Right = ({ name, matric }: { name: string; matric?: string }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {},
-});

@@ -1,11 +1,14 @@
+import { Wrapper } from '@/components/ui/wrapper';
+import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 
 const ChatId = () => {
+  const { chatId } = useLocalSearchParams();
   return (
-    <View>
-      <Text>ChatId</Text>
-    </View>
+    <Wrapper>
+      <Text>{chatId}</Text>
+    </Wrapper>
   );
 };
 

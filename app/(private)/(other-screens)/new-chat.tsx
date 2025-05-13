@@ -8,8 +8,10 @@ import { Users } from '@/features/chat/components/users';
 import { useAuth } from '@/lib/zustand/useAuth';
 import React, { useCallback, useState } from 'react';
 import { useDebounce } from 'use-debounce';
+
 const NewChatScreen = () => {
   const [value, setValue] = useState('');
+
   const [query] = useDebounce(value, 500);
   const [offset, setOffset] = useState(0);
   const userData = useAuth((state) => state.user);
@@ -35,6 +37,7 @@ const NewChatScreen = () => {
   return (
     <Wrapper>
       <NavHeader title="New chat" />
+
       <SearchInput
         value={value}
         onChangeText={setValue}

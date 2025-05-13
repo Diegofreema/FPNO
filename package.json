@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@expo/react-native-action-sheet": "^4.1.1",
+    "@expo/ui": "~0.1.1-alpha.7",
     "@expo/vector-icons": "^14.1.0",
     "@gorhom/bottom-sheet": "^5.1.4",
     "@hookform/resolvers": "^5.0.1",
