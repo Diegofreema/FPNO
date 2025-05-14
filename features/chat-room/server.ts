@@ -59,3 +59,21 @@ export const createChatRoom = async ({
     throw new Error(errorMessage);
   }
 };
+
+export const getTopChatRooms = async () => {
+  try {
+    const chatRooms = await databases.listDocuments<ChannelType>(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      [Query.limit(10), Query.orderDesc('members_count')]
+    );
+
+    return chatRooms;
+  } catch (error) {
+    const errorMessage =
+      error instanceof AppwriteException
+        ? error.message
+        : 'Failed to get top chat rooms';
+    throw new Error(errorMessage);
+  }
+};
