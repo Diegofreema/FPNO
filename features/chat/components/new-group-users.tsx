@@ -3,41 +3,38 @@ import { useNewGroupMembers } from '@/lib/zustand/useNewGroupMembers';
 import { NewConversationType } from '@/types';
 import { IconX } from '@tabler/icons-react-native';
 import { Image } from 'expo-image';
-import { ScrollView } from 'moti';
-import { useEffect } from 'react';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
-import Animated, {
-  LinearTransition,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  ZoomIn,
-  ZoomOut,
-} from 'react-native-reanimated';
+
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 
-const _layoutTransition = LinearTransition.springify()
-  .damping(80)
-  .stiffness(200);
+// const _layoutTransition = LinearTransition.springify()
+//   .damping(80)
+//   .stiffness(200);
 
 export const NewGroupUsers = () => {
   const newMembers = useNewGroupMembers((state) => state.members);
-  const height = useSharedValue(0);
-  const animatedStyle = useAnimatedStyle(() => ({
-    height: withSpring(height.value, {
-      damping: 80,
-      stiffness: 200,
-    }),
-  }));
-  useEffect(() => {
-    if (newMembers.length) {
-      height.value = 80;
-    } else {
-      height.value = 0;
-    }
-  }, [newMembers, height]);
+  // const height = useSharedValue(0);
+  // const animatedStyle = useAnimatedStyle(() => ({
+  //   height: withSpring(height.value, {
+  //     damping: 80,
+  //     stiffness: 200,
+  //   }),
+  // }));
+  // useEffect(() => {
+  //   if (newMembers.length) {
+  //     height.value = 80;
+  //   } else {
+  //     height.value = 0;
+  //   }
+  // }, [newMembers, height]);
   return (
-    <Animated.View style={animatedStyle}>
+    <View>
       <ScrollView
         style={{
           borderBottomColor: colors.border,
@@ -53,7 +50,7 @@ export const NewGroupUsers = () => {
           <NewGroupUser item={member} key={index} showBtn={true} />
         ))}
       </ScrollView>
-    </Animated.View>
+    </View>
   );
 };
 
@@ -66,11 +63,11 @@ export const NewGroupUser = ({
 }) => {
   const removeMember = useNewGroupMembers((state) => state.removeMember);
   return (
-    <Animated.View
-      layout={_layoutTransition}
+    <View
+      // layout={_layoutTransition}
       style={{ alignItems: 'center', flex: 1 }}
-      entering={ZoomIn}
-      exiting={ZoomOut}
+      // entering={ZoomIn}
+      // exiting={ZoomOut}
     >
       <Image
         source={{ uri: item.image }}
@@ -87,7 +84,7 @@ export const NewGroupUser = ({
           <IconX color={colors.white} size={15} />
         </TouchableOpacity>
       )}
-    </Animated.View>
+    </View>
   );
 };
 
