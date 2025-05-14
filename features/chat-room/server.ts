@@ -6,7 +6,7 @@ import {
 } from '@/config';
 import { databases, storage } from '@/db/appwrite';
 import { ChannelType } from '@/types';
-import { AppwriteException, ID, Query } from 'react-native-appwrite';
+import { ID, Query } from 'react-native-appwrite';
 import { CreateChatRoomSchema } from './schema';
 
 export const createChatRoom = async ({
@@ -32,7 +32,7 @@ export const createChatRoom = async ({
       [Query.equal('channel_name', name)]
     );
     if (chatRoomInDb.documents.length > 0) {
-      throw new Error('Chat room already exists');
+      throw new Error('Chat room with name already exists');
     }
     const chatRoom = await databases.createDocument<ChannelType>(
       DATABASE_ID,
@@ -46,15 +46,13 @@ export const createChatRoom = async ({
         description,
         image_url: link,
         image_id: id,
+        last_message: `The chat room "${name}" was created`,
       }
     );
     return chatRoom;
-  } catch (error) {
-    console.log(error);
+  } catch (error: unknown) {
     const errorMessage =
-      error instanceof AppwriteException
-        ? error.message
-        : 'Failed to create chat room';
+      error instanceof Error ? error.message : 'Failed to create chat room';
 
     throw new Error(errorMessage);
   }
@@ -71,9 +69,38 @@ export const getTopChatRooms = async () => {
     return chatRooms;
   } catch (error) {
     const errorMessage =
-      error instanceof AppwriteException
-        ? error.message
-        : 'Failed to get top chat rooms';
+      error instanceof Error ? error.message : 'Failed to get top chat rooms';
+    throw new Error(errorMessage);
+  }
+};
+
+export const getChannelsIamIn = async ({
+  userId,
+  search,
+  more,
+}: {
+  userId: string;
+  search?: string;
+  more: number;
+}) => {
+  try {
+    const query = [Query.limit(25 + more), Query.contains('members', userId)];
+
+    if (search) {
+      query.push(Query.search('channel_name', search));
+    }
+
+    const chatRooms = await databases.listDocuments<ChannelType>(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      query
+    );
+    return chatRooms;
+  } catch (error) {
+    console.log(error);
+    const errorMessage =
+      error instanceof Error ? error.message : 'Failed to load chat rooms';
+
     throw new Error(errorMessage);
   }
 };

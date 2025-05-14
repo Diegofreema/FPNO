@@ -15,7 +15,8 @@ export const useCreateChatRoom = () => {
     onSuccess: (data) => {
       toast.success('Chat room created');
       query.invalidateQueries({ queryKey: ['chat-rooms'] });
-      router.push(`/chat/${data.$id}`);
+      query.invalidateQueries({ queryKey: ['top-chat-rooms'] });
+      router.replace(`/chat/${data.$id}`);
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to create chat room');

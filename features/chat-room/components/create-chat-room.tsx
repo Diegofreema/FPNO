@@ -60,7 +60,6 @@ export const CreateChatRoom = () => {
   };
   const { image } = watch();
   const imageUrl = image?.uri;
-  console.log({ errors, image });
 
   return (
     <View style={{ flex: 1 }}>

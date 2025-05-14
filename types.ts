@@ -136,3 +136,7 @@ export type ChatMessageType = Models.Document & {
 
   // content_type: 'image' | 'text' | 'pdf';
 };
+
+export type ErrorType = {
+  message: string;
+};
