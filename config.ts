@@ -12,3 +12,5 @@ export const CHAT_MESSAGES_COLLECTION_ID =
   process.env.EXPO_PUBLIC_MESSAGES_COLLECTION_ID!;
 
 export const DATABASE_ID = process.env.EXPO_PUBLIC_DATABASE_ID!;
+
+export const BUCKET_ID = process.env.EXPO_PUBLIC_BUCKET_ID!;

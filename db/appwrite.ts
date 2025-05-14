@@ -1,9 +1,10 @@
 import { API_ENDPOINT, PROJECT_ID } from '@/config';
-import { Client, Databases, Models } from 'react-native-appwrite';
+import { Client, Databases, Models, Storage } from 'react-native-appwrite';
 
 // console.log({ API_ENDPOINT, PROJECT_ID, PROJECT_NAME });
 let client: Client;
 let databases: Databases;
+let storage: Storage;
 client = new Client();
 client
   .setEndpoint(API_ENDPOINT)
@@ -11,4 +12,5 @@ client
   .setPlatform('com.diegodark.FPNO');
 
 databases = new Databases(client);
-export { client, databases, Models };
+storage = new Storage(client);
+export { client, databases, Models, storage };

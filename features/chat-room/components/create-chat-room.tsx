@@ -3,35 +3,59 @@ import { Button } from '@/components/ui/button';
 import { colors } from '@/constants';
 import { Feather } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
+import * as ImagePicker from 'expo-image-picker';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+
 import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { z } from 'zod';
 import { createChatRoomSchema } from '../schema';
 
 const { width } = Dimensions.get('window');
-
+type MimeType = 'image/jpeg' | 'image/png';
 export const CreateChatRoom = () => {
   const {
     control,
     formState: { errors, isSubmitting },
     handleSubmit,
+    setValue,
   } = useForm<z.infer<typeof createChatRoomSchema>>({
     defaultValues: {
-      channel_name: '',
+      name: '',
       description: '',
-      image_url: '',
     },
     resolver: zodResolver(createChatRoomSchema),
   });
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 0.5,
+    });
 
+    console.log(result);
+
+    if (!result.canceled) {
+      setValue('image', {
+        type: result.assets[0].mimeType as MimeType,
+        uri: result.assets[0].uri,
+        name: result.assets[0].fileName!,
+        size: result.assets[0].fileSize!,
+      });
+    }
+  };
   const onSubmit = (data: z.infer<typeof createChatRoomSchema>) => {
     console.log(data);
   };
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
-        <TouchableOpacity activeOpacity={0.6} style={styles.imageContainer}>
+        <TouchableOpacity
+          activeOpacity={0.6}
+          style={styles.imageContainer}
+          onPress={pickImage}
+        >
           <Feather color={colors.white} name="image" size={width * 0.2} />
           <View style={styles.abs}>
             <Feather
@@ -45,7 +69,7 @@ export const CreateChatRoom = () => {
           control={control}
           errors={errors}
           label=""
-          name="channel_name"
+          name="name"
           placeholder="Room Name"
         />
         <CustomInput
