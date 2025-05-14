@@ -117,6 +117,8 @@ export type ChannelType = Models.Document & {
   members: string[];
   last_message: string;
   last_message_time: number;
+  description: string;
+  image_url: string;
 };
 
 export type PendingMembersType = Models.Document & {

@@ -6,14 +6,17 @@ import {
   KeyboardAvoidingView,
   KeyboardTypeOptions,
   Platform,
+  StyleProp,
   StyleSheet,
   Text,
   TextInput,
+  TextInputProps,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 
-type Props = {
+type Props = TextInputProps & {
   label: string;
   placeholder: string;
   password?: boolean;
@@ -24,6 +27,7 @@ type Props = {
   control: Control<any>;
   type?: KeyboardTypeOptions;
   onEditFinish?: () => void;
+  containerStyle?: StyleProp<ViewStyle>;
 };
 export const CustomInput = ({
   label,
@@ -36,6 +40,8 @@ export const CustomInput = ({
   control,
   type = 'default',
   onEditFinish,
+  containerStyle,
+  ...rest
 }: Props) => {
   const onPress = () => {
     if (toggleSecure) {
@@ -51,13 +57,17 @@ export const CustomInput = ({
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer, containerStyle]}>
           <Controller
             control={control}
             render={({ field: { onBlur, value, onChange } }) => (
               <TextInput
                 placeholder={placeholder}
-                style={{ flex: 1, fontFamily: 'NunitoRegular', fontSize: 15 }}
+                style={[
+                  { flex: 1, fontFamily: 'NunitoRegular', fontSize: 15 },
+                  rest.style,
+                ]}
+                placeholderTextColor={colors.gray}
                 secureTextEntry={secureTextEntry}
                 onBlur={onBlur}
                 value={value}
@@ -65,6 +75,7 @@ export const CustomInput = ({
                 keyboardType={type}
                 autoCapitalize="none"
                 onEndEditing={onEndEditing}
+                {...rest}
               />
             )}
             name={name}

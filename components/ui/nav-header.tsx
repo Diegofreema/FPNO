@@ -34,6 +34,7 @@ export const NavHeader = ({
           justifyContent: 'space-between',
           zIndex: 4,
           alignItems: 'center',
+          gap: 7,
         },
         style,
       ]}

@@ -9,12 +9,12 @@ import { TouchableOpacity } from 'react-native';
 export const ChatHeader = () => {
   const router = useRouter();
   const onPress = () => {
-    router.push('/new-chat');
+    router.push('/create-chat-room');
   };
   return (
     <HStack
       leftContent={() => (
-        <Title text="Chat" textStyle={{ color: colors.black }} />
+        <Title text="Chat Rooms" textStyle={{ color: colors.black }} />
       )}
       rightContent={() => (
         <TouchableOpacity activeOpacity={0.7} hitSlop={10} onPress={onPress}>
