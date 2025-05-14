@@ -119,6 +119,7 @@ export type ChannelType = Models.Document & {
   last_message_time: number;
   description: string;
   image_url: string;
+  members_count: number;
 };
 
 export type PendingMembersType = Models.Document & {

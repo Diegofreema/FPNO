@@ -7,18 +7,30 @@ import * as ImagePicker from 'expo-image-picker';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
-import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useAuth } from '@/lib/zustand/useAuth';
+import { Image } from 'expo-image';
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { z } from 'zod';
-import { createChatRoomSchema } from '../schema';
+import { useCreateChatRoom } from '../api/use-create-chat-room';
+import { CreateChatRoomSchema, createChatRoomSchema } from '../schema';
 
 const { width } = Dimensions.get('window');
 type MimeType = 'image/jpeg' | 'image/png';
 export const CreateChatRoom = () => {
+  const { mutateAsync } = useCreateChatRoom();
+  const user = useAuth((state) => state.user);
   const {
     control,
     formState: { errors, isSubmitting },
     handleSubmit,
     setValue,
+    watch,
   } = useForm<z.infer<typeof createChatRoomSchema>>({
     defaultValues: {
       name: '',
@@ -34,20 +46,22 @@ export const CreateChatRoom = () => {
       quality: 0.5,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setValue('image', {
         type: result.assets[0].mimeType as MimeType,
         uri: result.assets[0].uri,
-        name: result.assets[0].fileName!,
+        name: new Date().toISOString(),
         size: result.assets[0].fileSize!,
       });
     }
   };
-  const onSubmit = (data: z.infer<typeof createChatRoomSchema>) => {
-    console.log(data);
+  const onSubmit = async (data: CreateChatRoomSchema) => {
+    await mutateAsync({ ...data, creatorId: user?.id! });
   };
+  const { image } = watch();
+  const imageUrl = image?.uri;
+  console.log({ errors, image });
+
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
@@ -56,15 +70,35 @@ export const CreateChatRoom = () => {
           style={styles.imageContainer}
           onPress={pickImage}
         >
-          <Feather color={colors.white} name="image" size={width * 0.2} />
-          <View style={styles.abs}>
-            <Feather
-              name="camera"
-              color={colors.lightblue}
-              size={width * 0.05}
+          {imageUrl ? (
+            <Image
+              style={{ width: '100%', height: '100%', borderRadius: 1000 }}
+              contentFit="cover"
+              source={imageUrl}
             />
-          </View>
+          ) : (
+            <View
+              style={{
+                width: '100%',
+                height: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Feather color={colors.white} name="image" size={width * 0.2} />
+              <View style={styles.abs}>
+                <Feather
+                  name="camera"
+                  color={colors.lightblue}
+                  size={width * 0.05}
+                />
+              </View>
+            </View>
+          )}
         </TouchableOpacity>
+        {errors['image'] && (
+          <Text style={{ color: colors.red }}>{errors['image'].message}</Text>
+        )}
         <CustomInput
           control={control}
           errors={errors}
@@ -79,6 +113,7 @@ export const CreateChatRoom = () => {
           name="description"
           placeholder="Describe this room, this will enable people to know what this room is about"
           numberOfLines={5}
+          maxLength={200}
           multiline
           style={{
             height: 150,

@@ -5,7 +5,8 @@ import {
   PROJECT_ID,
 } from '@/config';
 import { databases, storage } from '@/db/appwrite';
-import { ID, Query } from 'react-native-appwrite';
+import { ChannelType } from '@/types';
+import { AppwriteException, ID, Query } from 'react-native-appwrite';
 import { CreateChatRoomSchema } from './schema';
 
 export const createChatRoom = async ({
@@ -28,30 +29,33 @@ export const createChatRoom = async ({
     const chatRoomInDb = await databases.listDocuments(
       DATABASE_ID,
       CHAT_COLLECTION_ID,
-      [Query.equal('name', name)]
+      [Query.equal('channel_name', name)]
     );
     if (chatRoomInDb.documents.length > 0) {
       throw new Error('Chat room already exists');
     }
-    const chatRoom = await databases.createDocument(
+    const chatRoom = await databases.createDocument<ChannelType>(
       DATABASE_ID,
       CHAT_COLLECTION_ID,
       ID.unique(),
       {
         channel_name: name,
-        description,
-        image: id,
         creator_id: creatorId,
-        image_url: link,
-        image_id: id,
         members: [creatorId],
         admin_ids: [creatorId],
+        description,
+        image_url: link,
+        image_id: id,
       }
     );
     return chatRoom;
   } catch (error) {
     console.log(error);
+    const errorMessage =
+      error instanceof AppwriteException
+        ? error.message
+        : 'Failed to create chat room';
 
-    throw new Error('Failed to create chat room');
+    throw new Error(errorMessage);
   }
 };
