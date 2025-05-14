@@ -2,6 +2,7 @@ import { Avatar } from '@/components/ui/avatar';
 import { CustomPressable } from '@/components/ui/custom-pressable';
 import { HStack } from '@/components/ui/h-stack';
 import { colors } from '@/constants';
+import { formatNumber } from '@/helper';
 import { useAuth } from '@/lib/zustand/useAuth';
 import { ChannelType } from '@/types';
 import { Text, View } from 'react-native';
@@ -41,17 +42,20 @@ type RightProps = {
   isMember: boolean;
   membersCount: number;
 };
-const Right = ({ name, lastMessage }: RightProps) => {
+const Right = ({ name, lastMessage, isMember, membersCount }: RightProps) => {
+  const textToDisplay = isMember
+    ? lastMessage
+    : `${formatNumber(membersCount)} member(s)`;
+
   return (
     <View style={{ gap: 5 }}>
       <Text style={{ fontSize: RFPercentage(1.6), fontWeight: 'bold' }}>
         {name}
       </Text>
-      {lastMessage && (
-        <Text style={{ fontSize: RFPercentage(1.4), color: colors.textGray }}>
-          {lastMessage}
-        </Text>
-      )}
+
+      <Text style={{ fontSize: RFPercentage(1.4), color: colors.textGray }}>
+        {textToDisplay}
+      </Text>
     </View>
   );
 };

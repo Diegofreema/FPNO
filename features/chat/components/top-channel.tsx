@@ -17,7 +17,7 @@ export const TopChannel = ({ channel }: Props) => {
   };
   return (
     <CustomPressable onPress={onPress}>
-      <Avatar size={width * 0.15} imgSrc={channel.image_url} />
+      <Avatar size={width / 6} imgSrc={channel.image_url} />
     </CustomPressable>
   );
 };

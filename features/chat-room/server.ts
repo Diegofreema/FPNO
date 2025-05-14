@@ -63,7 +63,7 @@ export const getTopChatRooms = async () => {
     const chatRooms = await databases.listDocuments<ChannelType>(
       DATABASE_ID,
       CHAT_COLLECTION_ID,
-      [Query.limit(10), Query.orderDesc('members_count')]
+      [Query.limit(5), Query.orderDesc('members_count')]
     );
 
     return chatRooms;
@@ -96,6 +96,47 @@ export const getChannelsIamIn = async ({
       query
     );
     return chatRooms;
+  } catch (error) {
+    console.log(error);
+    const errorMessage =
+      error instanceof Error ? error.message : 'Failed to load chat rooms';
+
+    throw new Error(errorMessage);
+  }
+};
+
+export const exploreRooms = async ({
+  creatorId,
+  more,
+  search,
+}: {
+  creatorId: string;
+  more: number;
+  search?: string;
+}) => {
+  try {
+    const query = [
+      Query.limit(25 + more),
+      Query.notEqual('creator_id', creatorId),
+    ];
+
+    if (search) {
+      query.push(Query.search('channel_name', search));
+    }
+
+    const rooms = await databases.listDocuments<ChannelType>(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      query
+    );
+
+    const finalRooms = rooms.documents.filter(
+      (r) => !r.members.includes(creatorId)
+    );
+    return {
+      ...rooms,
+      documents: finalRooms,
+    };
   } catch (error) {
     console.log(error);
     const errorMessage =
