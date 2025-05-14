@@ -110,9 +110,8 @@ export type UserType = Models.Document & {
   matriculation_number?: string;
 };
 
-export type ChatRoomType = Models.Document & {
-  conversation_name: string;
-  type: 'GROUP' | 'SINGLE';
+export type ChannelType = Models.Document & {
+  channel_name: string;
   creator_id: string;
   admin_ids: string[];
   members: string[];
@@ -120,9 +119,14 @@ export type ChatRoomType = Models.Document & {
   last_message_time: number;
 };
 
+export type PendingMembersType = Models.Document & {
+  channel_id: string;
+  member_id: string;
+};
+
 export type ChatMessageType = Models.Document & {
   sender_id: string;
-  conversation_id: string;
+  channel_id: string;
   message: string;
   seen_ids: string[];
   sent_to: string[];
