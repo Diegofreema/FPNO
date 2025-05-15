@@ -1,32 +1,48 @@
 import { ErrorComponent } from '@/components/ui/error-component';
 import { Loading } from '@/components/ui/loading';
 import { Wrapper } from '@/components/ui/wrapper';
+import {
+  useGetMember,
+  useGetPendingMember,
+} from '@/features/chat-room/api/use-get-member';
 import { useGetConversationWithMessages } from '@/features/chat/api/use-get-conversation';
 import { ChatNav } from '@/features/chat/components/chat-nav';
-import { checkIfIsMember, formatNumber } from '@/helper';
+import { formatNumber } from '@/helper';
 import { useIsCreator } from '@/hooks/useIsCreator';
-import { useAuth } from '@/lib/zustand/useAuth';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 
 const ChatId = () => {
   const { chatId } = useLocalSearchParams<{ chatId: string }>();
   const [more] = useState(0);
-  const id = useAuth((state) => state.user?.id!);
+
   const { data, isPending, isError, error, refetch } =
     useGetConversationWithMessages({ roomId: chatId, offSet: more });
+  const {
+    data: member,
+    isPending: isPendingMember,
+    isError: isErrorMember,
+    error: errorMember,
+  } = useGetMember({ channel_id: chatId });
+  const {
+    data: pendingMember,
+    isPending: isPendingPendingMember,
+    isError: isErrorPendingMember,
+    error: errorPendingMember,
+  } = useGetPendingMember({ channel_id: chatId });
   const isCreator = useIsCreator({ creatorId: data?.creator_id });
-
-  if (isError) {
-    return <ErrorComponent onPress={refetch} title={error.message} />;
+  const errorMessage =
+    error?.message || errorMember?.message || errorPendingMember?.message;
+  if (isError || isErrorMember || isErrorPendingMember) {
+    return <ErrorComponent onPress={refetch} title={errorMessage} />;
   }
 
-  if (isPending) {
+  if (isPending || isPendingMember || isPendingPendingMember) {
     return <Loading />;
   }
 
   const followersText = `${formatNumber(data?.members_count)} members`;
-  const isMember = checkIfIsMember(data.members, id);
+
   return (
     <Wrapper>
       <ChatNav
@@ -35,7 +51,8 @@ const ChatId = () => {
         imageUrl={data.image_url}
         channelId={chatId}
         isCreator={isCreator}
-        isMember={isMember}
+        isMember={!!member.total}
+        isInPending={!!pendingMember.total}
       />
     </Wrapper>
   );

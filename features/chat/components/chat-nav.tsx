@@ -51,7 +51,7 @@ export const ChatNav = ({
             text={name}
             textStyle={{
               fontFamily: 'NunitoRegular',
-              fontSize: RFPercentage(2.5),
+              fontSize: RFPercentage(2.2),
               color: colors.black,
             }}
           />
@@ -69,9 +69,9 @@ export const ChatNav = ({
       </CustomPressable>
 
       {isMember ? (
-        <JoinBtn roomId={channelId} isInPending={isInPending} />
-      ) : (
         <ChatMenu menuItems={menuItems} />
+      ) : (
+        <JoinBtn roomId={channelId} isInPending={isInPending} />
       )}
     </View>
   );

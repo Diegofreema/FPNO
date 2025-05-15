@@ -3,7 +3,6 @@ import {
   CHAT_COLLECTION_ID,
   DATABASE_ID,
   MEMBER_ID,
-  PENDING_ID,
   PROJECT_ID,
 } from '@/config';
 import { databases, storage } from '@/db/appwrite';
@@ -15,7 +14,7 @@ import {
   MemberType,
 } from '@/types';
 import { ID, Query } from 'react-native-appwrite';
-import { CreateChatRoomSchema, JoinModelType, JoinType } from './schema';
+import { CreateChatRoomSchema, JoinType } from './schema';
 
 export const createChatRoom = async ({
   name,
@@ -49,7 +48,7 @@ export const createChatRoom = async ({
       {
         channel_name: name,
         creator_id: creatorId,
-        last_message_time: Date.now(),
+        last_message_time: new Date().toISOString(),
         description,
         image_url: link,
         image_id: id,
@@ -64,7 +63,7 @@ export const createChatRoom = async ({
       {
         channel_id: chatRoom.$id,
         member_id: creatorId,
-        accessRole: MemberAccessRole.ADMIN,
+        access_role: MemberAccessRole.ADMIN,
         status: MemberStatus.ACCEPTED,
       }
     );
@@ -92,7 +91,7 @@ export const getTopChatRooms = async () => {
     throw new Error(errorMessage);
   }
 };
-
+const BASE_LIMIT = 25;
 export const getChannelsIamIn = async ({
   userId,
   search,
@@ -106,22 +105,33 @@ export const getChannelsIamIn = async ({
     const channelsThatIAmIn = await databases.listDocuments<MemberType>(
       DATABASE_ID,
       MEMBER_ID,
-      [Query.equal('member_id', userId)]
+      [
+        Query.equal('member_id', userId),
+        Query.equal('status', MemberStatus.ACCEPTED),
+      ]
     );
 
     const channelIds = channelsThatIAmIn.documents.map(
       (item) => item.channel_id
     );
 
-    const query = [Query.limit(25 + more)];
-
-    if (channelIds.length > 0) {
-      query.push(Query.equal('$id', channelIds));
-    }
-    if (search) {
-      query.push(Query.search('channel_name', search));
+    // If no channels, return empty result
+    if (channelIds.length === 0) {
+      return { documents: [], total: 0 };
     }
 
+    // Build query
+    const query = [Query.equal('$id', channelIds)];
+
+    // Add search if provided and valid
+    if (search && search.trim()) {
+      query.push(Query.search('channel_name', search.trim()));
+    }
+
+    // Add limit last for better performance
+    query.push(Query.limit(BASE_LIMIT + more));
+
+    // Fetch channels
     const chatRooms = await databases.listDocuments<ChannelType>(
       DATABASE_ID,
       CHAT_COLLECTION_ID,
@@ -200,27 +210,28 @@ export const exploreRooms = async ({
 export const joinRoom = async ({
   channel_id,
   member_to_join,
-}: JoinType): Promise<JoinModelType> => {
+}: JoinType): Promise<MemberType> => {
   try {
     const isAlreadyInPendingList = await databases.listDocuments(
       DATABASE_ID,
-      PENDING_ID,
+      MEMBER_ID,
       [
         Query.equal('channel_id', channel_id),
-        Query.equal('member_to_join', member_to_join),
+        Query.equal('member_id', member_to_join),
+        Query.equal('status', MemberStatus.PENDING),
       ]
     );
     if (isAlreadyInPendingList.documents.length > 0) {
       throw new Error('You have already sent a request to join this room');
     }
 
-    const pending = await databases.createDocument<JoinModelType>(
+    const pending = await databases.createDocument<MemberType>(
       DATABASE_ID,
-      PENDING_ID,
+      MEMBER_ID,
       ID.unique(),
       {
         channel_id,
-        member_to_join,
+        member_id: member_to_join,
       }
     );
 
@@ -286,6 +297,37 @@ export const getMember = async ({
         Query.equal('channel_id', channel_id),
         Query.equal('member_id', member_id),
         Query.equal('status', MemberStatus.ACCEPTED),
+      ]
+    );
+
+    return member;
+  } catch (error) {
+    throw new Error(generateErrorMessage(error, 'Failed to get member'));
+  }
+};
+export const getPendingMember = async ({
+  member_id,
+  channel_id,
+}: {
+  member_id: string;
+  channel_id: string;
+}) => {
+  try {
+    const channel = await databases.getDocument<ChannelType>(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      channel_id
+    );
+    if (!channel) {
+      throw new Error('Channel not found');
+    }
+    const member = await databases.listDocuments<MemberType>(
+      DATABASE_ID,
+      MEMBER_ID,
+      [
+        Query.equal('channel_id', channel_id),
+        Query.equal('member_id', member_id),
+        Query.equal('status', MemberStatus.PENDING),
       ]
     );
 

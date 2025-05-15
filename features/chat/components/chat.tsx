@@ -22,14 +22,15 @@ export const Chat = () => {
     refetch: refetchChannel,
     error: channelError,
   } = useGetChannelIAmIn({ more, search });
-  console.log({ error, channelError });
 
   const handleRefetch = () => {
     refetch();
     refetchChannel();
   };
+
+  const errorMessage = channelError?.message || error?.message;
   if (isError || isChannelError) {
-    return <ErrorComponent onPress={handleRefetch} />;
+    return <ErrorComponent onPress={handleRefetch} title={errorMessage} />;
   }
 
   if (isPending || isChannelPending) {

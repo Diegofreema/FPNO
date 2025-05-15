@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { colors } from '@/constants';
 import { ChannelTypeWithPendingMembers } from '@/types';
 import { LegendList } from '@legendapp/list';
-import { useRouter } from 'expo-router';
+import { Href, usePathname, useRouter } from 'expo-router';
 import { View } from 'react-native';
 import { RenderRoom } from './render-room';
 
@@ -30,17 +30,27 @@ export const RenderRooms = ({ channels, handleLoadMore }: Props) => {
 
 export const EmptyComponent = () => {
   const router = useRouter();
+  const pathname = usePathname();
+  const isExplorePage = pathname === '/explore';
+  const text = isExplorePage
+    ? 'No chat room found'
+    : 'You are not in any chat room';
+  const buttonText = isExplorePage
+    ? 'Create a chat room'
+    : 'Explore chat rooms';
+
+  const path: Href = isExplorePage ? '/create-chat-room' : '/explore';
   const onPress = () => {
-    router.push('/explore');
+    router.push(path);
   };
   return (
-    <View>
+    <View style={{ marginTop: isExplorePage ? 50 : 0 }}>
       <Title
-        text="You are not in any chat room"
+        text={text}
         textStyle={{ color: colors.black, textAlign: 'center' }}
       />
       <Button
-        text="Explore"
+        text={buttonText}
         onPress={onPress}
         style={{ backgroundColor: 'transparent' }}
         textStyle={{ color: colors.lightblue }}
