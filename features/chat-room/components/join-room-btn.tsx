@@ -7,21 +7,23 @@ import { useJoinGroup } from '../api/use-join-group';
 
 type Props = {
   roomId: string;
+  isInPending: boolean;
 };
 
-export const JoinBtn = ({ roomId }: Props) => {
+export const JoinBtn = ({ roomId, isInPending }: Props) => {
   const userId = useAuth((state) => state.user?.id!);
   const { mutateAsync, isPending } = useJoinGroup();
   const onPress = async () => {
     await mutateAsync({ channel_id: roomId, member_to_join: userId });
   };
+  const text = isInPending ? 'Pending' : 'Join';
   return (
     <CustomPressable
       style={styles.followBtn}
-      disabled={isPending}
+      disabled={isPending || isInPending}
       onPress={onPress}
     >
-      <Text style={styles.followText}>Join</Text>
+      <Text style={styles.followText}>{text}</Text>
     </CustomPressable>
   );
 };

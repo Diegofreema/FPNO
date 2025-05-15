@@ -4,8 +4,13 @@ import { JoinBtn } from './join-room-btn';
 type OuterRightProps = {
   isMember: boolean;
   roomId: string;
+  isInPending: boolean;
 };
-export const OuterRight = ({ isMember, roomId }: OuterRightProps) => {
+export const OuterRight = ({
+  isMember,
+  roomId,
+  isInPending,
+}: OuterRightProps) => {
   if (isMember) {
     return (
       <View>
@@ -14,5 +19,5 @@ export const OuterRight = ({ isMember, roomId }: OuterRightProps) => {
     );
   }
 
-  return <JoinBtn roomId={roomId} />;
+  return <JoinBtn roomId={roomId} isInPending={isInPending} />;
 };

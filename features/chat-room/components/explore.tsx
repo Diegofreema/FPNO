@@ -29,6 +29,7 @@ export const Explore = () => {
     if (documents.length >= total) return;
     setMore(more + 10);
   };
+
   return (
     <View style={{ flex: 1 }}>
       <NavHeader title="Explore chat rooms" />

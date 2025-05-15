@@ -142,7 +142,7 @@ export const exploreRooms = async ({
 
       return {
         ...room,
-        pendingMembers: pendingMembersResponse.documents, // Use documents array
+        pendingMembers: pendingMembersResponse.documents,
       };
     });
 

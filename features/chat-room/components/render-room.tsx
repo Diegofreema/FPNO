@@ -2,23 +2,32 @@ import { Avatar } from '@/components/ui/avatar';
 import { CustomPressable } from '@/components/ui/custom-pressable';
 import { HStack } from '@/components/ui/h-stack';
 import { colors } from '@/constants';
-import { formatNumber } from '@/helper';
+import { formatNumber, trimText } from '@/helper';
 import { useAuth } from '@/lib/zustand/useAuth';
-import { ChannelType } from '@/types';
+import { ChannelTypeWithPendingMembers } from '@/types';
+import { router, usePathname } from 'expo-router';
 import { Text, View } from 'react-native';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import { OuterRight } from './outer-right';
 
 type Props = {
-  room: ChannelType;
+  room: ChannelTypeWithPendingMembers;
 };
 
 export const RenderRoom = ({ room }: Props) => {
   const userId = useAuth((state) => state.user?.id!);
   const isMember = room.members.some((member) => member === userId);
+  const isInPending = room?.pendingMembers?.some(
+    (member) => member.member_to_join === userId
+  );
   const membersCount = room.members.length;
+  const pathname = usePathname();
+  const disabled = pathname === '/explore';
+  const onPress = () => {
+    router.push(`/chat/${room.$id}`);
+  };
   return (
-    <CustomPressable>
+    <CustomPressable disabled={disabled} onPress={onPress}>
       <HStack
         justifyContent="space-between"
         alignItems="center"
@@ -29,10 +38,15 @@ export const RenderRoom = ({ room }: Props) => {
             isMember={isMember}
             membersCount={membersCount}
             name={room.channel_name}
+            lastMessage={trimText(room.last_message, 40)}
           />
         )}
         rightContent={() => (
-          <OuterRight isMember={isMember} roomId={room.$id} />
+          <OuterRight
+            isMember={isMember}
+            roomId={room.$id}
+            isInPending={isInPending || false}
+          />
         )}
       />
     </CustomPressable>
@@ -82,7 +96,11 @@ const Left = ({
 const Right = ({ name, lastMessage, isMember, membersCount }: RightProps) => {
   const textToDisplay = isMember
     ? lastMessage
-    : `${formatNumber(membersCount)} member(s)`;
+    : `${formatNumber(membersCount)} ${
+        membersCount > 1 ? 'members' : 'member'
+      }`;
+
+  console.log({ lastMessage });
 
   return (
     <View style={{ flex: 1 }}>
