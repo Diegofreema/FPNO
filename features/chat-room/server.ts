@@ -46,10 +46,10 @@ export const createChatRoom = async ({
       CHAT_COLLECTION_ID,
       ID.unique(),
       {
-        channel_name: name,
+        channel_name: name.trim(),
         creator_id: creatorId,
         last_message_time: new Date().toISOString(),
-        description,
+        description: description?.trim(),
         image_url: link,
         image_id: id,
         last_message: `The chat room "${name}" was created`,
@@ -191,7 +191,10 @@ export const exploreRooms = async ({
 
     // Filter out rooms where creatorId is in members
     const finalRooms = roomsWithPendingMembers.filter((room) => {
-      return !room.pendingMembers.some((member) => member.member_id === userId);
+      return !room.pendingMembers.some(
+        (member) =>
+          member.member_id === userId && member.status === MemberStatus.ACCEPTED
+      );
     });
 
     return {

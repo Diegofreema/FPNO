@@ -1,12 +1,21 @@
+import { ErrorComponent } from '@/components/ui/error-component';
 import { useAuth } from '@/lib/zustand/useAuth';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
-import { SplashScreen, Stack, useSegments } from 'expo-router';
+import {
+  ErrorBoundaryProps,
+  SplashScreen,
+  Stack,
+  useSegments,
+} from 'expo-router';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { MenuProvider } from 'react-native-popup-menu';
 import { Toaster } from 'sonner-native';
 
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  return <ErrorComponent onPress={retry} title={error.message} />;
+}
 SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
 export default function RootLayout() {

@@ -3,11 +3,7 @@ import { Avatar } from '@/components/ui/avatar';
 import { CustomPressable } from '@/components/ui/custom-pressable';
 import { HStack } from '@/components/ui/h-stack';
 import { colors } from '@/constants';
-import {
-  checkIfIsInPending,
-  formatNumber,
-  trimText
-} from '@/helper';
+import { checkIfIsInPending, formatNumber, trimText } from '@/helper';
 import { useAuth } from '@/lib/zustand/useAuth';
 import { ChannelTypeWithPendingMembers } from '@/types';
 import { router, usePathname } from 'expo-router';
@@ -22,23 +18,22 @@ type Props = {
 
 export const RenderRoom = ({ room }: Props) => {
   const userId = useAuth((state) => state.user?.id!);
-   const {
-     data: member,
-     isPending: isPendingMember,
-     isError: isErrorMember,
-     
-   } = useGetMember({ channel_id: room.$id });
-   const pathname = usePathname();
-  const isMember = !!member
+  const {
+    data: member,
+    isPending: isPendingMember,
+    isError: isErrorMember,
+  } = useGetMember({ channel_id: room.$id });
+  const pathname = usePathname();
+  const isMember = !!member?.total;
   const isInPending = checkIfIsInPending(room?.pendingMembers, userId);
   const membersCount = room.members_count;
   const disabled = pathname === '/explore';
-  if(isErrorMember) {
-    throw new Error('Failed to get data' )
-  };
+  if (isErrorMember) {
+    throw new Error('Failed to get data');
+  }
 
-  if(isPendingMember) {
-    return <ChatLoader length={1} />
+  if (isPendingMember) {
+    return <ChatLoader length={1} />;
   }
   const onPress = () => {
     router.push(`/chat/${room.$id}`);

@@ -15,6 +15,8 @@ export const useJoinGroup = () => {
       toast.success('Your request has been sent');
       query.invalidateQueries({ queryKey: ['chat-rooms'] });
       query.invalidateQueries({ queryKey: ['channels-i-am-in'] });
+      query.invalidateQueries({ queryKey: ['pending-member'] });
+      query.invalidateQueries({ queryKey: ['member'] });
       query.invalidateQueries({ queryKey: ['explore-rooms'] });
 
       // ! to add more later
