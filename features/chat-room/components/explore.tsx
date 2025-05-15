@@ -12,7 +12,7 @@ export const Explore = () => {
   const [value, setValue] = useState('');
   const [search] = useDebounce(value, 500);
   const [more, setMore] = useState(0);
-  const { data, isPending, isError, refetch } = useExploreRooms({
+  const { data, isPending, isError, refetch, isRefetching } = useExploreRooms({
     more,
     search,
   });
@@ -30,6 +30,10 @@ export const Explore = () => {
     setMore(more + 10);
   };
 
+  const refresh = () => {
+    refetch();
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <NavHeader title="Explore chat rooms" />
@@ -39,7 +43,12 @@ export const Explore = () => {
         onChangeText={setValue}
       />
 
-      <RenderRooms channels={documents} handleLoadMore={handleMore} />
+      <RenderRooms
+        channels={documents}
+        handleLoadMore={handleMore}
+        refresh={refresh}
+        isRefreshing={isRefetching}
+      />
     </View>
   );
 };

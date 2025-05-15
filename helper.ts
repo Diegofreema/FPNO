@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { format, isToday, isYesterday, parseISO } from 'date-fns';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import { MemberType, userData } from './types';
@@ -218,4 +219,26 @@ export const checkIfIsInPending = (
 ) => {
   if (!pendingMembers?.length) return false;
   return pendingMembers?.some((item) => item.member_id === userId);
+};
+
+export const formatMessageTime = (timestamp: string | Date): string => {
+  try {
+    // Parse timestamp if it's a string
+    const date =
+      typeof timestamp === 'string' ? parseISO(timestamp) : timestamp;
+
+    if (isToday(date)) {
+      // Today: Show time like "12:34 PM"
+      return format(date, 'h:mm a');
+    } else if (isYesterday(date)) {
+      // Yesterday: Show "Yesterday"
+      return 'Yesterday';
+    } else {
+      // Older: Show date like "MM/DD/YY"
+      return format(date, 'MM/dd/yy');
+    }
+  } catch (error) {
+    console.error('Error formatting timestamp:', error);
+    return 'Invalid date';
+  }
 };

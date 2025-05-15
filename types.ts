@@ -123,7 +123,7 @@ export type ChannelType = Models.Document & {
   channel_name: string;
   creator_id: string;
   last_message: string;
-  last_message_time: number;
+  last_message_time: string;
   description: string;
   image_url: string;
   members_count: number;

@@ -21,6 +21,7 @@ export const Chat = () => {
     isError: isChannelError,
     refetch: refetchChannel,
     error: channelError,
+    isRefetching,
   } = useGetChannelIAmIn({ more, search });
 
   const handleRefetch = () => {
@@ -54,7 +55,12 @@ export const Chat = () => {
         onChangeText={setValue}
       />
       <TopChannels channels={data.documents} />
-      <RenderRooms channels={documents} handleLoadMore={handleLoadMore} />
+      <RenderRooms
+        channels={documents}
+        handleLoadMore={handleLoadMore}
+        isRefreshing={isRefetching}
+        refresh={refetch}
+      />
     </View>
   );
 };

@@ -51,6 +51,7 @@ export const RenderRoom = ({ room }: Props) => {
             membersCount={membersCount}
             name={room.channel_name}
             lastMessage={trimText(room.last_message, 40)}
+            lastMessageTime={room.last_message_time}
           />
         )}
         rightContent={() => (
@@ -58,6 +59,7 @@ export const RenderRoom = ({ room }: Props) => {
             isMember={isMember}
             roomId={room.$id}
             isInPending={isInPending || false}
+            lastMessageTime={room.last_message_time}
           />
         )}
       />
@@ -70,11 +72,13 @@ type RightProps = {
   lastMessage?: string;
   isMember: boolean;
   membersCount: number;
+  lastMessageTime: string;
 };
 
 type LeftProps = {
   name: string;
   lastMessage?: string;
+  lastMessageTime?: string;
   isMember: boolean;
   membersCount: number;
   image: string;
@@ -85,6 +89,7 @@ const Left = ({
   membersCount,
   name,
   lastMessage,
+  lastMessageTime,
 }: LeftProps) => {
   return (
     <HStack
@@ -99,6 +104,7 @@ const Left = ({
           lastMessage={lastMessage}
           isMember={isMember}
           membersCount={membersCount}
+          lastMessageTime={lastMessageTime!}
         />
       )}
     />
@@ -111,8 +117,6 @@ const Right = ({ name, lastMessage, isMember, membersCount }: RightProps) => {
     : `${formatNumber(membersCount)} ${
         membersCount > 1 ? 'members' : 'member'
       }`;
-
-  console.log({ lastMessage });
 
   return (
     <View style={{ flex: 1 }}>
