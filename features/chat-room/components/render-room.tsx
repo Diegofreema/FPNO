@@ -2,7 +2,12 @@ import { Avatar } from '@/components/ui/avatar';
 import { CustomPressable } from '@/components/ui/custom-pressable';
 import { HStack } from '@/components/ui/h-stack';
 import { colors } from '@/constants';
-import { formatNumber, trimText } from '@/helper';
+import {
+  checkIfIsInPending,
+  checkIfIsMember,
+  formatNumber,
+  trimText,
+} from '@/helper';
 import { useAuth } from '@/lib/zustand/useAuth';
 import { ChannelTypeWithPendingMembers } from '@/types';
 import { router, usePathname } from 'expo-router';
@@ -16,10 +21,8 @@ type Props = {
 
 export const RenderRoom = ({ room }: Props) => {
   const userId = useAuth((state) => state.user?.id!);
-  const isMember = room.members.some((member) => member === userId);
-  const isInPending = room?.pendingMembers?.some(
-    (member) => member.member_to_join === userId
-  );
+  const isMember = checkIfIsMember(room?.members, userId);
+  const isInPending = checkIfIsInPending(room?.pendingMembers, userId);
   const membersCount = room.members.length;
   const pathname = usePathname();
   const disabled = pathname === '/explore';

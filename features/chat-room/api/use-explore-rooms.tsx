@@ -11,7 +11,7 @@ export const useExploreRooms = ({ more, search }: Props) => {
   const userId = useAuth((state) => state.user?.id!);
   return useQuery({
     queryKey: ['explore-rooms', userId, search, more],
-    queryFn: () => exploreRooms({ search, creatorId: userId, more }),
+    queryFn: () => exploreRooms({ search, userId, more }),
     placeholderData: keepPreviousData,
   });
 };

@@ -51,3 +51,8 @@ export const getConversationWithMessages = async ({
     throw new Error(generateErrorMessage(error, 'Failed to get chat room'));
   }
 };
+
+export const getMembers = async ({ channel_id }: { channel_id: string }) => {
+  try {
+  } catch (error) {}
+};

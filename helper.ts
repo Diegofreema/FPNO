@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
-import { userData } from './types';
+import { MemberType, userData } from './types';
 
 export const sendEmail = async (email: string, otp: string) => {
   const { data } = await axios.get(
@@ -206,4 +206,16 @@ export const generateErrorMessage = (
   const errorMessage = error instanceof Error ? error.message : message;
 
   return errorMessage;
+};
+
+export const checkIfIsMember = (members: string[], userId: string) => {
+  return members.includes(userId);
+};
+
+export const checkIfIsInPending = (
+  pendingMembers: MemberType[] = [],
+  userId: string
+) => {
+  if (!pendingMembers?.length) return false;
+  return pendingMembers?.some((item) => item.member_id === userId);
 };

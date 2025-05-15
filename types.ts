@@ -3,6 +3,15 @@ import { upcoming } from './data';
 
 export type DataType = (typeof upcoming)[0];
 
+export enum MemberAccessRole {
+  ADMIN = 'ADMIN',
+  MEMBER = 'MEMBER',
+}
+
+export enum MemberStatus {
+  PENDING = 'PENDING',
+  ACCEPTED = 'ACCEPTED',
+}
 export type DashBoardType = {
   outstandingassignment: string;
   registeredcourse: string;
@@ -113,8 +122,6 @@ export type UserType = Models.Document & {
 export type ChannelType = Models.Document & {
   channel_name: string;
   creator_id: string;
-  admin_ids: string[];
-  members: string[];
   last_message: string;
   last_message_time: number;
   description: string;
@@ -128,7 +135,14 @@ export type PendingMembersType = Models.Document & {
 };
 
 export type ChannelTypeWithPendingMembers = ChannelType & {
-  pendingMembers?: PendingMembersType[];
+  pendingMembers?: MemberType[];
+};
+
+export type MemberType = Models.Document & {
+  access_role: MemberAccessRole;
+  channel_id: string;
+  member_id: string;
+  status: MemberStatus;
 };
 
 export type ChatMessageType = Models.Document & {

@@ -20,8 +20,9 @@ export const Chat = () => {
     isPending: isChannelPending,
     isError: isChannelError,
     refetch: refetchChannel,
+    error: channelError,
   } = useGetChannelIAmIn({ more, search });
-  console.log(error);
+  console.log({ error, channelError });
 
   const handleRefetch = () => {
     refetch();

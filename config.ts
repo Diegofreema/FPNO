@@ -16,3 +16,4 @@ export const DATABASE_ID = process.env.EXPO_PUBLIC_DATABASE_ID!;
 export const BUCKET_ID = process.env.EXPO_PUBLIC_BUCKET_ID!;
 
 export const PENDING_ID = process.env.EXPO_PUBLIC_PENDING_ID!;
+export const MEMBER_ID = process.env.EXPO_PUBLIC_MEMBER_ID!;
