@@ -198,3 +198,12 @@ export function trimTextByWidth(
   // Trim text to fit within maxChars and append '...'
   return `${text.substring(0, maxChars)}...`;
 }
+
+export const generateErrorMessage = (
+  error: unknown,
+  message: string
+): string => {
+  const errorMessage = error instanceof Error ? error.message : message;
+
+  return errorMessage;
+};

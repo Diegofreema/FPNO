@@ -5,8 +5,9 @@ import { colors } from '@/constants';
 import { formatNumber } from '@/helper';
 import { useAuth } from '@/lib/zustand/useAuth';
 import { ChannelType } from '@/types';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { RFPercentage } from 'react-native-responsive-fontsize';
+import { OuterRight } from './outer-right';
 
 type Props = {
   room: ChannelType;
@@ -30,7 +31,9 @@ export const RenderRoom = ({ room }: Props) => {
             name={room.channel_name}
           />
         )}
-        rightContent={() => <OuterRight isMember={isMember} />}
+        rightContent={() => (
+          <OuterRight isMember={isMember} roomId={room.$id} />
+        )}
       />
     </CustomPressable>
   );
@@ -98,7 +101,6 @@ const Right = ({ name, lastMessage, isMember, membersCount }: RightProps) => {
       <Text
         style={{
           fontSize: RFPercentage(1.4),
-
           color: colors.textGray,
         }}
       >
@@ -107,35 +109,3 @@ const Right = ({ name, lastMessage, isMember, membersCount }: RightProps) => {
     </View>
   );
 };
-
-type OuterRightProps = {
-  isMember: boolean;
-};
-
-const OuterRight = ({ isMember }: OuterRightProps) => {
-  if (isMember) {
-    return (
-      <View>
-        <Text>ddfdf</Text>
-      </View>
-    );
-  }
-
-  return (
-    <CustomPressable style={styles.followBtn}>
-      <Text style={styles.followText}>Join</Text>
-    </CustomPressable>
-  );
-};
-
-const styles = StyleSheet.create({
-  followBtn: {
-    borderRadius: 15,
-    padding: 10,
-    paddingHorizontal: 20,
-    backgroundColor: colors.lightblue,
-  },
-  followText: {
-    color: colors.white,
-  },
-});

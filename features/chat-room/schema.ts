@@ -1,5 +1,5 @@
+import { Models } from 'react-native-appwrite';
 import { z } from 'zod';
-
 // Custom validator for ImagePickerAsset
 const imagePickerAssetSchema = z
   .object({
@@ -24,3 +24,12 @@ export const createChatRoomSchema = z.object({
 
 // Export inferred TypeScript type
 export type CreateChatRoomSchema = z.infer<typeof createChatRoomSchema>;
+
+export const joinRoomSchema = z.object({
+  channel_id: z.string(),
+  member_to_join: z.string(),
+});
+
+export type JoinType = z.infer<typeof joinRoomSchema>;
+
+export type JoinModelType = Models.Document & JoinType;

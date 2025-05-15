@@ -124,7 +124,11 @@ export type ChannelType = Models.Document & {
 
 export type PendingMembersType = Models.Document & {
   channel_id: string;
-  member_id: string;
+  member_to_join: string;
+};
+
+export type ChannelTypeWithPendingMembers = ChannelType & {
+  pendingMembers?: PendingMembersType[];
 };
 
 export type ChatMessageType = Models.Document & {

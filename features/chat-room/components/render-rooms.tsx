@@ -1,14 +1,14 @@
 import { Title } from '@/components/typography/title';
 import { Button } from '@/components/ui/button';
 import { colors } from '@/constants';
-import { ChannelType } from '@/types';
+import { ChannelTypeWithPendingMembers } from '@/types';
 import { LegendList } from '@legendapp/list';
 import { useRouter } from 'expo-router';
 import { View } from 'react-native';
 import { RenderRoom } from './render-room';
 
 type Props = {
-  channels: ChannelType[];
+  channels: ChannelTypeWithPendingMembers[];
   handleLoadMore: () => void;
 };
 

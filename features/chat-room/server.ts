@@ -2,12 +2,14 @@ import {
   BUCKET_ID,
   CHAT_COLLECTION_ID,
   DATABASE_ID,
+  PENDING_ID,
   PROJECT_ID,
 } from '@/config';
 import { databases, storage } from '@/db/appwrite';
+import { generateErrorMessage } from '@/helper';
 import { ChannelType } from '@/types';
 import { ID, Query } from 'react-native-appwrite';
-import { CreateChatRoomSchema } from './schema';
+import { CreateChatRoomSchema, JoinModelType, JoinType } from './schema';
 
 export const createChatRoom = async ({
   name,
@@ -117,6 +119,7 @@ export const exploreRooms = async ({
   try {
     const query = [
       Query.limit(25 + more),
+      Query.orderDesc('members_count'),
       Query.notEqual('creator_id', creatorId),
     ];
 
@@ -130,9 +133,26 @@ export const exploreRooms = async ({
       query
     );
 
-    const finalRooms = rooms.documents.filter(
-      (r) => !r.members.includes(creatorId)
-    );
+    // Fetch pending members for each room
+    const pendingMembersToFetch = rooms.documents.map(async (room) => {
+      const pendingMembersResponse =
+        await databases.listDocuments<JoinModelType>(DATABASE_ID, PENDING_ID, [
+          Query.equal('channel_id', room.$id),
+        ]);
+
+      return {
+        ...room,
+        pendingMembers: pendingMembersResponse.documents, // Use documents array
+      };
+    });
+
+    const roomsWithPendingMembers = await Promise.all(pendingMembersToFetch);
+
+    // Filter out rooms where creatorId is in members
+    const finalRooms = roomsWithPendingMembers.filter((room) => {
+      return room.members && !room.members.includes(creatorId);
+    });
+
     return {
       ...rooms,
       documents: finalRooms,
@@ -143,5 +163,38 @@ export const exploreRooms = async ({
       error instanceof Error ? error.message : 'Failed to load chat rooms';
 
     throw new Error(errorMessage);
+  }
+};
+
+export const joinRoom = async ({
+  channel_id,
+  member_to_join,
+}: JoinType): Promise<JoinModelType> => {
+  try {
+    const isAlreadyInPendingList = await databases.listDocuments(
+      DATABASE_ID,
+      PENDING_ID,
+      [
+        Query.equal('channel_id', channel_id),
+        Query.equal('member_to_join', member_to_join),
+      ]
+    );
+    if (isAlreadyInPendingList.documents.length > 0) {
+      throw new Error('You have already sent a request to join this room');
+    }
+
+    const pending = await databases.createDocument<JoinModelType>(
+      DATABASE_ID,
+      PENDING_ID,
+      ID.unique(),
+      {
+        channel_id,
+        member_to_join,
+      }
+    );
+
+    return pending;
+  } catch (error) {
+    throw new Error(generateErrorMessage(error, 'Failed to send request'));
   }
 };
