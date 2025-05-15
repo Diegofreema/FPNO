@@ -1,5 +1,11 @@
 import React from 'react';
-import { FlexAlignType, StyleProp, View, ViewStyle } from 'react-native';
+import {
+  DimensionValue,
+  FlexAlignType,
+  StyleProp,
+  View,
+  ViewStyle,
+} from 'react-native';
 
 type HStackProps = {
   justifyContent?:
@@ -16,6 +22,7 @@ type HStackProps = {
   marginTop?: number;
   gap?: number;
   style?: StyleProp<ViewStyle>;
+  width?: DimensionValue;
 };
 export const HStack = ({
   leftContent: LeftContent,
@@ -25,6 +32,7 @@ export const HStack = ({
   marginTop = 15,
   gap,
   style,
+  width,
 }: HStackProps) => {
   return (
     <View
@@ -35,7 +43,7 @@ export const HStack = ({
           alignItems,
           marginTop,
           gap,
-          width: '100%',
+          width,
         },
         style,
       ]}

@@ -178,3 +178,23 @@ export const formatNumber = (num: number): string => {
   }
   return num.toString();
 };
+
+export function trimTextByWidth(
+  text: string,
+  availableWidth: number,
+  fontSize: number
+): string {
+  // Average character width is approximately 0.5 * fontSize in pixels (heuristic)
+  const avgCharWidth = fontSize * 0.5;
+  // Calculate max characters that fit in availableWidth, reserving space for '...'
+  const ellipsisWidth = avgCharWidth * 3; // Approximate width of '...'
+  const maxWidth = availableWidth - ellipsisWidth;
+  const maxChars = Math.floor(maxWidth / avgCharWidth);
+
+  if (text.length <= maxChars || maxWidth <= 0) {
+    return text;
+  }
+
+  // Trim text to fit within maxChars and append '...'
+  return `${text.substring(0, maxChars)}...`;
+}
