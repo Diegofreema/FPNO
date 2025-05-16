@@ -6,6 +6,7 @@ import { useGetMembers } from '@/features/chat-room/api/use-get-members';
 import { useGetRoomInfo } from '@/features/chat-room/api/use-get-room-info';
 import { ChatMenu } from '@/features/chat/components/chat-menu';
 import { RoomInfo } from '@/features/chat/components/room-info';
+import { useAuth } from '@/lib/zustand/useAuth';
 import { MemberStatus } from '@/types';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -13,6 +14,7 @@ import React, { useState } from 'react';
 const RoomInfoScreen = () => {
   const { roomId } = useLocalSearchParams<{ roomId: string }>();
   const [more, setMore] = useState(0);
+  const id = useAuth((state) => state.user?.id);
   const {
     data,
     isPending: isPendingData,
@@ -64,14 +66,17 @@ const RoomInfoScreen = () => {
   };
   const infoData = [{ data, memberData }];
   console.log({ memberData });
+  const isCreator = data.creator_id === id;
 
   return (
     <Wrapper>
       <NavHeader
         title=""
-        leftContent={() => (
-          <ChatMenu menuItems={[{ onSelect: onSelect, text: 'Edit' }]} />
-        )}
+        leftContent={() =>
+          isCreator ? (
+            <ChatMenu menuItems={[{ onSelect: onSelect, text: 'Edit' }]} />
+          ) : null
+        }
       />
       <RoomInfo
         infoData={infoData}

@@ -7,6 +7,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import { ChatMenu } from './chat-menu';
 
@@ -45,7 +46,12 @@ export const ChatNav = ({
     <View style={styles.container}>
       <CustomPressable onPress={onPress} style={styles.press}>
         <AntDesign name="arrowleft" color={colors.black} size={25} />
-        <Avatar imgSrc={imageUrl} size={50} />
+        <Animated.View
+          sharedTransitionTag="avatar"
+          style={{ width: 50, height: 50 }}
+        >
+          <Avatar imgSrc={imageUrl} size={50} />
+        </Animated.View>
         <View>
           <SubTitle
             text={name}

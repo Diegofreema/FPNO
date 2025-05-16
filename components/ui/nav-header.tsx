@@ -9,7 +9,7 @@ import React from 'react';
 type NavHeaderProps = {
   title: string;
   style?: StyleProp<ViewStyle>;
-  leftContent?: () => React.JSX.Element;
+  leftContent?: () => React.JSX.Element | null;
   avatarContent?: React.JSX.Element;
   color?: string;
   onPress?: () => void;
