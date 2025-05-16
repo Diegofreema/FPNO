@@ -419,3 +419,78 @@ export const getRoomInfo = async ({ roomId }: { roomId: string }) => {
     throw new Error(generateErrorMessage(error, 'Failed to get room info'));
   }
 };
+
+export const acceptRequest = async ({
+  memberId,
+  roomId,
+}: {
+  roomId: string;
+  memberId: string;
+}) => {
+  try {
+    const roomExists = await databases.getDocument(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      roomId
+    );
+    if (!roomExists) {
+      throw new Error('Chat room does not exist');
+    }
+
+    const pendingMember = await databases.listDocuments<MemberType>(
+      DATABASE_ID,
+      MEMBER_ID,
+      [Query.equal('channel_id', roomId), Query.equal('member_id', memberId)]
+    );
+    if (pendingMember.total === 0) {
+      throw new Error('Pending member does not exist');
+    }
+
+    await databases.updateDocument(
+      DATABASE_ID,
+      MEMBER_ID,
+      pendingMember.documents[0].$id,
+      {
+        status: MemberStatus.ACCEPTED,
+      }
+    );
+  } catch (error) {
+    throw new Error(generateErrorMessage(error, 'Failed to accept request'));
+  }
+};
+
+export const declineRequest = async ({
+  memberId,
+  roomId,
+}: {
+  roomId: string;
+  memberId: string;
+}) => {
+  try {
+    const roomExists = await databases.getDocument(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      roomId
+    );
+    if (!roomExists) {
+      throw new Error('Chat room does not exist');
+    }
+
+    const pendingMember = await databases.listDocuments<MemberType>(
+      DATABASE_ID,
+      MEMBER_ID,
+      [Query.equal('channel_id', roomId), Query.equal('member_id', memberId)]
+    );
+    if (pendingMember.total === 0) {
+      throw new Error('Pending member does not exist');
+    }
+
+    await databases.deleteDocument(
+      DATABASE_ID,
+      MEMBER_ID,
+      pendingMember.documents[0].$id
+    );
+  } catch (error) {
+    throw new Error(generateErrorMessage(error, 'Failed to delete request'));
+  }
+};

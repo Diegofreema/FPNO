@@ -41,6 +41,7 @@ const PendingMembersScreen = () => {
         handleMore={handleMore}
         onRefresh={refetch}
         refreshing={isRefetching}
+        roomId={roomId}
       />
     </Wrapper>
   );

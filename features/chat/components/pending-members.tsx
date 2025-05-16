@@ -1,3 +1,5 @@
+import { useAccept } from '@/features/chat-room/api/use-accept';
+import { useDecline } from '@/features/chat-room/api/use-decline';
 import { MemberWithUserProfile } from '@/types';
 import { LegendList } from '@legendapp/list';
 import React from 'react';
@@ -10,6 +12,7 @@ type Props = {
   handleMore: () => void;
   onRefresh: () => void;
   refreshing: boolean;
+  roomId: string;
 };
 
 export const PendingMembers = ({
@@ -17,9 +20,11 @@ export const PendingMembers = ({
   handleMore,
   onRefresh,
   refreshing,
+  roomId,
 }: Props) => {
-  const accept = async (memberId: string) => {};
-  const decline = async (memberId: string) => {};
+  const { mutateAsync: accept, isPending: isAccepting } = useAccept();
+  const { mutateAsync: decline, isPending: isDeclining } = useDecline();
+
   return (
     <View style={{ flex: 1 }}>
       <LegendList
@@ -35,9 +40,18 @@ export const PendingMembers = ({
             user={item.user}
             rightContent={
               <ChatMenu
+                disable={isAccepting || isDeclining}
                 menuItems={[
-                  { text: 'Accept', onSelect: () => accept(item.member_id) },
-                  { text: 'Decline', onSelect: () => decline(item.member_id) },
+                  {
+                    text: 'Accept',
+                    onSelect: () =>
+                      accept({ roomId, memberId: item.member_id }),
+                  },
+                  {
+                    text: 'Decline',
+                    onSelect: () =>
+                      decline({ roomId, memberId: item.member_id }),
+                  },
                 ]}
               />
             }
