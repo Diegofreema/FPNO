@@ -12,7 +12,6 @@ import { ChatMenu } from '@/features/chat/components/chat-menu';
 import { RoomInfo } from '@/features/chat/components/room-info';
 import { RoomInfoTop } from '@/features/chat/components/room-info-top';
 import { useAuth } from '@/lib/zustand/useAuth';
-import { MemberStatus } from '@/types';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 
@@ -39,7 +38,6 @@ const RoomInfoScreen = () => {
   } = useGetMembers({
     channel_id: roomId,
     more,
-    status: MemberStatus.ACCEPTED,
   });
   const {
     data: pendingMemberData,
@@ -51,7 +49,6 @@ const RoomInfoScreen = () => {
   } = useGetPendingMembers({
     channel_id: roomId,
     more,
-    status: MemberStatus.PENDING,
   });
   const router = useRouter();
 
@@ -99,7 +96,7 @@ const RoomInfoScreen = () => {
           ) : null
         }
       />
-      <PendingMemberBanner pendingMemberCount={total} />
+      <PendingMemberBanner pendingMemberCount={total} roomId={roomId} />
       <RoomInfoTop data={data} />
       <RoomInfo infoData={memberData} handleMore={handleMore} />
     </ScrollWrapper>

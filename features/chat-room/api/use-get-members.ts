@@ -4,21 +4,23 @@ import { getMembers } from '../server';
 
 type Props = {
   channel_id: string;
-  status: MemberStatus;
+
   more: number;
 };
 
-export const useGetMembers = ({ channel_id, status, more }: Props) => {
+export const useGetMembers = ({ channel_id, more }: Props) => {
   return useQuery({
-    queryKey: ['members', status, channel_id, more],
-    queryFn: () => getMembers({ channel_id, status, more }),
+    queryKey: ['members', channel_id, more],
+    queryFn: () =>
+      getMembers({ channel_id, status: MemberStatus.ACCEPTED, more }),
     placeholderData: keepPreviousData,
   });
 };
-export const useGetPendingMembers = ({ channel_id, status, more }: Props) => {
+export const useGetPendingMembers = ({ channel_id, more }: Props) => {
   return useQuery({
-    queryKey: ['pending-members', status, channel_id, more],
-    queryFn: () => getMembers({ channel_id, status, more }),
+    queryKey: ['pending_members', channel_id, more],
+    queryFn: () =>
+      getMembers({ channel_id, status: MemberStatus.PENDING, more }),
     placeholderData: keepPreviousData,
   });
 };

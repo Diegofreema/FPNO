@@ -2,7 +2,6 @@ import { Avatar } from '@/components/ui/avatar';
 import { HStack } from '@/components/ui/h-stack';
 import { colors } from '@/constants';
 import { UserType } from '@/types';
-import { useRouter } from 'expo-router';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { RFPercentage } from 'react-native-responsive-fontsize';
@@ -12,10 +11,7 @@ type Props = {
 };
 
 export const User = ({ user }: Props) => {
-  const router = useRouter();
-  const onPress = () => {
-    router.push(`/chat/${user.$id}`);
-  };
+  const onPress = () => {};
   return (
     <TouchableOpacity activeOpacity={0.7} onPress={onPress}>
       <HStack

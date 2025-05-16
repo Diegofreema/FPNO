@@ -9,10 +9,11 @@ import Animated, {
 
 interface Props {
   pendingMemberCount: number;
+  roomId: string;
 }
 const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
-export const PendingMemberBanner = ({ pendingMemberCount }: Props) => {
+export const PendingMemberBanner = ({ pendingMemberCount, roomId }: Props) => {
   const height = useSharedValue(0);
   const router = useRouter();
   useEffect(() => {
@@ -28,7 +29,7 @@ export const PendingMemberBanner = ({ pendingMemberCount }: Props) => {
     overflow: 'hidden',
   }));
   const onPress = () => {
-    router.push('/pending-members');
+    router.push(`/pending-members?roomId=${roomId}`);
   };
   return (
     <AnimatedTouchableOpacity style={animatedStyle} onPress={onPress}>
