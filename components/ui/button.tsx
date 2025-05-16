@@ -36,7 +36,7 @@ export const Button = ({
       onPress={onPress}
       style={({ pressed }) => [
         {
-          opacity: pressed ? 0.5 : 1,
+          opacity: pressed || isDisabled ? 0.5 : 1,
           height: 50,
           borderRadius: 5,
           width: '100%',

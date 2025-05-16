@@ -6,9 +6,11 @@ import React from 'react';
 
 const RoomInfo = () => {
   const { roomId } = useLocalSearchParams<{ roomId: string }>();
+  console.log({ roomId });
+
   const router = useRouter();
   const onSelect = () => {
-    router.push(`/chat/edit?${roomId}`);
+    router.push(`/chat/edit?roomId=${roomId}`);
   };
   return (
     <Wrapper>

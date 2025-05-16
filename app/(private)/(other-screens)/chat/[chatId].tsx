@@ -41,7 +41,9 @@ const ChatId = () => {
     return <Loading />;
   }
 
-  const followersText = `${formatNumber(data?.members_count)} members`;
+  const followersText = `${formatNumber(data?.members_count)} ${
+    data?.members_count > 1 ? 'members' : 'member'
+  }`;
 
   return (
     <Wrapper>

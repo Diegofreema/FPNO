@@ -34,7 +34,7 @@ export const ChatNav = ({
     router.back();
   };
   const goToRoomInfo = () => {
-    router.push(`/chat/room-info?${channelId}`);
+    router.push(`/chat/room-info?roomId=${channelId}`);
   };
   const handleLeave = () => {};
   const menuItems = [

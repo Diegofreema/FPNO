@@ -25,13 +25,11 @@ export const createChatRoom = async ({
   try {
     let id;
     let link;
-    if (image) {
+    if (typeof image !== 'string' && image) {
       const file = await storage.createFile(BUCKET_ID, ID.unique(), image);
       id = file.$id;
       link = `https://fra.cloud.appwrite.io/v1/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}&mode=admin`;
     }
-
-    console.log(id, link);
 
     const chatRoomInDb = await databases.listDocuments(
       DATABASE_ID,
@@ -73,6 +71,56 @@ export const createChatRoom = async ({
       error instanceof Error ? error.message : 'Failed to create chat room';
 
     throw new Error(errorMessage);
+  }
+};
+
+export const editChatRoom = async ({
+  name,
+  description,
+  image,
+  creatorId,
+  channel_id,
+}: CreateChatRoomSchema & { creatorId: string; channel_id: string }) => {
+  try {
+    const channelExists = await databases.getDocument<ChannelType>(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      channel_id
+    );
+
+    if (!channelExists) {
+      throw new Error('Chat room not found');
+    }
+
+    if (channelExists.creator_id !== creatorId) {
+      throw new Error('You are not the creator of this chat room');
+    }
+
+    let id;
+    let link;
+    if (typeof image !== 'string' && image) {
+      const file = await storage.createFile(BUCKET_ID, ID.unique(), image);
+      id = file.$id;
+      link = `https://fra.cloud.appwrite.io/v1/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}&mode=admin`;
+    } else {
+      link = image;
+    }
+
+    const chatRoom = await databases.updateDocument<ChannelType>(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      channel_id,
+      {
+        channel_name: name.trim(),
+        description: description?.trim(),
+        image_url: link,
+        image_id: id || channelExists.image_id,
+      }
+    );
+
+    return chatRoom;
+  } catch (error: unknown) {
+    throw new Error(generateErrorMessage(error, 'Failed to update chat room'));
   }
 };
 
@@ -337,5 +385,19 @@ export const getPendingMember = async ({
     return member;
   } catch (error) {
     throw new Error(generateErrorMessage(error, 'Failed to get member'));
+  }
+};
+
+export const getRoomInfo = async ({ roomId }: { roomId: string }) => {
+  try {
+    const room = await databases.getDocument<ChannelType>(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      roomId
+    );
+
+    return room;
+  } catch (error) {
+    throw new Error(generateErrorMessage(error, 'Failed to get room info'));
   }
 };

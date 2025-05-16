@@ -37,7 +37,13 @@
         }
       ],
       "expo-build-properties",
-      "react-native-vision-camera"
+      "react-native-vision-camera",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

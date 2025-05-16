@@ -1,26 +1,14 @@
-import { CustomInput } from '@/components/form/custom-input';
-import { Button } from '@/components/ui/button';
-import { colors } from '@/constants';
-import { Feather } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as ImagePicker from 'expo-image-picker';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useAuth } from '@/lib/zustand/useAuth';
-import { Image } from 'expo-image';
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { z } from 'zod';
+import { View } from 'react-native';
 import { useCreateChatRoom } from '../api/use-create-chat-room';
 import { CreateChatRoomSchema, createChatRoomSchema } from '../schema';
+import { RoomForm } from './room-form';
 
-const { width } = Dimensions.get('window');
 type MimeType = 'image/jpeg' | 'image/png';
 export const CreateChatRoom = () => {
   const { mutateAsync } = useCreateChatRoom();
@@ -31,7 +19,7 @@ export const CreateChatRoom = () => {
     handleSubmit,
     setValue,
     watch,
-  } = useForm<z.infer<typeof createChatRoomSchema>>({
+  } = useForm<CreateChatRoomSchema>({
     defaultValues: {
       name: '',
       description: '',
@@ -59,110 +47,19 @@ export const CreateChatRoom = () => {
     await mutateAsync({ ...data, creatorId: user?.id! });
   };
   const { image } = watch();
-  const imageUrl = image?.uri;
+  const imageUrl = typeof image === 'string' ? image : image?.uri;
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ flex: 1 }}>
-        <TouchableOpacity
-          activeOpacity={0.6}
-          style={styles.imageContainer}
-          onPress={pickImage}
-        >
-          {imageUrl ? (
-            <Image
-              style={{ width: '100%', height: '100%', borderRadius: 1000 }}
-              contentFit="cover"
-              source={imageUrl}
-            />
-          ) : (
-            <View
-              style={{
-                width: '100%',
-                height: '100%',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <Feather color={colors.white} name="image" size={width * 0.2} />
-              <View style={styles.abs}>
-                <Feather
-                  name="camera"
-                  color={colors.lightblue}
-                  size={width * 0.05}
-                />
-              </View>
-            </View>
-          )}
-        </TouchableOpacity>
-        {errors['image'] && (
-          <Text style={{ color: colors.red }}>{errors['image'].message}</Text>
-        )}
-        <CustomInput
-          control={control}
-          errors={errors}
-          label=""
-          name="name"
-          placeholder="Room Name"
-        />
-        <CustomInput
-          control={control}
-          errors={errors}
-          label=""
-          name="description"
-          placeholder="Describe this room, this will enable people to know what this room is about"
-          numberOfLines={5}
-          maxLength={200}
-          multiline
-          style={{
-            height: 150,
-          }}
-          containerStyle={{
-            height: 150,
-            padding: 5,
-          }}
-        />
-        <Button
-          onPress={handleSubmit(onSubmit)}
-          text="Create Room"
-          isDisabled={isSubmitting}
-          isLoading={isSubmitting}
-          style={{
-            marginTop: 'auto',
-            marginBottom: 20,
-          }}
-        />
-      </View>
+      <RoomForm
+        imageUrl={imageUrl}
+        control={control}
+        errors={errors}
+        handleSubmit={handleSubmit}
+        onSubmit={onSubmit}
+        isSubmitting={isSubmitting}
+        pickImage={pickImage}
+      />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {},
-  imageContainer: {
-    backgroundColor: colors.lightblue,
-    width: width * 0.4,
-    height: width * 0.4,
-    borderRadius: width * 0.4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
-    marginTop: 20,
-  },
-  abs: {
-    position: 'absolute',
-    bottom: 10,
-    right: -5,
-    backgroundColor: colors.lightGray,
-    width: width * 0.12,
-    height: width * 0.12,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 6,
-    shadowColor: 'black',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-  },
-});
