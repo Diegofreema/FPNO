@@ -5,10 +5,11 @@ import { RFPercentage } from 'react-native-responsive-fontsize';
 type Props = {
   text: string;
   textStyle?: StyleProp<TextStyle>;
+  numberOfLines?: number;
 };
-export const SubTitle = ({ text, textStyle }: Props) => {
+export const SubTitle = ({ text, textStyle, numberOfLines = 5 }: Props) => {
   return (
-    <Text style={[styles.title, textStyle]} numberOfLines={5}>
+    <Text style={[styles.title, textStyle]} numberOfLines={numberOfLines}>
       {text}
     </Text>
   );

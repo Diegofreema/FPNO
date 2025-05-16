@@ -158,3 +158,17 @@ export type ChatMessageType = Models.Document & {
 export type ErrorType = {
   message: string;
 };
+
+export type MemberWithUserProfile = {
+  user: UserType;
+  $id: string;
+  $collectionId: string;
+  $databaseId: string;
+  $createdAt: string;
+  $updatedAt: string;
+  $permissions: string[];
+  access_role: MemberAccessRole;
+  channel_id: string;
+  member_id: string;
+  status: MemberStatus;
+};

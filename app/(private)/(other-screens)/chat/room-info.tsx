@@ -63,6 +63,8 @@ const RoomInfoScreen = () => {
     setMore((state) => state + 10);
   };
   const infoData = [{ data, memberData }];
+  console.log({ memberData });
+
   return (
     <Wrapper>
       <NavHeader
@@ -72,10 +74,10 @@ const RoomInfoScreen = () => {
         )}
       />
       <RoomInfo
-        data={infoData}
+        infoData={infoData}
         handleMore={handleMore}
-        onRefresh={onRefetching}
-        refresh={handleRefetch}
+        onRefresh={handleRefetch}
+        refreshing={onRefetching}
       />
     </Wrapper>
   );

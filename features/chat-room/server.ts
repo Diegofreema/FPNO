@@ -4,6 +4,7 @@ import {
   DATABASE_ID,
   MEMBER_ID,
   PROJECT_ID,
+  USER_COLLECTION_ID,
 } from '@/config';
 import { databases, storage } from '@/db/appwrite';
 import { generateErrorMessage } from '@/helper';
@@ -12,6 +13,7 @@ import {
   MemberAccessRole,
   MemberStatus,
   MemberType,
+  UserType,
 } from '@/types';
 import { ID, Query } from 'react-native-appwrite';
 import { CreateChatRoomSchema, JoinType } from './schema';
@@ -319,7 +321,23 @@ export const getMembers = async ({
         Query.limit(25 + more),
       ]
     );
-    return members;
+    const membersList = members.documents.map(async (member) => {
+      const res = await databases.listDocuments<UserType>(
+        DATABASE_ID,
+        USER_COLLECTION_ID,
+        [Query.equal('userId', member.member_id)]
+      );
+      return {
+        ...member,
+        user: res.documents[0],
+      };
+    });
+
+    const membersWithUserProfile = await Promise.all(membersList);
+    return {
+      ...members,
+      documents: membersWithUserProfile,
+    };
   } catch (error) {
     throw new Error(generateErrorMessage(error, 'Failed to get members'));
   }
