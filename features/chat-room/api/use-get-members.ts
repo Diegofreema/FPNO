@@ -10,7 +10,7 @@ type Props = {
 
 export const useGetMembers = ({ channel_id, status, more }: Props) => {
   return useQuery({
-    queryKey: ['member', status, channel_id, more],
+    queryKey: ['members', status, channel_id, more],
     queryFn: () => getMembers({ channel_id, status, more }),
     placeholderData: keepPreviousData,
   });
