@@ -2,18 +2,24 @@ import { Avatar } from '@/components/ui/avatar';
 import { HStack } from '@/components/ui/h-stack';
 import { colors } from '@/constants';
 import { UserType } from '@/types';
-import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import React, { ReactNode } from 'react';
+import { Text, View } from 'react-native';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 
 type Props = {
   user: UserType;
+  rightContent?: ReactNode;
 };
 
-export const User = ({ user }: Props) => {
-  const onPress = () => {};
+export const User = ({ user, rightContent }: Props) => {
   return (
-    <TouchableOpacity activeOpacity={0.7} onPress={onPress}>
+    <View
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}
+    >
       <HStack
         justifyContent="flex-start"
         alignItems="center"
@@ -23,7 +29,9 @@ export const User = ({ user }: Props) => {
           <Right name={user.name} matric={user.matriculation_number} />
         )}
       />
-    </TouchableOpacity>
+
+      {rightContent}
+    </View>
   );
 };
 

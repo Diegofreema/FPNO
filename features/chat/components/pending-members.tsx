@@ -2,6 +2,7 @@ import { MemberWithUserProfile } from '@/types';
 import { LegendList } from '@legendapp/list';
 import React from 'react';
 import { View } from 'react-native';
+import { ChatMenu } from './chat-menu';
 import { User } from './user';
 
 type Props = {
@@ -17,6 +18,8 @@ export const PendingMembers = ({
   onRefresh,
   refreshing,
 }: Props) => {
+  const accept = async (memberId: string) => {};
+  const decline = async (memberId: string) => {};
   return (
     <View style={{ flex: 1 }}>
       <LegendList
@@ -27,7 +30,19 @@ export const PendingMembers = ({
         onRefresh={onRefresh}
         onEndReached={handleMore}
         onEndReachedThreshold={0.5}
-        renderItem={({ item }) => <User user={item.user} />}
+        renderItem={({ item }) => (
+          <User
+            user={item.user}
+            rightContent={
+              <ChatMenu
+                menuItems={[
+                  { text: 'Accept', onSelect: () => accept(item.member_id) },
+                  { text: 'Decline', onSelect: () => decline(item.member_id) },
+                ]}
+              />
+            }
+          />
+        )}
         contentContainerStyle={{ gap: 15 }}
       />
     </View>
