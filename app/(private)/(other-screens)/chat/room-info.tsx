@@ -1,11 +1,16 @@
 import { ErrorComponent } from '@/components/ui/error-component';
 import { Loading } from '@/components/ui/loading';
 import { NavHeader } from '@/components/ui/nav-header';
-import { Wrapper } from '@/components/ui/wrapper';
-import { useGetMembers } from '@/features/chat-room/api/use-get-members';
+import { ScrollWrapper } from '@/components/ui/wrapper';
+import {
+  useGetMembers,
+  useGetPendingMembers,
+} from '@/features/chat-room/api/use-get-members';
 import { useGetRoomInfo } from '@/features/chat-room/api/use-get-room-info';
+import { PendingMemberBanner } from '@/features/chat-room/components/pending-member-banner';
 import { ChatMenu } from '@/features/chat/components/chat-menu';
 import { RoomInfo } from '@/features/chat/components/room-info';
+import { RoomInfoTop } from '@/features/chat/components/room-info-top';
 import { useAuth } from '@/lib/zustand/useAuth';
 import { MemberStatus } from '@/types';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -20,7 +25,7 @@ const RoomInfoScreen = () => {
     isPending: isPendingData,
     isError: isDataError,
     error,
-    isRefetching,
+
     isRefetchError,
     refetch,
   } = useGetRoomInfo({ channel_id: roomId });
@@ -31,21 +36,39 @@ const RoomInfoScreen = () => {
     isError: isMemberError,
     isRefetchError: isMemberRefetchError,
     refetch: refetchMember,
-    isRefetching: isMemberRefetching,
   } = useGetMembers({
     channel_id: roomId,
     more,
     status: MemberStatus.ACCEPTED,
   });
+  const {
+    data: pendingMemberData,
+    error: pendingMemberError,
+    isPending: isPendingPendingMember,
+    isError: isPendingMemberError,
+    isRefetchError: isPendingMemberRefetchError,
+    refetch: refetchPendingMember,
+  } = useGetPendingMembers({
+    channel_id: roomId,
+    more,
+    status: MemberStatus.PENDING,
+  });
   const router = useRouter();
 
-  const errorMessage = error?.message || memberError?.message;
+  const errorMessage =
+    error?.message || memberError?.message || pendingMemberError?.message;
   const isError =
-    isDataError || isRefetchError || isMemberError || isMemberRefetchError;
-  const isPending = isPendingData || isPendingMember;
+    isDataError ||
+    isRefetchError ||
+    isMemberError ||
+    isMemberRefetchError ||
+    isPendingMemberError ||
+    isPendingMemberRefetchError;
+  const isPending = isPendingData || isPendingMember || isPendingPendingMember;
   const handleRefetch = () => {
     refetch();
     refetchMember();
+    refetchPendingMember();
   };
   if (isError) {
     return <ErrorComponent onPress={handleRefetch} title={errorMessage} />;
@@ -54,7 +77,6 @@ const RoomInfoScreen = () => {
     return <Loading />;
   }
 
-  const onRefetching = isRefetching || isMemberRefetching;
   const onSelect = () => {
     router.push(`/chat/edit?roomId=${roomId}`);
   };
@@ -64,12 +86,11 @@ const RoomInfoScreen = () => {
     }
     setMore((state) => state + 10);
   };
-  const infoData = [{ data, memberData }];
-  console.log({ memberData });
-  const isCreator = data.creator_id === id;
 
+  const isCreator = data.creator_id === id;
+  const { total } = pendingMemberData;
   return (
-    <Wrapper>
+    <ScrollWrapper>
       <NavHeader
         title=""
         leftContent={() =>
@@ -78,13 +99,10 @@ const RoomInfoScreen = () => {
           ) : null
         }
       />
-      <RoomInfo
-        infoData={infoData}
-        handleMore={handleMore}
-        onRefresh={handleRefetch}
-        refreshing={onRefetching}
-      />
-    </Wrapper>
+      <PendingMemberBanner pendingMemberCount={total} />
+      <RoomInfoTop data={data} />
+      <RoomInfo infoData={memberData} handleMore={handleMore} />
+    </ScrollWrapper>
   );
 };
 

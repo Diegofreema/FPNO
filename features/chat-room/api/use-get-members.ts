@@ -15,3 +15,10 @@ export const useGetMembers = ({ channel_id, status, more }: Props) => {
     placeholderData: keepPreviousData,
   });
 };
+export const useGetPendingMembers = ({ channel_id, status, more }: Props) => {
+  return useQuery({
+    queryKey: ['pending-members', status, channel_id, more],
+    queryFn: () => getMembers({ channel_id, status, more }),
+    placeholderData: keepPreviousData,
+  });
+};
