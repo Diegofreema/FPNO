@@ -21,7 +21,15 @@ export const ErrorComponent = ({
 }) => {
   return (
     <View style={[styles.container, { height }]}>
-      <Text style={{ color: 'black', fontSize: RFPercentage(3) }}>{title}</Text>
+      <Text
+        style={{
+          color: 'black',
+          fontSize: RFPercentage(3),
+          textAlign: 'center',
+        }}
+      >
+        {title}
+      </Text>
       <Button
         text={btnText}
         onPress={onPress}
