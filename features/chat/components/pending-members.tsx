@@ -29,7 +29,6 @@ export const PendingMembers = ({
 
   return (
     <View style={{ flex: 1 }}>
-      {isVisible && <LoadingModal visible={isVisible} />}
       <LegendList
         data={users}
         keyExtractor={(item) => item.$id}
@@ -62,6 +61,7 @@ export const PendingMembers = ({
         )}
         contentContainerStyle={{ gap: 15 }}
       />
+      <LoadingModal visible={isVisible} />
     </View>
   );
 };

@@ -1,13 +1,20 @@
 import { LoadingModal } from '@/components/typography/loading-modal';
+import { SubTitle } from '@/components/typography/subtitle';
+import { CustomPressable } from '@/components/ui/custom-pressable';
+import { HStack } from '@/components/ui/h-stack';
+import { colors } from '@/constants';
+import { useLeave } from '@/features/chat-room/api/use-leave';
 import { useRemoveMember } from '@/features/chat-room/api/use-remove-member';
 import { useUpdateMemberRole } from '@/features/chat-room/api/use-update-member-role';
 import { ChatRoleDisplay } from '@/features/chat-room/components/role';
 import { useAuth } from '@/lib/zustand/useAuth';
 import { MemberAccessRole, MemberWithUserProfile } from '@/types';
+import { Feather } from '@expo/vector-icons';
 import { LegendList } from '@legendapp/list';
 import React from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { Models } from 'react-native-appwrite';
+import { RFPercentage } from 'react-native-responsive-fontsize';
 import { ChatMenu } from './chat-menu';
 import { User } from './user';
 
@@ -29,11 +36,12 @@ export const RoomInfo = ({
   loggedInUser,
 }: Props) => {
   const { documents, total } = infoData;
-  const hide = documents.length === total;
+  const show = documents.length < total;
   const { mutateAsync: removeMember, isPending: isRemoving } =
     useRemoveMember();
   const { mutateAsync: updateMember, isPending: isUpdating } =
     useUpdateMemberRole();
+  const { mutateAsync: leaveRoom, isPending: isLeaving } = useLeave();
   const actionUserId = useAuth((state) => state.user?.id!);
   const onRemoveUser = async ({ memberId }: { memberId: string }) => {
     Alert.alert('Are you sure?', 'This can not be reversed', [
@@ -63,7 +71,22 @@ export const RoomInfo = ({
       },
     ]);
   };
-  const isVisible = isRemoving || isUpdating;
+
+  const onLeaveRoom = async () => {
+    Alert.alert('Are you sure?', 'This can not be reversed!!!', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {
+        text: 'Leave',
+        onPress: () => leaveRoom({ roomId, memberId: actionUserId }),
+        style: 'destructive',
+      },
+    ]);
+  };
+  const isVisible = isRemoving || isUpdating || isLeaving;
   return (
     <View style={{ flex: 1 }}>
       <LoadingModal visible={isVisible} />
@@ -106,7 +129,12 @@ export const RoomInfo = ({
         }}
         keyExtractor={(item) => item.$id}
         ListFooterComponent={() => (
-          <ListFooterComponent hide={hide} handleMore={handleMore} />
+          <ListFooterComponent
+            show={show}
+            handleMore={handleMore}
+            onLeaveRoom={onLeaveRoom}
+            isNotCreator={creatorId !== loggedInUser}
+          />
         )}
         scrollEnabled={false}
         contentContainerStyle={{ gap: 15 }}
@@ -118,10 +146,46 @@ export const RoomInfo = ({
 
 const ListFooterComponent = ({
   handleMore,
-  hide,
+  show,
+  onLeaveRoom,
+  isNotCreator,
 }: {
-  hide: boolean;
+  show: boolean;
   handleMore: () => void;
+  onLeaveRoom: () => void;
+  isNotCreator: boolean;
 }) => {
-  return <View></View>;
+  return (
+    <View style={styles.listFooter}>
+      {show && (
+        <CustomPressable onPress={handleMore}>
+          <SubTitle text="Load more" textStyle={{ color: colors.lightblue }} />
+        </CustomPressable>
+      )}
+      {isNotCreator && (
+        <CustomPressable onPress={onLeaveRoom}>
+          <HStack
+            alignItems="center"
+            style={{ gap: 10 }}
+            leftContent={() => (
+              <Feather name="log-out" size={30} color={colors.red} />
+            )}
+            rightContent={() => (
+              <SubTitle
+                text="Leave"
+                textStyle={{ color: colors.red, fontSize: RFPercentage(2) }}
+              />
+            )}
+          />
+        </CustomPressable>
+      )}
+    </View>
+  );
 };
+
+const styles = StyleSheet.create({
+  listFooter: {
+    marginTop: 20,
+    gap: 10,
+  },
+});

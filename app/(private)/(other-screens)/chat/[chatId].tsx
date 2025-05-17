@@ -55,6 +55,7 @@ const ChatId = () => {
         isCreator={isCreator}
         isMember={!!member.total}
         isInPending={!!pendingMember.total}
+        roomId={chatId}
       />
     </Wrapper>
   );
