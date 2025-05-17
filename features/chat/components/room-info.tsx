@@ -24,6 +24,8 @@ export const RoomInfo = ({ infoData, handleMore }: Props) => {
           <ListFooterComponent hide={hide} handleMore={handleMore} />
         )}
         scrollEnabled={false}
+        contentContainerStyle={{ gap: 15 }}
+        recycleItems
       />
     </View>
   );

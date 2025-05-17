@@ -428,7 +428,7 @@ export const acceptRequest = async ({
   memberId: string;
 }) => {
   try {
-    const roomExists = await databases.getDocument(
+    const roomExists = await databases.getDocument<ChannelType>(
       DATABASE_ID,
       CHAT_COLLECTION_ID,
       roomId
@@ -452,6 +452,15 @@ export const acceptRequest = async ({
       pendingMember.documents[0].$id,
       {
         status: MemberStatus.ACCEPTED,
+      }
+    );
+
+    await databases.updateDocument(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      roomExists.$id,
+      {
+        members_count: roomExists.members_count + 1,
       }
     );
   } catch (error) {
