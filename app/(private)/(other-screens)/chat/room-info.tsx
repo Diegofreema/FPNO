@@ -102,6 +102,7 @@ const RoomInfoScreen = () => {
         infoData={memberData}
         handleMore={handleMore}
         creatorId={data.creator_id}
+        roomId={roomId}
       />
     </ScrollWrapper>
   );
