@@ -16,6 +16,7 @@ export const useAccept = () => {
       query.invalidateQueries({ queryKey: ['pending_members'] });
       query.invalidateQueries({ queryKey: ['members'] });
       query.invalidateQueries({ queryKey: ['room-info'] });
+      query.invalidateQueries({ queryKey: ['channels-i-am-in'] });
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to accept request');

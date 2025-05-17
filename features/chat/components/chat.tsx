@@ -59,7 +59,7 @@ export const Chat = () => {
         channels={documents}
         handleLoadMore={handleLoadMore}
         isRefreshing={isRefetching}
-        refresh={refetch}
+        refresh={handleRefetch}
       />
     </View>
   );

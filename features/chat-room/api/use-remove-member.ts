@@ -19,6 +19,8 @@ export const useRemoveMember = () => {
 
       query.invalidateQueries({ queryKey: ['member'] });
       query.invalidateQueries({ queryKey: ['members'] });
+      query.invalidateQueries({ queryKey: ['room-info'] });
+      query.invalidateQueries({ queryKey: ['channels-i-am-in'] });
 
       // ! to add more later
     },

@@ -549,7 +549,19 @@ export const removeMember = async ({
     if (isAMember.total === 0) {
       throw new Error('Member does not exist');
     }
-    await databases.deleteDocument(DATABASE_ID, MEMBER_ID, memberId);
+    await databases.deleteDocument(
+      DATABASE_ID,
+      MEMBER_ID,
+      isAMember.documents[0].$id
+    );
+    await databases.updateDocument(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      chatRoom.$id,
+      {
+        members_count: chatRoom.members_count - 1,
+      }
+    );
   } catch (error) {
     throw new Error(generateErrorMessage(error, 'Failed to delete request'));
   }
@@ -579,7 +591,20 @@ export const leaveRoom = async ({
     if (member.total === 0) {
       throw new Error('Member does not exist');
     }
-    await databases.deleteDocument(DATABASE_ID, MEMBER_ID, memberId);
+    await databases.deleteDocument(
+      DATABASE_ID,
+      MEMBER_ID,
+      member.documents[0].$id
+    );
+
+    await databases.updateDocument(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      chatRoom.$id,
+      {
+        members_count: chatRoom.members_count - 1,
+      }
+    );
   } catch (error) {
     throw new Error(generateErrorMessage(error, 'Failed to leave room'));
   }

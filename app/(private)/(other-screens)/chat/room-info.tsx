@@ -105,14 +105,18 @@ const RoomInfoScreen = () => {
           ) : null
         }
       />
-      <PendingMemberBanner pendingMemberCount={total} roomId={roomId} />
+      {isCreator ||
+        (isLoggedInUserAdmin && (
+          <PendingMemberBanner pendingMemberCount={total} roomId={roomId} />
+        ))}
       <RoomInfoTop data={data} />
       <RoomInfo
         infoData={memberData}
         handleMore={handleMore}
         creatorId={data.creator_id}
         roomId={roomId}
-        disableAction={!isLoggedInUserAdmin || !isCreator}
+        loggedInUser={id!}
+        disableAction={!isLoggedInUserAdmin && !isCreator}
       />
     </ScrollWrapper>
   );

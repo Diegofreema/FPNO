@@ -15,6 +15,9 @@ export const useLeave = () => {
       toast.success('Successfully left the room');
       query.invalidateQueries({ queryKey: ['member'] });
       query.invalidateQueries({ queryKey: ['members'] });
+      query.invalidateQueries({ queryKey: ['room-info'] });
+      query.invalidateQueries({ queryKey: ['channels-i-am-in'] });
+
       router.replace('/chat');
 
       // ! to add more later

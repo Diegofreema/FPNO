@@ -17,6 +17,7 @@ type Props = {
   creatorId: string;
   roomId: string;
   disableAction: boolean;
+  loggedInUser: string;
 };
 
 export const RoomInfo = ({
@@ -25,6 +26,7 @@ export const RoomInfo = ({
   creatorId,
   roomId,
   disableAction,
+  loggedInUser,
 }: Props) => {
   const { documents, total } = infoData;
   const hide = documents.length === total;
@@ -80,7 +82,9 @@ export const RoomInfo = ({
           const text = isAdmin ? 'Member' : 'Admin';
           return (
             <ChatMenu
-              disable={disabled || disableAction}
+              disable={
+                disabled || disableAction || item.user.userId === loggedInUser
+              }
               trigger={
                 <User
                   user={item.user}

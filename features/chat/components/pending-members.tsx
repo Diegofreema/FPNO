@@ -1,3 +1,4 @@
+import { LoadingModal } from '@/components/typography/loading-modal';
 import { useAccept } from '@/features/chat-room/api/use-accept';
 import { useDecline } from '@/features/chat-room/api/use-decline';
 import { MemberWithUserProfile } from '@/types';
@@ -24,9 +25,11 @@ export const PendingMembers = ({
 }: Props) => {
   const { mutateAsync: accept, isPending: isAccepting } = useAccept();
   const { mutateAsync: decline, isPending: isDeclining } = useDecline();
+  const isVisible = isAccepting || isDeclining;
 
   return (
     <View style={{ flex: 1 }}>
+      {isVisible && <LoadingModal visible={isVisible} />}
       <LegendList
         data={users}
         keyExtractor={(item) => item.$id}
