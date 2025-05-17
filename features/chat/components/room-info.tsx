@@ -1,3 +1,4 @@
+import { LoadingModal } from '@/components/typography/loading-modal';
 import { useRemoveMember } from '@/features/chat-room/api/use-remove-member';
 import { useUpdateMemberRole } from '@/features/chat-room/api/use-update-member-role';
 import { ChatRoleDisplay } from '@/features/chat-room/components/role';
@@ -15,6 +16,7 @@ type Props = {
   handleMore: () => void;
   creatorId: string;
   roomId: string;
+  disableAction: boolean;
 };
 
 export const RoomInfo = ({
@@ -22,11 +24,14 @@ export const RoomInfo = ({
   handleMore,
   creatorId,
   roomId,
+  disableAction,
 }: Props) => {
   const { documents, total } = infoData;
   const hide = documents.length === total;
-  const { mutateAsync: removeMember } = useRemoveMember();
-  const { mutateAsync: updateMember } = useUpdateMemberRole();
+  const { mutateAsync: removeMember, isPending: isRemoving } =
+    useRemoveMember();
+  const { mutateAsync: updateMember, isPending: isUpdating } =
+    useUpdateMemberRole();
   const actionUserId = useAuth((state) => state.user?.id!);
   const onRemoveUser = async ({ memberId }: { memberId: string }) => {
     Alert.alert('Are you sure?', 'This can not be reversed', [
@@ -43,21 +48,23 @@ export const RoomInfo = ({
     ]);
   };
   const onChangeRole = async (memberId: string) => {
-    Alert.alert('Update member role', 'This will update the user role', [
+    Alert.alert('Update role', 'This will update the user role', [
       {
         text: 'Cancel',
         onPress: () => console.log('Cancel Pressed'),
         style: 'cancel',
       },
       {
-        text: 'Remove',
+        text: 'Update',
         onPress: () => updateMember({ roomId, memberId, actionUserId }),
         style: 'default',
       },
     ]);
   };
+  const isVisible = isRemoving || isUpdating;
   return (
     <View style={{ flex: 1 }}>
+      <LoadingModal visible={isVisible} />
       <LegendList
         data={documents}
         showsVerticalScrollIndicator={false}
@@ -73,7 +80,7 @@ export const RoomInfo = ({
           const text = isAdmin ? 'Member' : 'Admin';
           return (
             <ChatMenu
-              disable={disabled}
+              disable={disabled || disableAction}
               trigger={
                 <User
                   user={item.user}

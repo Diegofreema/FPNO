@@ -594,6 +594,8 @@ export const updateMemberRole = async ({
   memberId: string;
   actionUserId: string;
 }) => {
+  console.log({ roomId, memberId, actionUserId });
+
   try {
     const chatRoom = await databases.getDocument<ChannelType>(
       DATABASE_ID,
@@ -611,6 +613,9 @@ export const updateMemberRole = async ({
         Query.equal('member_id', actionUserId),
       ]
     );
+    if (member.total === 0) {
+      throw new Error('You are not authorized to perform this action');
+    }
     if (
       chatRoom.creator_id !== actionUserId &&
       member.documents[0].access_role !== MemberAccessRole.ADMIN
@@ -630,10 +635,17 @@ export const updateMemberRole = async ({
       isAMember.documents[0].access_role === MemberAccessRole.ADMIN
         ? MemberAccessRole.MEMBER
         : MemberAccessRole.ADMIN;
-    await databases.updateDocument(DATABASE_ID, MEMBER_ID, memberId, {
-      access_role: newRole,
-    });
+    await databases.updateDocument(
+      DATABASE_ID,
+      MEMBER_ID,
+      isAMember.documents[0].$id,
+      {
+        access_role: newRole,
+      }
+    );
   } catch (error) {
+    console.log(error);
+
     throw new Error(
       generateErrorMessage(error, 'Failed to update member role')
     );

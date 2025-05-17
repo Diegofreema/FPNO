@@ -12,6 +12,7 @@ import { ChatMenu } from '@/features/chat/components/chat-menu';
 import { RoomInfo } from '@/features/chat/components/room-info';
 import { RoomInfoTop } from '@/features/chat/components/room-info-top';
 import { useAuth } from '@/lib/zustand/useAuth';
+import { MemberAccessRole } from '@/types';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 
@@ -19,6 +20,7 @@ const RoomInfoScreen = () => {
   const { roomId } = useLocalSearchParams<{ roomId: string }>();
   const [more, setMore] = useState(0);
   const id = useAuth((state) => state.user?.id);
+
   const {
     data,
     isPending: isPendingData,
@@ -85,6 +87,13 @@ const RoomInfoScreen = () => {
   };
 
   const isCreator = data.creator_id === id;
+  const loggedInMember = memberData.documents.find(
+    (member) => member.member_id === id
+  );
+
+  const isLoggedInUserAdmin = !!(
+    loggedInMember && loggedInMember.access_role === MemberAccessRole.ADMIN
+  );
   const { total } = pendingMemberData;
   return (
     <ScrollWrapper>
@@ -103,6 +112,7 @@ const RoomInfoScreen = () => {
         handleMore={handleMore}
         creatorId={data.creator_id}
         roomId={roomId}
+        disableAction={!isLoggedInUserAdmin || !isCreator}
       />
     </ScrollWrapper>
   );
