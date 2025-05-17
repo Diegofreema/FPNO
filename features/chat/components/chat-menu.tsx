@@ -18,16 +18,25 @@ interface MenuItem {
 interface PopupMenuProps {
   menuItems: MenuItem[];
   disable?: boolean;
+  trigger?: React.ReactNode;
 }
 
-export const ChatMenu: React.FC<PopupMenuProps> = ({ menuItems, disable }) => {
+export const ChatMenu: React.FC<PopupMenuProps> = ({
+  menuItems,
+  disable,
+  trigger,
+}) => {
   return (
     <Menu renderer={renderers.ContextMenu}>
       <MenuTrigger
         customStyles={{ triggerTouchable: styles.trigger }}
         disabled={disable}
       >
-        <Ionicons name="ellipsis-vertical" size={24} color="black" />
+        {trigger ? (
+          trigger
+        ) : (
+          <Ionicons name="ellipsis-vertical" size={24} color="black" />
+        )}
       </MenuTrigger>
       <MenuOptions customStyles={menuOptionsStyles}>
         {menuItems.map((item, index) => (

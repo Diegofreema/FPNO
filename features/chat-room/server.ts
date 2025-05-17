@@ -503,3 +503,139 @@ export const declineRequest = async ({
     throw new Error(generateErrorMessage(error, 'Failed to delete request'));
   }
 };
+
+export const removeMember = async ({
+  roomId,
+  memberId,
+  actionUserId,
+}: {
+  roomId: string;
+  memberId: string;
+  actionUserId: string;
+}) => {
+  try {
+    const chatRoom = await databases.getDocument<ChannelType>(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      roomId
+    );
+
+    if (!chatRoom) {
+      throw new Error('Chat room does not exist');
+    }
+    const member = await databases.listDocuments<MemberType>(
+      DATABASE_ID,
+      MEMBER_ID,
+      [
+        Query.equal('channel_id', roomId),
+        Query.equal('member_id', actionUserId),
+      ]
+    );
+    if (member.total === 0) {
+      throw new Error('You are not authorized to perform this action');
+    }
+    if (
+      chatRoom.creator_id !== actionUserId &&
+      member.documents[0].access_role !== MemberAccessRole.ADMIN
+    ) {
+      throw new Error('You are not authorized to perform this action');
+    }
+
+    const isAMember = await databases.listDocuments<MemberType>(
+      DATABASE_ID,
+      MEMBER_ID,
+      [Query.equal('channel_id', roomId), Query.equal('member_id', memberId)]
+    );
+    if (isAMember.total === 0) {
+      throw new Error('Member does not exist');
+    }
+    await databases.deleteDocument(DATABASE_ID, MEMBER_ID, memberId);
+  } catch (error) {
+    throw new Error(generateErrorMessage(error, 'Failed to delete request'));
+  }
+};
+
+export const leaveRoom = async ({
+  roomId,
+  memberId,
+}: {
+  roomId: string;
+  memberId: string;
+}) => {
+  try {
+    const chatRoom = await databases.getDocument<ChannelType>(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      roomId
+    );
+    if (!chatRoom) {
+      throw new Error('Chat room does not exist');
+    }
+    const member = await databases.listDocuments<MemberType>(
+      DATABASE_ID,
+      MEMBER_ID,
+      [Query.equal('channel_id', roomId), Query.equal('member_id', memberId)]
+    );
+    if (member.total === 0) {
+      throw new Error('Member does not exist');
+    }
+    await databases.deleteDocument(DATABASE_ID, MEMBER_ID, memberId);
+  } catch (error) {
+    throw new Error(generateErrorMessage(error, 'Failed to leave room'));
+  }
+};
+
+export const updateMemberRole = async ({
+  roomId,
+  memberId,
+  actionUserId,
+}: {
+  roomId: string;
+  memberId: string;
+  actionUserId: string;
+}) => {
+  try {
+    const chatRoom = await databases.getDocument<ChannelType>(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      roomId
+    );
+    if (!chatRoom) {
+      throw new Error('Chat room does not exist');
+    }
+    const member = await databases.listDocuments<MemberType>(
+      DATABASE_ID,
+      MEMBER_ID,
+      [
+        Query.equal('channel_id', roomId),
+        Query.equal('member_id', actionUserId),
+      ]
+    );
+    if (
+      chatRoom.creator_id !== actionUserId &&
+      member.documents[0].access_role !== MemberAccessRole.ADMIN
+    ) {
+      throw new Error('You are not authorized to perform this action');
+    }
+
+    const isAMember = await databases.listDocuments<MemberType>(
+      DATABASE_ID,
+      MEMBER_ID,
+      [Query.equal('channel_id', roomId), Query.equal('member_id', memberId)]
+    );
+    if (isAMember.total === 0) {
+      throw new Error('Member does not exist');
+    }
+    const newRole =
+      isAMember.documents[0].access_role === MemberAccessRole.ADMIN
+        ? MemberAccessRole.MEMBER
+        : MemberAccessRole.ADMIN;
+    await databases.updateDocument(DATABASE_ID, MEMBER_ID, memberId, {
+      access_role: newRole,
+    });
+  } catch (error) {
+    throw new Error(
+      generateErrorMessage(error, 'Failed to update member role')
+    );
+  }
+};

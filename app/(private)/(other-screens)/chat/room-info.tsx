@@ -98,7 +98,11 @@ const RoomInfoScreen = () => {
       />
       <PendingMemberBanner pendingMemberCount={total} roomId={roomId} />
       <RoomInfoTop data={data} />
-      <RoomInfo infoData={memberData} handleMore={handleMore} />
+      <RoomInfo
+        infoData={memberData}
+        handleMore={handleMore}
+        creatorId={data.creator_id}
+      />
     </ScrollWrapper>
   );
 };
