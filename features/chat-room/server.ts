@@ -739,6 +739,7 @@ export const sendMessage = async ({
   senderId,
   fileType,
   fileUrl,
+  fileId,
 }: SendMessageType) => {
   try {
     const chatRoom = await databases.getDocument<ChannelType>(
@@ -771,6 +772,7 @@ export const sendMessage = async ({
         seen_ids: [senderId],
         fileType,
         fileUrl,
+        fileId,
       }
     );
 
@@ -779,7 +781,7 @@ export const sendMessage = async ({
       CHAT_COLLECTION_ID,
       chatRoom.$id,
       {
-        last_message: message,
+        last_message: message || 'file',
         last_message_time: new Date().toISOString(),
       }
     );

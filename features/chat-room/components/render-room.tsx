@@ -7,6 +7,7 @@ import { checkIfIsInPending, formatNumber, trimText } from '@/helper';
 import { useAuth } from '@/lib/zustand/useAuth';
 import { ChannelTypeWithPendingMembers } from '@/types';
 import { router, usePathname } from 'expo-router';
+import { File } from 'lucide-react-native';
 import { Text, View } from 'react-native';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import { useGetMember } from '../api/use-get-member';
@@ -132,14 +133,18 @@ const Right = ({ name, lastMessage, isMember, membersCount }: RightProps) => {
         {name}
       </Text>
 
-      <Text
-        style={{
-          fontSize: RFPercentage(1.4),
-          color: colors.textGray,
-        }}
-      >
-        {textToDisplay}
-      </Text>
+      {lastMessage === 'file' ? (
+        <File color={colors.textGray} size={20} />
+      ) : (
+        <Text
+          style={{
+            fontSize: RFPercentage(1.4),
+            color: colors.textGray,
+          }}
+        >
+          {textToDisplay}
+        </Text>
+      )}
     </View>
   );
 };

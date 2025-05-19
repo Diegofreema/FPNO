@@ -132,6 +132,8 @@ export const RenderBubble = ({
             styles.image,
             isSent ? styles.sentImage : styles.receivedImage,
           ]}
+          placeholder={require('@/assets/images/place.webp')}
+          placeholderContentFit="cover"
           contentFit="cover"
         />
       );
@@ -143,7 +145,6 @@ export const RenderBubble = ({
             style={styles.pdf}
             singlePage
           />
-          <Text style={styles.pdfText}>PDF Document</Text>
         </TouchableOpacity>
       );
     } else {
@@ -302,6 +303,8 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   sentImage: {
     borderBottomRightRadius: 2,
@@ -310,18 +313,15 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 2,
   },
   pdfContainer: {
-    alignItems: 'center',
+    width: 200,
+    height: 200,
   },
   pdf: {
-    width: 150,
-    height: 150,
+    width: '100%',
+    height: '100%',
     borderRadius: 8,
   },
-  pdfText: {
-    marginTop: 4,
-    fontSize: 14,
-    color: '#007AFF',
-  },
+
   time: {
     fontSize: 12,
     color: '#888',

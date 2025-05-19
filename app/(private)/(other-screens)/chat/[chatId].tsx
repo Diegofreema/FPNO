@@ -122,37 +122,53 @@ const ChatId = () => {
   }, []);
   const handlePhotoTaken = useCallback((message: IMessage) => {}, []);
   const handleFilePick = async () => {
+    setSending(true);
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: ['image/jpeg', 'image/png', 'application/pdf'],
+        type: ['application/pdf'],
         copyToCacheDirectory: true,
+        multiple: true,
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        const asset = result.assets[0];
-        const file = {
-          uri: asset.uri,
-          type: asset.mimeType || 'application/octet-stream',
-          name:
-            asset.name ||
-            `file_${Date.now()}.${asset.mimeType?.split('/').pop() || 'file'}`,
-        };
-        console.log({ file });
+        const { assets } = result;
+        const filePromises = assets.map(async (asset) => {
+          const file = {
+            uri: asset.uri,
+            type: asset.mimeType || 'application/octet-stream',
+            name:
+              asset.name ||
+              `file_${Date.now()}.${
+                asset.mimeType?.split('/').pop() || 'file'
+              }`,
+            size: asset.size || 0,
+          };
 
-        //  const { fileId, fileUrl, fileType } = await appwriteService.uploadFile(
-        //    file
-        //  );
-        //  const message = {
-        //    text: '',
-        //    user: { _id: 'current_user_id' },
-        //    fileId,
-        //    fileUrl,
-        //    fileType,
-        //  };
-        //  await onSend([message]);
+          const { id, link } = await generateImageUrl(file);
+
+          return {
+            id,
+            link,
+          };
+        });
+
+        const fileUrls = await Promise.all(filePromises);
+
+        const messages = fileUrls.map((file) => {
+          return {
+            text: '',
+            user: { _id: loggedInUser },
+            fileId: file.id,
+            fileUrl: file.link,
+            fileType: 'pdf' as FileType,
+          };
+        });
+        onSend(messages);
       }
     } catch (error) {
       console.error('Error picking file:', error);
+    } finally {
+      setSending(false);
     }
   };
   const handleImagePick = async () => {
@@ -185,7 +201,6 @@ const ChatId = () => {
 
         const fileUrls = await Promise.all(filePromises);
 
-        console.log({ fileUrls });
         const messages = fileUrls.map((file) => {
           return {
             text: '',

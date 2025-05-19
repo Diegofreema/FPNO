@@ -152,7 +152,9 @@ export type ChatMessageType = Models.Document & {
   message: string;
   seen_ids: string[];
   sent_to: string[];
-
+  fileType?: FileType;
+  fileUrl?: string;
+  fileId?: string;
   // content_type: 'image' | 'text' | 'pdf';
 };
 
@@ -178,7 +180,7 @@ export type SendMessageType = {
   senderId: string;
   channel_id: string;
   message: string;
-  fileType?: 'pdf' | 'image' | 'audio';
+  fileType?: FileType;
   fileUrl?: string;
   fileId?: string;
 };

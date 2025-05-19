@@ -26,6 +26,8 @@ export const useMessages = ({ channel_id, more, loggedInUser }: Props) => {
       name: message.sender_id === loggedInUser ? 'You' : message?.user?.name,
     },
     reactions: message.reactions,
+    fileType: message.fileType,
+    fileUrl: message.fileUrl,
   }));
   return {
     data: {
