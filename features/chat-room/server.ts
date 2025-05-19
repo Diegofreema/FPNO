@@ -17,6 +17,7 @@ import {
   MemberStatus,
   MemberType,
   MessageReactionsType,
+  Reaction_Enum,
   SendMessageType,
   UserType,
 } from '@/types';
@@ -780,5 +781,63 @@ export const sendMessage = async ({
     );
   } catch (error) {
     throw new Error(generateErrorMessage(error, 'Failed to send message'));
+  }
+};
+
+export const onReactToMessage = async ({
+  messageId,
+  reaction,
+  senderId,
+}: {
+  messageId: string;
+  reaction: Reaction_Enum;
+  senderId: string;
+}) => {
+  try {
+    const message = await databases.getDocument<ChatMessageType>(
+      DATABASE_ID,
+      CHAT_MESSAGES_COLLECTION_ID,
+      messageId
+    );
+    if (!message) {
+      throw new Error('Message does not exist');
+    }
+    const checkIfSenderIsAMember = await databases.listDocuments<MemberType>(
+      DATABASE_ID,
+      MEMBER_ID,
+      [
+        Query.equal('channel_id', message.channel_id),
+        Query.equal('member_id', senderId),
+      ]
+    );
+    if (checkIfSenderIsAMember.total === 0) {
+      throw new Error('Sender is not a member of the channel');
+    }
+
+    const reactionExists = await databases.listDocuments<MessageReactionsType>(
+      DATABASE_ID,
+      MESSAGE_REACTIONS,
+      [Query.equal('message_id', messageId), Query.equal('user_id', senderId)]
+    );
+    if (reactionExists.total !== 0) {
+      await databases.deleteDocument(
+        DATABASE_ID,
+        MESSAGE_REACTIONS,
+        reactionExists.documents[0].$id
+      );
+    }
+
+    await databases.createDocument(
+      DATABASE_ID,
+      MESSAGE_REACTIONS,
+      ID.unique(),
+      {
+        message_id: messageId,
+        user_id: senderId,
+        emoji: reaction,
+      }
+    );
+  } catch (error) {
+    throw new Error(generateErrorMessage(error, 'Failed to react to message'));
   }
 };

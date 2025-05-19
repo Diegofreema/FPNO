@@ -1,3 +1,5 @@
+import { Reaction_Enum } from './types';
+
 export const upcoming = [
   {
     img: require('@/assets/images/python.png'),
@@ -382,4 +384,13 @@ export const messageData = [
     date: 'Thu Sep 02 2021 06:12:56 GMT+0200 (Central European Summer Time)',
     msg: 'Proident qui do consequat labore magna amet reprehenderit do id. Eiusmod sunt fugiat aliquip sunt excepteur reprehenderit.',
   },
+];
+
+export const emojis = [
+  { value: Reaction_Enum.LIKE, emoji: '👍' },
+  { value: Reaction_Enum.LOVE, emoji: '❤️' },
+  { value: Reaction_Enum.LAUGH, emoji: '😂' },
+  { value: Reaction_Enum.WOW, emoji: '😮' },
+  { value: Reaction_Enum.SAD, emoji: '😢' },
+  { value: Reaction_Enum.ANGRY, emoji: '😡' },
 ];

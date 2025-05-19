@@ -4,7 +4,9 @@ import { BubbleProps } from 'react-native-gifted-chat';
 
 import { CustomPressable } from '@/components/ui/custom-pressable';
 import { colors } from '@/constants';
-import { IMessage } from '@/types';
+import { emojis } from '@/data';
+import { onReactToMessage } from '@/features/chat-room/server';
+import { IMessage, Reaction_Enum } from '@/types';
 import { Image } from 'expo-image';
 import {
   Dimensions,
@@ -14,6 +16,7 @@ import {
   View,
 } from 'react-native';
 import Pdf from 'react-native-pdf';
+import { toast } from 'sonner-native';
 import { EmojiPickerModal } from './emoji-modal';
 import { InChatFileTransfer } from './in-chat-file-transfer';
 import { InChatViewFile } from './in-chat-view-file';
@@ -49,6 +52,9 @@ export const RenderBubble = ({
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
   const bubbleRef = useRef<View>(null);
+  const findEmojiISelected = currentMessage.reactions?.find(
+    (reaction) => reaction.user_id === loggedInUserId
+  );
 
   const isSent = currentMessage.user._id === loggedInUserId;
   // const onPress = () => {
@@ -87,18 +93,31 @@ export const RenderBubble = ({
   const handleEmojiSelect = async (emoji: string) => {
     try {
       console.log(emoji);
-
-      // Reaction is updated via Appwrite subscription in ChatScreen
+      await onReactToMessage({
+        messageId: currentMessage._id as string,
+        reaction: emoji as Reaction_Enum,
+        senderId: loggedInUserId as string,
+      });
     } catch (error) {
       console.error('Error adding reaction:', error);
+      toast.error('Error adding reaction');
     }
   };
   const handleLongPress = () => {
     if (bubbleRef.current) {
       bubbleRef.current.measure((x, y, w, h, pageX, pageY) => {
+        const bubbleCenter = pageX + width / 2;
+        // Calculate the width of the emoji picker (40px per emoji)
+        const pickerWidth = emojis.length * 45;
         setPickerPosition({
           top: pageY - 60, // Position above bubble
-          left: Math.max(16, pageX - (emojis.length * 40) / 2), // Center horizontally
+          left: Math.max(
+            16,
+            Math.min(
+              Dimensions.get('window').width - pickerWidth - 16,
+              bubbleCenter - pickerWidth / 2
+            )
+          ), // Center horizontally
         });
         setPickerVisible(true);
       });
@@ -155,7 +174,7 @@ export const RenderBubble = ({
       <View style={styles.reactionsContainer}>
         {reactionEmojis.map((emoji, index) => (
           <Text key={index} style={styles.reactionEmoji}>
-            {emoji.emoji}
+            {renderEmoji[emoji.emoji]}
           </Text>
         ))}
       </View>
@@ -211,6 +230,7 @@ export const RenderBubble = ({
         onClose={() => setPickerVisible(false)}
         onSelect={handleEmojiSelect}
         position={pickerPosition}
+        findEmojiISelected={findEmojiISelected}
       />
     </>
     // <Bubble
@@ -314,10 +334,22 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 6,
     paddingVertical: 2,
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
+    zIndex: 1000,
   },
   reactionEmoji: {
     fontSize: 14,
     marginHorizontal: 2,
   },
 });
-const emojis = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
+
+const renderEmoji = {
+  LIKE: '👍',
+  LOVE: '❤️',
+  LAUGH: '😂',
+  WOW: '😮',
+  SAD: '😢',
+  ANGRY: '😡',
+};

@@ -3,6 +3,7 @@ import {
   CHAT_MESSAGES_COLLECTION_ID,
   DATABASE_ID,
   MEMBER_ID,
+  MESSAGE_REACTIONS,
 } from '@/config';
 import { client } from '@/db/appwrite';
 import { useQueryClient } from '@tanstack/react-query';
@@ -25,8 +26,9 @@ export const useRealtime = () => {
     const roomChannel = `databases.${DATABASE_ID}.collections.${CHAT_COLLECTION_ID}.documents`;
     const memberChannel = `databases.${DATABASE_ID}.collections.${MEMBER_ID}.documents`;
     const messageChannel = `databases.${DATABASE_ID}.collections.${CHAT_MESSAGES_COLLECTION_ID}.documents`;
+    const likeChannel = `databases.${DATABASE_ID}.collections.${MESSAGE_REACTIONS}.documents`;
     const unsubscribe = client.subscribe(
-      [roomChannel, messageChannel, memberChannel],
+      [roomChannel, messageChannel, memberChannel, likeChannel],
       (response) => {
         console.log(response, 'pending');
         keys.forEach((key) => {

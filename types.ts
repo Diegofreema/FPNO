@@ -185,13 +185,13 @@ export type MessageReactionsType = Models.Document & {
   emoji: Reaction_Enum;
 };
 
-enum Reaction_Enum {
+export enum Reaction_Enum {
   LIKE = 'LIKE',
   LOVE = 'LOVE',
   WOW = 'WOW',
   SAD = 'SAD',
   ANGRY = 'ANGRY',
-  DISLIKE = 'DISLIKE',
+  LAUGH = 'LAUGH',
 }
 
 export interface IMessage {

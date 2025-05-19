@@ -175,6 +175,7 @@ const ChatId = () => {
   const loadEarlier =
     (messageData.messages?.length || 0) < (messageData.total || 0);
   const isMember = !!member.total;
+  console.log({ message: messageData.messages });
 
   return (
     <Wrapper>

@@ -1,3 +1,6 @@
+import { colors } from '@/constants';
+import { emojis } from '@/data';
+import { MessageReactionsType } from '@/types';
 import React from 'react';
 import {
   Dimensions,
@@ -13,14 +16,16 @@ interface EmojiPickerModalProps {
   onClose: () => void;
   onSelect: (emoji: string) => void;
   position?: { top: number; left: number }; // Position above the bubble
+  findEmojiISelected: MessageReactionsType | undefined;
 }
 
-const emojis = ['👍', '❤️', '😂', '😮', '😢', '🙏']; // WhatsApp-like emojis
+// WhatsApp-like emojis
 
 export const EmojiPickerModal: React.FC<EmojiPickerModalProps> = ({
   visible,
   onClose,
   onSelect,
+  findEmojiISelected,
   position = { top: 0, left: 0 },
 }) => {
   return (
@@ -43,19 +48,22 @@ export const EmojiPickerModal: React.FC<EmojiPickerModalProps> = ({
             { top: position.top, left: position.left },
           ]}
         >
-          {emojis.map((emoji) => (
-            <TouchableOpacity
-              key={emoji}
-              style={styles.emojiButton}
-              onPress={() => {
-                onSelect(emoji);
-                onClose();
-              }}
-              accessibilityLabel={`React with ${emoji}`}
-            >
-              <Text style={styles.emoji}>{emoji}</Text>
-            </TouchableOpacity>
-          ))}
+          {emojis.map((emoji) => {
+            const isSelected = findEmojiISelected?.emoji === emoji.value;
+            return (
+              <TouchableOpacity
+                key={emoji.value}
+                style={[styles.emojiButton, isSelected && styles.selected]}
+                onPress={() => {
+                  onSelect(emoji.value);
+                  onClose();
+                }}
+                accessibilityLabel={`React with ${emoji.emoji}`}
+              >
+                <Text style={styles.emoji}>{emoji.emoji}</Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </TouchableOpacity>
     </Modal>
@@ -87,5 +95,9 @@ const styles = StyleSheet.create({
   },
   emoji: {
     fontSize: 24,
+  },
+  selected: {
+    backgroundColor: colors.lightblue,
+    borderRadius: 10,
   },
 });
