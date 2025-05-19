@@ -178,3 +178,33 @@ export type SendMessageType = {
   channel_id: string;
   message: string;
 };
+
+export type MessageReactionsType = Models.Document & {
+  message_id: string;
+  user_id: string;
+  emoji: Reaction_Enum;
+};
+
+enum Reaction_Enum {
+  LIKE = 'LIKE',
+  LOVE = 'LOVE',
+  WOW = 'WOW',
+  SAD = 'SAD',
+  ANGRY = 'ANGRY',
+  DISLIKE = 'DISLIKE',
+}
+
+export interface IMessage {
+  _id: string | number;
+  text: string;
+  createdAt: Date | number;
+  user: {
+    _id: string;
+    name: string;
+  };
+  image?: string;
+  fileType?: 'pdf' | 'image' | 'audio';
+  audio?: string;
+  fileUrl?: string;
+  reactions?: MessageReactionsType[];
+}

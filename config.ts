@@ -17,3 +17,5 @@ export const BUCKET_ID = process.env.EXPO_PUBLIC_BUCKET_ID!;
 
 export const PENDING_ID = process.env.EXPO_PUBLIC_PENDING_ID!;
 export const MEMBER_ID = process.env.EXPO_PUBLIC_MEMBER_ID!;
+
+export const MESSAGE_REACTIONS = process.env.EXPO_PUBLIC_REACTIONS_ID!;

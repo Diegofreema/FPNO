@@ -4,6 +4,7 @@ import {
   CHAT_MESSAGES_COLLECTION_ID,
   DATABASE_ID,
   MEMBER_ID,
+  MESSAGE_REACTIONS,
   PROJECT_ID,
   USER_COLLECTION_ID,
 } from '@/config';
@@ -15,6 +16,7 @@ import {
   MemberAccessRole,
   MemberStatus,
   MemberType,
+  MessageReactionsType,
   SendMessageType,
   UserType,
 } from '@/types';
@@ -174,7 +176,10 @@ export const getChannelsIamIn = async ({
     }
 
     // Build query
-    const query = [Query.equal('$id', channelIds)];
+    const query = [
+      Query.equal('$id', channelIds),
+      Query.orderDesc('last_message_time'),
+    ];
 
     // Add search if provided and valid
     if (search && search.trim()) {
@@ -698,23 +703,29 @@ export const getMessages = async ({
       ]
     );
 
-    const messagesWithUserProfile = await Promise.all(
+    const messagesWithUserProfileAndLikes = await Promise.all(
       messages.documents.map(async (message) => {
         const res = await databases.listDocuments<UserType>(
           DATABASE_ID,
           USER_COLLECTION_ID,
           [Query.equal('userId', message.sender_id)]
         );
+        const reactions = await databases.listDocuments<MessageReactionsType>(
+          DATABASE_ID,
+          MESSAGE_REACTIONS,
+          [Query.equal('message_id', message.$id)]
+        );
         return {
           ...message,
           user: res.documents[0],
+          reactions: reactions.documents,
         };
       })
     );
 
     return {
       ...messages,
-      documents: messagesWithUserProfile,
+      documents: messagesWithUserProfileAndLikes,
     };
   } catch (error) {
     throw new Error(generateErrorMessage(error, 'Failed to get messages'));

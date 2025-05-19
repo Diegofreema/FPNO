@@ -1,5 +1,6 @@
 import { colors } from '@/constants';
 import { useAuth } from '@/lib/zustand/useAuth';
+import { IMessage } from '@/types';
 import { ActionSheetOptions } from '@expo/react-native-action-sheet';
 import React from 'react';
 import {
@@ -9,12 +10,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import {
-  GiftedChat,
-  IMessage,
-  SystemMessage,
-  Time,
-} from 'react-native-gifted-chat';
+import { GiftedChat, SystemMessage, Time } from 'react-native-gifted-chat';
 import { SharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChatFooter } from './chat-footer';
