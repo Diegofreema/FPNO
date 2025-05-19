@@ -127,7 +127,7 @@ const ChatComponent = ({
           )}
           renderActions={(props) => (
             <RenderActions
-              disable={imagePaths.length > 0}
+              disable={sending}
               {...props}
               onPickDocument={() => setVisible(true)}
             />

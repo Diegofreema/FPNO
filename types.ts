@@ -178,6 +178,9 @@ export type SendMessageType = {
   senderId: string;
   channel_id: string;
   message: string;
+  fileType?: 'pdf' | 'image' | 'audio';
+  fileUrl?: string;
+  fileId?: string;
 };
 
 export type MessageReactionsType = Models.Document & {
@@ -204,7 +207,7 @@ export interface IMessage {
     name: string;
   };
   image?: string;
-  fileType?: 'pdf' | 'image' | 'audio';
+  fileType?: FileType;
   audio?: string;
   fileUrl?: string;
   reactions?: MessageReactionsType[];
@@ -213,7 +216,10 @@ export interface SendIMessage {
   text: string;
 
   image?: ImagePickerAsset;
-  fileType?: 'pdf' | 'image' | 'audio';
+  fileType?: FileType;
   audio?: string;
   fileUrl?: string;
+  fileId?: string;
 }
+
+export type FileType = 'pdf' | 'image' | 'audio';

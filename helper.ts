@@ -2,6 +2,9 @@ import axios from 'axios';
 import { format, isToday, isYesterday, parseISO } from 'date-fns';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
+import { ID } from 'react-native-appwrite';
+import { BUCKET_ID, PROJECT_ID } from './config';
+import { storage } from './db/appwrite';
 import { MemberType, userData } from './types';
 
 export const sendEmail = async (email: string, otp: string) => {
@@ -241,4 +244,17 @@ export const formatMessageTime = (timestamp: string | Date): string => {
     console.error('Error formatting timestamp:', error);
     return 'Invalid date';
   }
+};
+
+export const generateImageUrl = async (image: {
+  name: string;
+  type: string;
+  size: number;
+  uri: string;
+}) => {
+  const file = await storage.createFile(BUCKET_ID, ID.unique(), image);
+  const id = file.$id;
+  const link = `https://fra.cloud.appwrite.io/v1/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}&mode=admin`;
+
+  return { link, id };
 };

@@ -12,11 +12,10 @@ import { useMessages } from '@/features/chat-room/hook/useMessages';
 import { useGetConversationWithMessages } from '@/features/chat/api/use-get-conversation';
 import ChatComponent from '@/features/chat/components/chat-component';
 import { ChatNav } from '@/features/chat/components/chat-nav';
-import { formatNumber } from '@/helper';
+import { formatNumber, generateImageUrl } from '@/helper';
 import { useIsCreator } from '@/hooks/useIsCreator';
 import { useAuth } from '@/lib/zustand/useAuth';
-import { useGetImage } from '@/lib/zustand/useGetImage';
-import { IMessage, SendIMessage } from '@/types';
+import { FileType, IMessage, SendIMessage } from '@/types';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import * as Clipboard from 'expo-clipboard';
 import * as DocumentPicker from 'expo-document-picker';
@@ -34,7 +33,7 @@ const ChatId = () => {
   const [text, setText] = useState('');
   const router = useRouter();
   const pathname = usePathname();
-  const [hasTriedSending, setHasTriedSending] = useState(false);
+
   const { mutateAsync, isPending: isSendingMessage } = useSendMessage();
   const [isAttachImage, setIsAttachImage] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -42,33 +41,17 @@ const ChatId = () => {
   const [imagePaths, setImagePaths] = useState<string[]>([]);
   const height = useSharedValue(0);
   const { showActionSheetWithOptions } = useActionSheet();
-  const img = useGetImage((state) => state.image);
-  const removeImage = useGetImage((state) => state.removeImage);
+
   const {
     data: messageData,
     error: messageError,
     isError: isMessageError,
     isPending: isMessagePending,
     isRefetchError,
-    isRefetching,
-    refetch: isRefetchMessage,
   } = useMessages({ channel_id: chatId, more, loggedInUser });
   const onOpenCamera = useCallback(() => {
     router.push(`/camera?path=${pathname}`);
-    setHasTriedSending(false);
   }, [router, pathname]);
-  const onPickImage = useCallback(async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsMultipleSelection: true,
-      quality: 0.5,
-    });
-
-    if (!result.canceled) {
-      console.log(result.assets);
-      setImagePaths(result.assets.map((r) => r.uri));
-      setIsAttachImage(true);
-    }
-  }, []);
 
   const [sending, setSending] = useState(false);
   const { data, isPending, isError, error, refetch } =
@@ -95,6 +78,9 @@ const ChatId = () => {
           message: message.text,
           channel_id: chatId,
           senderId: loggedInUser,
+          fileType: message.fileType,
+          fileUrl: message.fileUrl,
+          fileId: message.fileId,
         });
       });
     },
@@ -170,14 +156,52 @@ const ChatId = () => {
     }
   };
   const handleImagePick = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      quality: 1,
-    });
+    setSending(true);
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        quality: 0.5,
+        allowsMultipleSelection: true,
+      });
 
-    if (!result.canceled) {
-      console.log(result);
+      if (!result.canceled) {
+        console.log(result.assets);
+        const { assets } = result;
+        const filePromises = assets.map(async (asset) => {
+          const file = {
+            name: asset.fileName || new Date().toISOString(),
+            uri: asset.uri,
+            type: asset.type || 'image/jpeg',
+            size: asset.fileSize || 0,
+          };
+
+          const { id, link } = await generateImageUrl(file);
+
+          return {
+            id,
+            link,
+          };
+        });
+
+        const fileUrls = await Promise.all(filePromises);
+
+        console.log({ fileUrls });
+        const messages = fileUrls.map((file) => {
+          return {
+            text: '',
+            user: { _id: loggedInUser },
+            fileId: file.id,
+            fileUrl: file.link,
+            fileType: 'image' as FileType,
+          };
+        });
+        onSend(messages);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      toast.error('Error picking image');
+    } finally {
+      setSending(false);
     }
   };
   const onLoadMore = useCallback(async () => {

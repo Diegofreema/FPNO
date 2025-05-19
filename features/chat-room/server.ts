@@ -737,6 +737,8 @@ export const sendMessage = async ({
   channel_id,
   message,
   senderId,
+  fileType,
+  fileUrl,
 }: SendMessageType) => {
   try {
     const chatRoom = await databases.getDocument<ChannelType>(
@@ -767,6 +769,8 @@ export const sendMessage = async ({
         message,
         sender_id: senderId,
         seen_ids: [senderId],
+        fileType,
+        fileUrl,
       }
     );
 
@@ -819,6 +823,15 @@ export const onReactToMessage = async ({
       MESSAGE_REACTIONS,
       [Query.equal('message_id', messageId), Query.equal('user_id', senderId)]
     );
+    const isTheSameReaction = reactionExists.documents[0]?.emoji === reaction;
+    if (reactionExists.total !== 0 && isTheSameReaction) {
+      await databases.deleteDocument(
+        DATABASE_ID,
+        MESSAGE_REACTIONS,
+        reactionExists.documents[0].$id
+      );
+      return;
+    }
     if (reactionExists.total !== 0) {
       await databases.deleteDocument(
         DATABASE_ID,
