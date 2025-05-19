@@ -1,6 +1,7 @@
 import {
   BUCKET_ID,
   CHAT_COLLECTION_ID,
+  CHAT_MESSAGES_COLLECTION_ID,
   DATABASE_ID,
   MEMBER_ID,
   PROJECT_ID,
@@ -10,9 +11,11 @@ import { databases, storage } from '@/db/appwrite';
 import { generateErrorMessage } from '@/helper';
 import {
   ChannelType,
+  ChatMessageType,
   MemberAccessRole,
   MemberStatus,
   MemberType,
+  SendMessageType,
   UserType,
 } from '@/types';
 import { ID, Query } from 'react-native-appwrite';
@@ -674,5 +677,97 @@ export const updateMemberRole = async ({
     throw new Error(
       generateErrorMessage(error, 'Failed to update member role')
     );
+  }
+};
+
+export const getMessages = async ({
+  channel_id,
+  more,
+}: {
+  channel_id: string;
+  more: number;
+}) => {
+  try {
+    const messages = await databases.listDocuments<ChatMessageType>(
+      DATABASE_ID,
+      CHAT_MESSAGES_COLLECTION_ID,
+      [
+        Query.equal('channel_id', channel_id),
+        Query.limit(50 + more),
+        Query.orderDesc('$createdAt'),
+      ]
+    );
+
+    const messagesWithUserProfile = await Promise.all(
+      messages.documents.map(async (message) => {
+        const res = await databases.listDocuments<UserType>(
+          DATABASE_ID,
+          USER_COLLECTION_ID,
+          [Query.equal('userId', message.sender_id)]
+        );
+        return {
+          ...message,
+          user: res.documents[0],
+        };
+      })
+    );
+
+    return {
+      ...messages,
+      documents: messagesWithUserProfile,
+    };
+  } catch (error) {
+    throw new Error(generateErrorMessage(error, 'Failed to get messages'));
+  }
+};
+
+export const sendMessage = async ({
+  channel_id,
+  message,
+  senderId,
+}: SendMessageType) => {
+  try {
+    const chatRoom = await databases.getDocument<ChannelType>(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      channel_id
+    );
+    if (!chatRoom) {
+      throw new Error('Chat room does not exist');
+    }
+    const checkIfSenderIsAMember = await databases.listDocuments<MemberType>(
+      DATABASE_ID,
+      MEMBER_ID,
+      [
+        Query.equal('channel_id', channel_id),
+        Query.equal('member_id', senderId),
+      ]
+    );
+    if (checkIfSenderIsAMember.total === 0) {
+      throw new Error('You are not authorized to perform this action');
+    }
+    await databases.createDocument(
+      DATABASE_ID,
+      CHAT_MESSAGES_COLLECTION_ID,
+      ID.unique(),
+      {
+        channel_id,
+        message,
+        sender_id: senderId,
+        seen_ids: [senderId],
+      }
+    );
+
+    await databases.updateDocument(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      chatRoom.$id,
+      {
+        last_message: message,
+        last_message_time: new Date().toISOString(),
+      }
+    );
+  } catch (error) {
+    throw new Error(generateErrorMessage(error, 'Failed to send message'));
   }
 };

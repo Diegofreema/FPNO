@@ -10,16 +10,9 @@ import { RenderRoom } from './render-room';
 type Props = {
   channels: ChannelTypeWithPendingMembers[];
   handleLoadMore: () => void;
-  refresh: () => void;
-  isRefreshing: boolean;
 };
 
-export const RenderRooms = ({
-  channels,
-  handleLoadMore,
-  refresh,
-  isRefreshing,
-}: Props) => {
+export const RenderRooms = ({ channels, handleLoadMore }: Props) => {
   return (
     <View style={{ flex: 1 }}>
       <LegendList
@@ -30,8 +23,6 @@ export const RenderRooms = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ gap: 15 }}
         ListEmptyComponent={EmptyComponent}
-        onRefresh={refresh}
-        refreshing={isRefreshing}
       />
     </View>
   );

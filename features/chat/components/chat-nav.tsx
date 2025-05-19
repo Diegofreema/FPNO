@@ -1,11 +1,8 @@
-import { LoadingModal } from '@/components/typography/loading-modal';
 import { SubTitle } from '@/components/typography/subtitle';
 import { Avatar } from '@/components/ui/avatar';
 import { CustomPressable } from '@/components/ui/custom-pressable';
 import { colors } from '@/constants';
-import { useLeave } from '@/features/chat-room/api/use-leave';
 import { JoinBtn } from '@/features/chat-room/components/join-room-btn';
-import { useAuth } from '@/lib/zustand/useAuth';
 import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -22,7 +19,8 @@ type Props = {
   isCreator: boolean;
   isMember: boolean;
   isInPending: boolean;
-  roomId: string;
+
+  leaveRoom: () => Promise<void>;
 };
 
 export const ChatNav = ({
@@ -33,11 +31,11 @@ export const ChatNav = ({
   isCreator,
   isMember,
   isInPending,
-  roomId,
+
+  leaveRoom,
 }: Props) => {
   const router = useRouter();
-  const { mutateAsync: leaveRoom, isPending: isLeaving } = useLeave();
-  const actionUserId = useAuth((state) => state.user?.id!);
+
   const onLeaveRoom = async () => {
     Alert.alert('Are you sure?', 'This can not be reversed!!!', [
       {
@@ -47,7 +45,7 @@ export const ChatNav = ({
       },
       {
         text: 'Leave',
-        onPress: () => leaveRoom({ roomId, memberId: actionUserId }),
+        onPress: () => leaveRoom(),
         style: 'destructive',
       },
     ]);
@@ -102,7 +100,7 @@ export const ChatNav = ({
           <JoinBtn roomId={channelId} isInPending={isInPending} />
         )}
       </View>
-      <LoadingModal visible={isLeaving} />
+      {/* <LoadingModal visible={isLeaving} /> */}
     </>
   );
 };

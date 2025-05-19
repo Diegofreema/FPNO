@@ -172,3 +172,9 @@ export type MemberWithUserProfile = {
   member_id: string;
   status: MemberStatus;
 };
+
+export type SendMessageType = {
+  senderId: string;
+  channel_id: string;
+  message: string;
+};

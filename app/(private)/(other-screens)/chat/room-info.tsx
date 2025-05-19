@@ -95,6 +95,8 @@ const RoomInfoScreen = () => {
     loggedInMember && loggedInMember.access_role === MemberAccessRole.ADMIN
   );
   const { total } = pendingMemberData;
+  console.log(total);
+  const showBanner = isCreator || isLoggedInUserAdmin;
   return (
     <ScrollWrapper>
       <NavHeader
@@ -105,10 +107,9 @@ const RoomInfoScreen = () => {
           ) : null
         }
       />
-      {isCreator ||
-        (isLoggedInUserAdmin && (
-          <PendingMemberBanner pendingMemberCount={total} roomId={roomId} />
-        ))}
+      {showBanner && (
+        <PendingMemberBanner pendingMemberCount={total} roomId={roomId} />
+      )}
       <RoomInfoTop data={data} />
       <RoomInfo
         infoData={memberData}
