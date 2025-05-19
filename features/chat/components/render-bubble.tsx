@@ -317,9 +317,10 @@ const styles = StyleSheet.create({
   image: {
     width: 200,
     height: 200,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: '#ccc',
+    overflow: 'hidden',
   },
   sentImage: {
     borderBottomRightRadius: 2,

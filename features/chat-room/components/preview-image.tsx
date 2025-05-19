@@ -30,7 +30,7 @@ export const PreviewChatImage = ({ url }: Props) => {
         isSingleTapEnabled
         resizeMode="cover"
       />
-      <DownloadBlurView url={url} onClose={onPress} />
+      <DownloadBlurView url={url} onClose={onPress} type="image" />
       <ActionIcon name="times" onPress={onPress} style={styles.abs} />
     </View>
   );

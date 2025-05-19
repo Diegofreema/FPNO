@@ -107,31 +107,104 @@ export const uploadProfilePicture = async (
   return { storageId, uploadUrl };
 };
 
-export const downloadAndSaveImage = async (imageUrl: string) => {
-  const fileUri = FileSystem.documentDirectory + `${new Date().getTime()}.jpg`;
+export const downloadAndSaveFile = async (
+  fileUrl: string,
+  fileType: 'image' | 'pdf'
+) => {
+  const extension = fileType === 'image' ? 'jpg' : 'pdf';
+  const mimeType = fileType === 'image' ? 'image/jpeg' : 'application/pdf';
+  const fileName = `${new Date().getTime()}.${extension}`;
+  const fileUri = `${FileSystem.cacheDirectory}${fileName}`; // Use cache for temporary storage
+
+  // Remove mode=admin from URL
+  const cleanUrl = fileUrl.replace(/&mode=admin/, '');
 
   try {
-    const res = await FileSystem.downloadAsync(imageUrl, fileUri);
-    return saveFile(res.uri);
+    // Configure headers for Appwrite Storage
+
+    // Download the file
+    const res = await FileSystem.downloadAsync(cleanUrl, fileUri);
+    console.log('Download Response:', {
+      status: res.status,
+      headers: res.headers,
+      uri: fileUri,
+    });
+
+    if (res.status !== 200) {
+      throw new Error(
+        `Download failed with status ${res.status}: ${
+          res.headers['Status-Message'] || 'Unknown error'
+        }`
+      );
+    }
+
+    // Verify file exists and has content
+    const fileInfo = await FileSystem.getInfoAsync(fileUri);
+    console.log('File Info:', fileInfo);
+    if (!fileInfo.exists || fileInfo.size === 0) {
+      throw new Error(`Downloaded file is empty or missing: ${fileUri}`);
+    }
+
+    // Verify MIME type
+    if (
+      fileType === 'pdf' &&
+      res.headers['Content-Type'] &&
+      !res.headers['Content-Type'].includes('application/pdf')
+    ) {
+      throw new Error(
+        `Downloaded file is not a PDF: Content-Type=${res.headers['Content-Type']}`
+      );
+    }
+
+    // Save the file to the device
+    const result = await saveFile(fileUri, mimeType, fileType, fileName);
+    return result;
   } catch (err) {
-    console.log('FS Err: ', err);
+    console.error(`Download Error (${fileType}):`, err);
+    throw new Error(
+      `Failed to download ${fileType}: ${
+        err instanceof Error ? err.message : 'Unknown error'
+      }`
+    );
   }
 };
 
-const saveFile = async (fileUri: string) => {
-  const { status } = await MediaLibrary.requestPermissionsAsync();
-  if (status === 'granted') {
-    try {
-      const asset = await MediaLibrary.createAssetAsync(fileUri);
-      const album = await MediaLibrary.getAlbumAsync('Download');
+const saveFile = async (
+  tempUri: string,
+  mimeType: string,
+  fileType: 'image' | 'pdf',
+  fileName: string
+) => {
+  try {
+    if (fileType === 'image') {
+      // Save images to MediaLibrary
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== 'granted') {
+        throw new Error(
+          status === 'denied'
+            ? 'Please allow permissions to save images'
+            : 'Permission request failed'
+        );
+      }
+
+      const assetUri = tempUri.startsWith('file://')
+        ? tempUri
+        : `file://${tempUri}`;
+      const asset = await MediaLibrary.createAssetAsync(assetUri);
+      console.log('Asset Created:', asset);
+
+      const albumName = 'Images';
+      let album = await MediaLibrary.getAlbumAsync(albumName);
+
       if (album == null) {
         const result = await MediaLibrary.createAlbumAsync(
-          'Download',
+          albumName,
           asset,
           false
         );
-        if (result) {
-          return 'saved';
+        console.log('Album Created:', albumName, result);
+        if (!result) {
+          throw new Error(`Failed to create ${albumName} album`);
         }
       } else {
         const result = await MediaLibrary.addAssetsToAlbumAsync(
@@ -139,19 +212,48 @@ const saveFile = async (fileUri: string) => {
           album,
           false
         );
-        if (result) {
-          return 'saved';
+        console.log('Asset Added to Album:', albumName, result);
+        if (!result) {
+          throw new Error(`Failed to add image to ${albumName} album`);
         }
       }
-    } catch (err) {
-      console.log('Save err: ', err);
-      throw new Error('Failed to save image');
+
+      console.log(`Image saved to ${albumName}: ${fileName}`);
+      return 'saved';
+    } else {
+      // Save PDFs to Downloads folder
+      const downloadsDir = `${FileSystem.documentDirectory}Downloads/`;
+
+      // Create Downloads folder
+      await FileSystem.makeDirectoryAsync(downloadsDir, {
+        intermediates: true,
+      });
+
+      const targetUri = `${downloadsDir}${fileName}`;
+      await FileSystem.moveAsync({
+        from: tempUri,
+        to: targetUri,
+      });
+
+      // Verify the file was moved
+      const targetInfo = await FileSystem.getInfoAsync(targetUri);
+      console.log('Target File Info:', targetInfo);
+      if (!targetInfo.exists || targetInfo.size === 0) {
+        throw new Error(`Failed to move PDF to ${targetUri}`);
+      }
+
+      console.log(`PDF saved to ${downloadsDir}: ${fileName}`);
+      return 'saved';
     }
-  } else if (status === 'denied') {
-    throw new Error('please allow permissions to download');
+  } catch (err) {
+    console.error(`Save Error (${fileType}):`, err);
+    throw new Error(
+      `Failed to save ${fileType}: ${
+        err instanceof Error ? err.message : 'Unknown error'
+      }`
+    );
   }
 };
-
 export function getName(user: userData): string {
   if (user.variant === 'STUDENT') {
     return `${user.fname} ${user.lname}`; // TypeScript knows user is StudentData here

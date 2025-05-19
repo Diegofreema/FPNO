@@ -13,6 +13,14 @@ const { height } = Dimensions.get('window');
 
 export const PreviewDoc = ({ uri }: Props) => {
   const router = useRouter();
+
+  const url = uri.replace('view', 'download');
+
+  // const getFileUrl = async () => {
+  //   const result = storage.getFileDownload(BUCKET_ID, fileId);
+
+  //   console.log(result);
+  // };
   const onPress = () => {
     router.back();
   };
@@ -26,7 +34,7 @@ export const PreviewDoc = ({ uri }: Props) => {
         minScale={0.5}
         maxScale={5}
       />
-      <DownloadBlurView url={uri} onClose={onPress} />
+      <DownloadBlurView url={url} onClose={onPress} type="pdf" />
       <ActionIcon name="times" onPress={onPress} style={styles.abs} />
     </>
   );

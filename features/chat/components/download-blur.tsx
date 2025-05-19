@@ -1,5 +1,4 @@
-import { downloadAndSaveImage } from '@/helper';
-import { useShowToast } from '@/lib/zustand/useShowToast';
+import { downloadAndSaveFile } from '@/helper';
 import { IconDownload } from '@tabler/icons-react-native';
 import { useState } from 'react';
 import {
@@ -8,34 +7,32 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { toast } from 'sonner-native';
 
 type Props = {
   url: string;
   onClose: () => void;
+  type: 'image' | 'pdf';
 };
 
-export const DownloadBlurView = ({ url, onClose }: Props) => {
+export const DownloadBlurView = ({ url, onClose, type }: Props) => {
   const [downloading, setDownloading] = useState(false);
-  const onShowToast = useShowToast((state) => state.onShow);
+
   const onDownload = async () => {
     setDownloading(true);
     try {
-      const result = await downloadAndSaveImage(url);
+      const result = await downloadAndSaveFile(url, type);
       onClose();
       if (result === 'saved') {
-        onShowToast({
-          message: 'Success',
-          type: 'success',
-          description: 'Image has been downloaded',
+        toast.success('Success', {
+          description: 'Download was successful',
         });
       }
     } catch (e) {
       console.log(e);
       onClose();
-      onShowToast({
-        message: 'Failed',
-        type: 'error',
-        description: 'Could not download image',
+      toast.error('Failed', {
+        description: 'Could not download',
       });
     } finally {
       setDownloading(false);
