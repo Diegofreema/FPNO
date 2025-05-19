@@ -1,3 +1,4 @@
+import { ImagePickerAsset } from 'expo-image-picker';
 import { Models } from 'react-native-appwrite';
 import { upcoming } from './data';
 
@@ -207,4 +208,12 @@ export interface IMessage {
   audio?: string;
   fileUrl?: string;
   reactions?: MessageReactionsType[];
+}
+export interface SendIMessage {
+  text: string;
+
+  image?: ImagePickerAsset;
+  fileType?: 'pdf' | 'image' | 'audio';
+  audio?: string;
+  fileUrl?: string;
 }

@@ -177,6 +177,7 @@ export const RenderBubble = ({
             {renderEmoji[emoji.emoji]}
           </Text>
         ))}
+        <Text>{reactionEmojis.length > 1 && reactionEmojis.length}</Text>
       </View>
     );
   };

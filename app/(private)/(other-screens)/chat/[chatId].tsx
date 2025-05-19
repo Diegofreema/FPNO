@@ -16,15 +16,17 @@ import { formatNumber } from '@/helper';
 import { useIsCreator } from '@/hooks/useIsCreator';
 import { useAuth } from '@/lib/zustand/useAuth';
 import { useGetImage } from '@/lib/zustand/useGetImage';
+import { IMessage, SendIMessage } from '@/types';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import * as Clipboard from 'expo-clipboard';
+import * as DocumentPicker from 'expo-document-picker';
+
 import * as ImagePicker from 'expo-image-picker';
 import { useLocalSearchParams, usePathname, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { toast } from 'sonner-native';
-
 const ChatId = () => {
   const { chatId } = useLocalSearchParams<{ chatId: string }>();
   const loggedInUser = useAuth((state) => state.user?.id!);
@@ -86,13 +88,25 @@ const ChatId = () => {
   const isCreator = useIsCreator({ creatorId: data?.creator_id });
 
   const { mutateAsync: leaveRoom, isPending: isLeaving } = useLeave();
-  const onSend = useCallback(async () => {
-    await mutateAsync({
-      message: text.trim(),
-      channel_id: chatId,
-      senderId: loggedInUser,
-    });
-  }, [chatId, loggedInUser, text, mutateAsync]);
+  const onSend = useCallback(
+    async (messages: SendIMessage[]) => {
+      messages.forEach(async (message) => {
+        await mutateAsync({
+          message: message.text,
+          channel_id: chatId,
+          senderId: loggedInUser,
+        });
+      });
+    },
+    [chatId, loggedInUser, mutateAsync]
+  );
+  const handleSend = async () => {
+    if (text.trim()) {
+      const message = { text, user: { _id: loggedInUser } };
+      await onSend([message]);
+      setText('');
+    }
+  };
   useEffect(() => {
     if (imagePaths.length) {
       height.value = 90;
@@ -120,6 +134,52 @@ const ChatId = () => {
       },
     ]);
   }, []);
+  const handlePhotoTaken = useCallback((message: IMessage) => {}, []);
+  const handleFilePick = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['image/jpeg', 'image/png', 'application/pdf'],
+        copyToCacheDirectory: true,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const asset = result.assets[0];
+        const file = {
+          uri: asset.uri,
+          type: asset.mimeType || 'application/octet-stream',
+          name:
+            asset.name ||
+            `file_${Date.now()}.${asset.mimeType?.split('/').pop() || 'file'}`,
+        };
+        console.log({ file });
+
+        //  const { fileId, fileUrl, fileType } = await appwriteService.uploadFile(
+        //    file
+        //  );
+        //  const message = {
+        //    text: '',
+        //    user: { _id: 'current_user_id' },
+        //    fileId,
+        //    fileUrl,
+        //    fileType,
+        //  };
+        //  await onSend([message]);
+      }
+    } catch (error) {
+      console.error('Error picking file:', error);
+    }
+  };
+  const handleImagePick = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      console.log(result);
+    }
+  };
   const onLoadMore = useCallback(async () => {
     if (
       messageData.messages &&
@@ -192,10 +252,11 @@ const ChatId = () => {
       <LoadingModal visible={isLeaving} />
       {isMember && (
         <ChatComponent
+          handlePhotTaken={handlePhotoTaken}
           loadEarlier={loadEarlier}
           messages={messageData.messages || []}
           onLoadMore={onLoadMore}
-          onSend={onSend}
+          onSend={handleSend}
           setText={setText}
           imagePaths={imagePaths}
           setImagePaths={setImagePaths}
@@ -205,7 +266,8 @@ const ChatId = () => {
           setIsAttachImage={setIsAttachImage}
           text={text}
           onOpenCamera={onOpenCamera}
-          onPickImage={onPickImage}
+          onPickImage={handleImagePick}
+          onPickDocument={handleFilePick}
           height={height}
           onCopy={copyToClipboard}
           showActionSheetWithOptions={showActionSheetWithOptions}

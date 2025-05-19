@@ -2,7 +2,7 @@ import { colors } from '@/constants';
 import { useAuth } from '@/lib/zustand/useAuth';
 import { IMessage } from '@/types';
 import { ActionSheetOptions } from '@expo/react-native-action-sheet';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -13,6 +13,7 @@ import {
 import { GiftedChat, SystemMessage, Time } from 'react-native-gifted-chat';
 import { SharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { ChatFooter } from './chat-footer';
 import { RenderComposer } from './message-input';
 import { RenderActions } from './render-action';
@@ -49,6 +50,8 @@ type Props = {
   }) => Promise<void>;
   onDelete: (messageId: string) => Promise<void>;
   onCopy: (textToCopy: string) => Promise<void>;
+  handlePhotTaken: (message: IMessage) => void;
+  onPickDocument: () => void;
 };
 
 const ChatComponent = ({
@@ -71,97 +74,110 @@ const ChatComponent = ({
   onEdit,
   showActionSheetWithOptions,
   onCopy,
+  handlePhotTaken,
+  onPickDocument,
 }: Props) => {
   const loggedInUserId = useAuth((state) => state.user?.id!);
   const insets = useSafeAreaInsets();
-
+  const [visible, setVisible] = useState(false);
   const disabled = (imagePaths.length < 1 && text.trim() === '') || sending;
   return (
-    <View style={{ flex: 1 }}>
-      <GiftedChat
-        messages={messages}
-        loadEarlier={loadEarlier}
-        onLoadEarlier={onLoadMore}
-        keyboardShouldPersistTaps={'always'}
-        onSend={(messages: any) => onSend(messages)}
-        onInputTextChanged={setText}
-        user={{
-          _id: loggedInUserId,
-        }}
-        renderSystemMessage={(props) => (
-          <SystemMessage {...props} textStyle={{ color: colors.gray }} />
+    <>
+      <View style={{ flex: 1 }}>
+        <GiftedChat
+          messages={messages}
+          loadEarlier={loadEarlier}
+          onLoadEarlier={onLoadMore}
+          keyboardShouldPersistTaps={'always'}
+          onSend={(messages: any) => onSend(messages)}
+          onInputTextChanged={setText}
+          user={{
+            _id: loggedInUserId,
+          }}
+          renderSystemMessage={(props) => (
+            <SystemMessage {...props} textStyle={{ color: colors.gray }} />
+          )}
+          bottomOffset={insets.bottom}
+          renderAvatar={null}
+          maxComposerHeight={100}
+          textInputProps={styles.composer}
+          renderUsernameOnMessage={true}
+          isScrollToBottomEnabled
+          renderMessageImage={(props) => (
+            <RenderImage
+              {...props}
+              showActionSheetWithOptions={showActionSheetWithOptions}
+              onDelete={onDelete}
+            />
+          )}
+          renderUsername={(user) => (
+            <Text style={{ fontSize: 10, color: 'white', paddingLeft: 7 }}>
+              {user.name}
+            </Text>
+          )}
+          renderBubble={(props) => (
+            <RenderBubble
+              {...props}
+              onCopy={onCopy}
+              showActionSheetWithOptions={showActionSheetWithOptions}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              loggedInUserId={loggedInUserId}
+            />
+          )}
+          renderActions={(props) => (
+            <RenderActions
+              disable={imagePaths.length > 0}
+              {...props}
+              onPickDocument={() => setVisible(true)}
+            />
+          )}
+          renderTime={(props) => (
+            <Time
+              {...props}
+              timeTextStyle={{
+                right: {
+                  color: colors.lightblue,
+                },
+                left: {
+                  color: colors.white,
+                },
+              }}
+            />
+          )}
+          renderComposer={(props) => (
+            <RenderComposer
+              {...props}
+              onPickImage={onPickImage}
+              onOpenCamera={onOpenCamera}
+              onClose={() => setVisible(false)}
+              onPickDocument={onPickDocument}
+              showFilePicker={visible}
+            />
+          )}
+          renderFooter={() => (
+            <ChatFooter
+              height={height}
+              imagePaths={imagePaths}
+              setImagePaths={setImagePaths}
+              setIsAttachImage={setIsAttachImage}
+            />
+          )}
+          renderSend={(props) => (
+            <RenderSend
+              disabled={disabled}
+              image={isAttachImage}
+              {...props}
+              sending={sending}
+            />
+          )}
+          alwaysShowSend
+        />
+        {Platform.OS === 'android' && (
+          <KeyboardAvoidingView behavior="height" />
         )}
-        bottomOffset={insets.bottom}
-        renderAvatar={null}
-        maxComposerHeight={100}
-        textInputProps={styles.composer}
-        renderUsernameOnMessage={true}
-        isScrollToBottomEnabled
-        renderMessageImage={(props) => (
-          <RenderImage
-            {...props}
-            showActionSheetWithOptions={showActionSheetWithOptions}
-            onDelete={onDelete}
-          />
-        )}
-        renderUsername={(user) => (
-          <Text style={{ fontSize: 10, color: 'white', paddingLeft: 7 }}>
-            {user.name}
-          </Text>
-        )}
-        renderBubble={(props) => (
-          <RenderBubble
-            {...props}
-            onCopy={onCopy}
-            showActionSheetWithOptions={showActionSheetWithOptions}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            loggedInUserId={loggedInUserId}
-          />
-        )}
-        renderActions={(props) => (
-          <RenderActions
-            disable={imagePaths.length > 0}
-            {...props}
-            onPickDocument={onPickImage}
-          />
-        )}
-        renderTime={(props) => (
-          <Time
-            {...props}
-            timeTextStyle={{
-              right: {
-                color: colors.lightblue,
-              },
-              left: {
-                color: colors.white,
-              },
-            }}
-          />
-        )}
-        renderComposer={(props) => (
-          <RenderComposer {...props} onPickImage={onOpenCamera} />
-        )}
-        renderFooter={() => (
-          <ChatFooter
-            height={height}
-            imagePaths={imagePaths}
-            setImagePaths={setImagePaths}
-            setIsAttachImage={setIsAttachImage}
-          />
-        )}
-        renderSend={(props) => (
-          <RenderSend
-            disabled={disabled}
-            image={isAttachImage}
-            {...props}
-            sending={sending}
-          />
-        )}
-        alwaysShowSend
-      />
-      {Platform.OS === 'android' && <KeyboardAvoidingView behavior="height" />}
-    </View>
+      </View>
+    </>
   );
 };
 

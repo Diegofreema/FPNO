@@ -58,7 +58,7 @@ PODS:
     - ExpoModulesCore
   - ExpoHaptics (14.1.4):
     - ExpoModulesCore
-  - ExpoHead (5.0.6):
+  - ExpoHead (5.0.7):
     - ExpoModulesCore
   - ExpoImage (2.1.7):
     - ExpoModulesCore
@@ -2053,7 +2053,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNSVG (15.12.0):
+  - RNSVG (15.11.2):
     - React-Core
   - SDWebImage (5.21.0):
     - SDWebImage/Core (= 5.21.0)
@@ -2465,7 +2465,7 @@ SPEC CHECKSUMS:
   ExpoFileSystem: 3a98ca2a6f13674ecfd97327d1b44a8ace444cbd
   ExpoFont: 312c73403bbd4f98e1d6a5330641a56292583cd2
   ExpoHaptics: 68c215e070f660e0a29c45dcda4f60eeff08aefb
-  ExpoHead: 3b32700951877d5fb69603b0de452b510b1c8ced
+  ExpoHead: 5df88545652c2d3a3ea50bcd7f6be6ca935ac997
   ExpoImage: ef8b25fddd3613a0bbdb2936d0583bc6588197dd
   ExpoImagePicker: d2fff488a0738343a3cc21e98544ee9feafaa0e6
   ExpoKeepAwake: e8dedc115d9f6f24b153ccd2d1d8efcdfd68a527
@@ -2564,7 +2564,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: f4b38c25a4a61f233589a3d321436360c59eccd1
   RNReanimated: d5e68954fe8409a6555f33551c9297ef1648543e
   RNScreens: 4561eef339c3ebe8176b27e01af7ac494780f678
-  RNSVG: 769d0a2e79162d08639e1fbb43031adac58ed24c
+  RNSVG: 1d73f0c3199936c8e44f4d102d2744f3d258d2fc
   SDWebImage: f84b0feeb08d2d11e6a9b843cb06d75ebf5b8868
   SDWebImageAVIFCoder: 00310d246aab3232ce77f1d8f0076f8c4b021d90
   SDWebImageSVGCoder: 15a300a97ec1c8ac958f009c02220ac0402e936c
