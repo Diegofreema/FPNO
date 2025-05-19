@@ -6,8 +6,10 @@ import { CustomPressable } from '@/components/ui/custom-pressable';
 import { colors } from '@/constants';
 import { emojis } from '@/data';
 import { onReactToMessage } from '@/features/chat-room/server';
-import { IMessage, Reaction_Enum } from '@/types';
+import { useFileUrlStore } from '@/hooks/use-file-url';
+import { FileType, IMessage, Reaction_Enum } from '@/types';
 import { Image } from 'expo-image';
+import { useRouter } from 'expo-router';
 import {
   Dimensions,
   StyleSheet,
@@ -52,6 +54,14 @@ export const RenderBubble = ({
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
   const bubbleRef = useRef<View>(null);
+  const router = useRouter();
+  const getFile = useFileUrlStore((state) => state.setFileUrl);
+
+  const onPress = (url: string | undefined, type: FileType | undefined) => {
+    if (!url || !type) return;
+    getFile({ type, url });
+    router.push('/preview-file');
+  };
   const findEmojiISelected = currentMessage.reactions?.find(
     (reaction) => reaction.user_id === loggedInUserId
   );
@@ -126,26 +136,30 @@ export const RenderBubble = ({
   const renderContent = () => {
     if (currentMessage.fileType === 'image' && currentMessage.fileUrl) {
       return (
-        <Image
-          source={{ uri: currentMessage.fileUrl }}
+        <View
           style={[
             styles.image,
             isSent ? styles.sentImage : styles.receivedImage,
           ]}
-          placeholder={require('@/assets/images/place.webp')}
-          placeholderContentFit="cover"
-          contentFit="cover"
-        />
+        >
+          <Image
+            source={{ uri: currentMessage.fileUrl }}
+            style={{ width: '100%', height: '100%' }}
+            placeholder={require('@/assets/images/place.webp')}
+            placeholderContentFit="cover"
+            contentFit="cover"
+          />
+        </View>
       );
     } else if (currentMessage.fileType === 'pdf' && currentMessage.fileUrl) {
       return (
-        <TouchableOpacity style={styles.pdfContainer}>
+        <View style={styles.pdfContainer}>
           <Pdf
             source={{ uri: currentMessage.fileUrl }}
             style={styles.pdf}
             singlePage
           />
-        </TouchableOpacity>
+        </View>
       );
     } else {
       return (
@@ -212,6 +226,7 @@ export const RenderBubble = ({
     <>
       <TouchableOpacity
         onLongPress={handleLongPress}
+        onPress={() => onPress(currentMessage.fileUrl, currentMessage.fileType)}
         delayLongPress={300}
         activeOpacity={0.8}
         style={[styles.container, styles.receivedContainer]}
