@@ -1,7 +1,9 @@
 import { colors } from '@/constants';
+import { IMessage } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
-import { Text, TouchableOpacity, View } from 'react-native';
-import { IMessage } from 'react-native-gifted-chat';
+import { Image } from 'expo-image';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Pdf from 'react-native-pdf';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 
 type ReplyMessageBarProps = {
@@ -10,12 +12,39 @@ type ReplyMessageBarProps = {
 };
 
 const ReplyMessageBar = ({ clearReply, message }: ReplyMessageBarProps) => {
+  const renderContent = () => {
+    if (message?.fileType === 'image' && message.fileUrl) {
+      return (
+        <Image
+          source={{ uri: message.fileUrl }}
+          style={{ width: 40, height: 40, marginLeft: 10 }}
+          placeholder={require('@/assets/images/place.webp')}
+          placeholderContentFit="cover"
+          contentFit="cover"
+        />
+      );
+    } else if (message?.fileType === 'pdf' && message.fileUrl) {
+      return (
+        <Pdf source={{ uri: message.fileUrl }} style={styles.pdf} singlePage />
+      );
+    } else {
+      return (
+        <Text style={{ color: colors.gray, paddingLeft: 10, paddingTop: 5 }}>
+          {message!.text.length > 40
+            ? message?.text.substring(0, 40) + '...'
+            : message?.text}
+        </Text>
+      );
+    }
+  };
+  const height =
+    message?.fileType === 'image' || message?.fileType === 'pdf' ? 70 : 50;
   return (
     <>
       {message !== null && (
         <Animated.View
           style={{
-            height: 50,
+            height: height,
             flexDirection: 'row',
             backgroundColor: '#E4E9EB',
           }}
@@ -23,7 +52,7 @@ const ReplyMessageBar = ({ clearReply, message }: ReplyMessageBarProps) => {
           exiting={FadeOutDown}
         >
           <View
-            style={{ height: 50, width: 6, backgroundColor: '#89BC0C' }}
+            style={{ height: height, width: 6, backgroundColor: '#89BC0C' }}
           ></View>
           <View style={{ flexDirection: 'column' }}>
             <Text
@@ -37,13 +66,8 @@ const ReplyMessageBar = ({ clearReply, message }: ReplyMessageBarProps) => {
             >
               {message?.user.name}
             </Text>
-            <Text
-              style={{ color: colors.gray, paddingLeft: 10, paddingTop: 5 }}
-            >
-              {message!.text.length > 40
-                ? message?.text.substring(0, 40) + '...'
-                : message?.text}
-            </Text>
+
+            {renderContent()}
           </View>
           <View
             style={{
@@ -68,3 +92,53 @@ const ReplyMessageBar = ({ clearReply, message }: ReplyMessageBarProps) => {
 };
 
 export default ReplyMessageBar;
+
+const styles = StyleSheet.create({
+  text: {
+    fontSize: 16,
+  },
+  sentText: {
+    color: colors.white,
+  },
+  receivedText: {
+    color: '#000',
+  },
+  sentTextContainer: {
+    backgroundColor: colors.lightblue,
+    padding: 10,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    borderBottomLeftRadius: 8,
+  },
+  receivedTextContainer: {
+    backgroundColor: colors.lightGray,
+    padding: 10,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
+  },
+  image: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    overflow: 'hidden',
+  },
+  sentImage: {
+    borderBottomRightRadius: 2,
+  },
+  receivedImage: {
+    borderBottomLeftRadius: 2,
+  },
+  pdfContainer: {
+    width: 200,
+    height: 200,
+  },
+  pdf: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    marginLeft: 10,
+  },
+});
