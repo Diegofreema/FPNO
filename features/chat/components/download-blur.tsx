@@ -1,4 +1,4 @@
-import { downloadAndSaveFile } from '@/helper';
+import { downloadAndSaveFile, downloadPdf } from '@/helper';
 import { IconDownload } from '@tabler/icons-react-native';
 import { useState } from 'react';
 import {
@@ -20,8 +20,13 @@ export const DownloadBlurView = ({ url, onClose, type }: Props) => {
 
   const onDownload = async () => {
     setDownloading(true);
+    let result;
     try {
-      const result = await downloadAndSaveFile(url, type);
+      if (type === 'pdf') {
+        result = await downloadPdf(url);
+      } else {
+        result = await downloadAndSaveFile(url, type);
+      }
       onClose();
       if (result === 'saved') {
         toast.success('Success', {

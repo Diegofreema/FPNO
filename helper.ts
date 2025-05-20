@@ -2,11 +2,11 @@ import axios from 'axios';
 import { format, isToday, isYesterday, parseISO } from 'date-fns';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
+import * as Sharing from 'expo-sharing';
 import { ID } from 'react-native-appwrite';
 import { BUCKET_ID, PROJECT_ID } from './config';
 import { storage } from './db/appwrite';
 import { MemberType, userData } from './types';
-
 export const sendEmail = async (email: string, otp: string) => {
   const { data } = await axios.get(
     `https://estate.netpro.software/sendsms.aspx?email=${email}&otp=${otp}`
@@ -85,7 +85,7 @@ export const uploadDoc = async (
     headers: { 'Content-Type': 'pdf' },
   });
   const { storageId } = await result.json();
-  console.log({ storageId });
+
   return { storageId, uploadUrl };
 };
 export const uploadProfilePicture = async (
@@ -107,10 +107,50 @@ export const uploadProfilePicture = async (
   return { storageId, uploadUrl };
 };
 
+export const downloadPdf = async (fileUrl: string) => {
+  const filename = `${new Date().getTime()}.pdf`;
+  const fileType = 'pdf';
+  try {
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    if (status !== 'granted') {
+      throw new Error(
+        status === 'denied'
+          ? 'Please allow permissions to save files'
+          : 'Permission request failed'
+      );
+    }
+    const result = await FileSystem.downloadAsync(
+      fileUrl,
+      FileSystem.documentDirectory + filename
+    );
+    if (result.status !== 200) {
+      throw new Error(
+        `Download failed with status ${result.status}: ${
+          result.headers['Status-Message'] || 'Unknown error'
+        }`
+      );
+    }
+
+    return save(result.uri);
+  } catch (error) {
+    console.error(`Download Error (${fileType}):`, error);
+    throw new Error(
+      `Failed to download ${fileType}: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
+    );
+  }
+};
+
+const save = async (uri: string) => {
+  await Sharing.shareAsync(uri);
+  return 'saved';
+};
+
 export const downloadAndSaveFile = async (
   fileUrl: string,
   fileType: 'image' | 'pdf'
-) => {
+): Promise<string> => {
   const extension = fileType === 'image' ? 'jpg' : 'pdf';
   const mimeType = fileType === 'image' ? 'image/jpeg' : 'application/pdf';
   const fileName = `${new Date().getTime()}.${extension}`;
@@ -120,10 +160,24 @@ export const downloadAndSaveFile = async (
   const cleanUrl = fileUrl.replace(/&mode=admin/, '');
 
   try {
-    // Configure headers for Appwrite Storage
+    // Request permissions for both image and PDF
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    if (status !== 'granted') {
+      throw new Error(
+        status === 'denied'
+          ? 'Please allow permissions to save files'
+          : 'Permission request failed'
+      );
+    }
 
     // Download the file
-    const res = await FileSystem.downloadAsync(cleanUrl, fileUri);
+    const res = await FileSystem.downloadAsync(cleanUrl, fileUri, {
+      headers: {
+        // Add headers if needed for Appwrite authentication
+        // 'Authorization': 'Bearer YOUR_TOKEN',
+      },
+    });
+
     console.log('Download Response:', {
       status: res.status,
       headers: res.headers,
@@ -154,10 +208,29 @@ export const downloadAndSaveFile = async (
       throw new Error(
         `Downloaded file is not a PDF: Content-Type=${res.headers['Content-Type']}`
       );
+    } else if (
+      fileType === 'image' &&
+      res.headers['Content-Type'] &&
+      !res.headers['Content-Type'].includes('image/jpeg')
+    ) {
+      throw new Error(
+        `Downloaded file is not an image: Content-Type=${res.headers['Content-Type']}`
+      );
     }
 
     // Save the file to the device
     const result = await saveFile(fileUri, mimeType, fileType, fileName);
+
+    // Optionally open the file
+    const canShare = await Sharing.isAvailableAsync();
+    if (canShare) {
+      await Sharing.shareAsync(fileUri, {
+        mimeType,
+        dialogTitle: `Open ${fileType}`,
+        UTI: fileType === 'pdf' ? 'com.adobe.pdf' : 'public.jpeg', // iOS-specific UTI
+      });
+    }
+
     return result;
   } catch (err) {
     console.error(`Download Error (${fileType}):`, err);
@@ -174,57 +247,34 @@ const saveFile = async (
   mimeType: string,
   fileType: 'image' | 'pdf',
   fileName: string
-) => {
+): Promise<string> => {
   try {
     if (fileType === 'image') {
       // Save images to MediaLibrary
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== 'granted') {
-        throw new Error(
-          status === 'denied'
-            ? 'Please allow permissions to save images'
-            : 'Permission request failed'
-        );
-      }
-
       const assetUri = tempUri.startsWith('file://')
         ? tempUri
         : `file://${tempUri}`;
       const asset = await MediaLibrary.createAssetAsync(assetUri);
       console.log('Asset Created:', asset);
 
-      const albumName = 'Images';
+      const albumName = 'MyAppImages';
       let album = await MediaLibrary.getAlbumAsync(albumName);
 
       if (album == null) {
-        const result = await MediaLibrary.createAlbumAsync(
-          albumName,
-          asset,
-          false
-        );
-        console.log('Album Created:', albumName, result);
-        if (!result) {
-          throw new Error(`Failed to create ${albumName} album`);
-        }
+        await MediaLibrary.createAlbumAsync(albumName, asset, false);
+        console.log('Album Created:', albumName);
       } else {
-        const result = await MediaLibrary.addAssetsToAlbumAsync(
-          [asset],
-          album,
-          false
-        );
-        console.log('Asset Added to Album:', albumName, result);
-        if (!result) {
-          throw new Error(`Failed to add image to ${albumName} album`);
-        }
+        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+        console.log('Asset Added to Album:', albumName);
       }
 
       console.log(`Image saved to ${albumName}: ${fileName}`);
       return 'saved';
     } else {
-      // Save PDFs to Downloads folder
+      // Save PDFs to documentDirectory (Downloads folder)
       const downloadsDir = `${FileSystem.documentDirectory}Downloads/`;
 
-      // Create Downloads folder
+      // Create Downloads folder if it doesn't exist
       await FileSystem.makeDirectoryAsync(downloadsDir, {
         intermediates: true,
       });
