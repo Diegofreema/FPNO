@@ -181,7 +181,6 @@ const ChatId = () => {
       });
 
       if (!result.canceled) {
-        console.log(result.assets);
         const { assets } = result;
         const filePromises = assets.map(async (asset) => {
           const file = {
@@ -274,7 +273,6 @@ const ChatId = () => {
   const loadEarlier =
     (messageData.messages?.length || 0) < (messageData.total || 0);
   const isMember = !!member.total;
-  console.log({ message: messageData.messages });
 
   return (
     <Wrapper>

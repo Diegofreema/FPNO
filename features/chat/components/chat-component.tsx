@@ -2,7 +2,7 @@ import { colors } from '@/constants';
 import { useAuth } from '@/lib/zustand/useAuth';
 import { IMessage } from '@/types';
 import { ActionSheetOptions } from '@expo/react-native-action-sheet';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -14,11 +14,12 @@ import { GiftedChat, SystemMessage, Time } from 'react-native-gifted-chat';
 import { SharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ChatFooter } from './chat-footer';
+import { SwipeableMethods } from 'react-native-gesture-handler/lib/typescript/components/ReanimatedSwipeable';
 import { RenderComposer } from './message-input';
 import { RenderActions } from './render-action';
 import { RenderBubble } from './render-bubble';
 import { RenderImage } from './render-image';
+import ReplyMessageBar from './render-message';
 import { RenderSend } from './render-send';
 
 type Props = {
@@ -81,6 +82,27 @@ const ChatComponent = ({
   const insets = useSafeAreaInsets();
   const [visible, setVisible] = useState(false);
   const disabled = (imagePaths.length < 1 && text.trim() === '') || sending;
+  const [replyMessage, setReplyMessage] = useState<IMessage | null>(null);
+  const swipeableRowRef = useRef<SwipeableMethods | null>(null);
+  const updateRowRef = useCallback(
+    (ref: any) => {
+      if (
+        ref &&
+        replyMessage &&
+        ref.props.children.props.currentMessage?._id === replyMessage?._id
+      ) {
+        swipeableRowRef.current = ref;
+      }
+    },
+    [replyMessage]
+  );
+  useEffect(() => {
+    if (replyMessage && swipeableRowRef.current) {
+      swipeableRowRef.current.close();
+      swipeableRowRef.current = null;
+    }
+  }, [replyMessage]);
+
   return (
     <>
       <View style={{ flex: 1 }}>
@@ -123,6 +145,8 @@ const ChatComponent = ({
               onEdit={onEdit}
               onDelete={onDelete}
               loggedInUserId={loggedInUserId}
+              updateRowRef={updateRowRef}
+              setReplyOnSwipeOpen={setReplyMessage}
             />
           )}
           renderActions={(props) => (
@@ -155,12 +179,10 @@ const ChatComponent = ({
               showFilePicker={visible}
             />
           )}
-          renderFooter={() => (
-            <ChatFooter
-              height={height}
-              imagePaths={imagePaths}
-              setImagePaths={setImagePaths}
-              setIsAttachImage={setIsAttachImage}
+          renderChatFooter={() => (
+            <ReplyMessageBar
+              clearReply={() => setReplyMessage(null)}
+              message={replyMessage}
             />
           )}
           renderSend={(props) => (

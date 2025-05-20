@@ -10,6 +10,7 @@ import { useFileUrlStore } from '@/hooks/use-file-url';
 import { FileType, IMessage, Reaction_Enum } from '@/types';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
+import { Reply } from 'lucide-react-native';
 import {
   Dimensions,
   StyleSheet,
@@ -17,7 +18,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import ReanimatedSwipeable, {
+  SwipeableMethods,
+} from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Pdf from 'react-native-pdf';
+import Animated, {
+  SharedValue,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 import { toast } from 'sonner-native';
 import { EmojiPickerModal } from './emoji-modal';
 import { InChatFileTransfer } from './in-chat-file-transfer';
@@ -25,6 +33,8 @@ import { InChatViewFile } from './in-chat-view-file';
 
 const { width } = Dimensions.get('window');
 type Props = BubbleProps<IMessage> & {
+  setReplyOnSwipeOpen: (message: IMessage) => void;
+  updateRowRef: (ref: any) => void;
   onCopy: (text: string) => void;
   showActionSheetWithOptions(
     options: ActionSheetOptions,
@@ -41,6 +51,27 @@ type Props = BubbleProps<IMessage> & {
   loggedInUserId: string;
 };
 
+function LeftAction(
+  prog: SharedValue<number>,
+  drag: SharedValue<number>,
+  swipeableMethods: SwipeableMethods
+) {
+  const styleAnimation = useAnimatedStyle(() => {
+    // console.log('showRightProgress:', prog.value);
+    // console.log('appliedTranslation:', drag.value);
+
+    return {
+      transform: [{ translateX: drag.value + 50 }],
+    };
+  });
+
+  return (
+    <Animated.View style={styleAnimation}>
+      <Reply color={colors.black} />
+    </Animated.View>
+  );
+}
+
 export const RenderBubble = ({
   onCopy,
   showActionSheetWithOptions,
@@ -48,11 +79,14 @@ export const RenderBubble = ({
   onDelete,
   loggedInUserId,
   currentMessage,
+  updateRowRef,
+  setReplyOnSwipeOpen,
   ...props
 }: Props) => {
   const [fileVisible, setFileVisible] = useState(false);
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
+
   const bubbleRef = useRef<View>(null);
   const router = useRouter();
   const getFile = useFileUrlStore((state) => state.setFileUrl);
@@ -222,26 +256,47 @@ export const RenderBubble = ({
       </CustomPressable>
     );
   }
+  const onSwipeAction = () => {
+    if (currentMessage) {
+      setReplyOnSwipeOpen({ ...currentMessage });
+    }
+  };
   return (
     <>
-      <TouchableOpacity
-        onLongPress={handleLongPress}
-        onPress={() => onPress(currentMessage.fileUrl, currentMessage.fileType)}
-        delayLongPress={300}
-        activeOpacity={0.8}
-        style={[styles.container, styles.receivedContainer]}
-        ref={bubbleRef}
-        accessibilityLabel="Message bubble, long press to react"
+      <ReanimatedSwipeable
+        renderLeftActions={LeftAction}
+        friction={2}
+        enableTrackpadTwoFingerGesture
+        leftThreshold={40}
+        containerStyle={{ width: '100%', backgroundColor: 'transparent' }}
+        onEnded={(event) => console.log('swiped ended')}
+        ref={updateRowRef}
+        onSwipeableOpen={onSwipeAction}
       >
-        {renderContent()}
-        <Text style={styles.time}>
-          {new Date(currentMessage.createdAt).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
-        </Text>
-        {renderReactions()}
-      </TouchableOpacity>
+        <TouchableOpacity
+          onLongPress={handleLongPress}
+          onPress={() =>
+            onPress(currentMessage.fileUrl, currentMessage.fileType)
+          }
+          delayLongPress={300}
+          activeOpacity={0.8}
+          style={[
+            styles.container,
+            isSent ? styles.sentContainer : styles.receivedContainer,
+          ]}
+          ref={bubbleRef}
+          accessibilityLabel="Message bubble, long press to react"
+        >
+          {renderContent()}
+          <Text style={styles.time}>
+            {new Date(currentMessage.createdAt).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </Text>
+          {renderReactions()}
+        </TouchableOpacity>
+      </ReanimatedSwipeable>
       <EmojiPickerModal
         visible={isPickerVisible}
         onClose={() => setPickerVisible(false)}
@@ -284,11 +339,10 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   sentContainer: {
-    backgroundColor: '#DCF8C6', // WhatsApp green for sent
+    // WhatsApp green for sent
     alignSelf: 'flex-end',
   },
   receivedContainer: {
-    backgroundColor: '#FFFFFF',
     alignSelf: 'flex-start',
   },
   text: {
@@ -337,6 +391,7 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 8,
   },
+  rightAction: { width: 50, height: 50, backgroundColor: 'purple' },
 
   time: {
     fontSize: 12,
