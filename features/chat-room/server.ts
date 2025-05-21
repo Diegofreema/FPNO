@@ -716,10 +716,38 @@ export const getMessages = async ({
           MESSAGE_REACTIONS,
           [Query.equal('message_id', message.$id)]
         );
+        let reply: ChatMessageType | undefined;
+        let replyUser: UserType | undefined;
+        if (message.replyTo) {
+          reply = await databases.getDocument<ChatMessageType>(
+            DATABASE_ID,
+            CHAT_MESSAGES_COLLECTION_ID,
+            message.replyTo
+          );
+          const replyUserData = await databases.listDocuments<UserType>(
+            DATABASE_ID,
+            USER_COLLECTION_ID,
+            [Query.equal('userId', reply?.sender_id)]
+          );
+          replyUser = replyUserData.documents[0];
+        }
+
+        const replyTo = {
+          fileType: reply?.fileType,
+          fileUrl: reply?.fileUrl,
+          message: reply?.message,
+          sender_id: reply?.sender_id,
+          user: {
+            name: replyUser?.name,
+            id: replyUser?.userId,
+          },
+        };
+
         return {
           ...message,
           user: res.documents[0],
           reactions: reactions.documents,
+          reply: replyTo,
         };
       })
     );
@@ -740,6 +768,7 @@ export const sendMessage = async ({
   fileType,
   fileUrl,
   fileId,
+  replyTo,
 }: SendMessageType) => {
   try {
     const chatRoom = await databases.getDocument<ChannelType>(
@@ -773,6 +802,7 @@ export const sendMessage = async ({
         fileType,
         fileUrl,
         fileId,
+        replyTo,
       }
     );
 

@@ -38,6 +38,7 @@ const ChatId = () => {
   const [isAttachImage, setIsAttachImage] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [messageId, setMessageId] = useState<string>('');
+  const [replyMessage, setReplyMessage] = useState<IMessage | null>(null);
   const [imagePaths, setImagePaths] = useState<string[]>([]);
   const height = useSharedValue(0);
   const { showActionSheetWithOptions } = useActionSheet();
@@ -81,16 +82,24 @@ const ChatId = () => {
           fileType: message.fileType,
           fileUrl: message.fileUrl,
           fileId: message.fileId,
+          replyTo: message.replyTo,
         });
       });
     },
     [chatId, loggedInUser, mutateAsync]
   );
-  const handleSend = async () => {
+  const handleSend = async (messages: IMessage[]) => {
     if (text.trim()) {
-      const message = { text, user: { _id: loggedInUser } };
+      const message = {
+        text,
+        user: { _id: loggedInUser },
+        replyTo: replyMessage?._id as string,
+      };
       await onSend([message]);
       setText('');
+      if (replyMessage) {
+        setReplyMessage(null);
+      }
     }
   };
   useEffect(() => {
@@ -289,6 +298,8 @@ const ChatId = () => {
       <LoadingModal visible={isLeaving} />
       {isMember && (
         <ChatComponent
+          replyMessage={replyMessage}
+          setReplyMessage={setReplyMessage}
           handlePhotTaken={handlePhotoTaken}
           loadEarlier={loadEarlier}
           messages={messageData.messages || []}

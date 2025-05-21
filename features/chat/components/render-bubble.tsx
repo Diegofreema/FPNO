@@ -30,6 +30,7 @@ import { toast } from 'sonner-native';
 import { EmojiPickerModal } from './emoji-modal';
 import { InChatFileTransfer } from './in-chat-file-transfer';
 import { InChatViewFile } from './in-chat-view-file';
+import { RenderReply } from './render-reply';
 
 const { width } = Dimensions.get('window');
 type Props = BubbleProps<IMessage> & {
@@ -86,6 +87,7 @@ export const RenderBubble = ({
   const [fileVisible, setFileVisible] = useState(false);
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
+  console.log(currentMessage.reply);
 
   const bubbleRef = useRef<View>(null);
   const router = useRouter();
@@ -287,8 +289,16 @@ export const RenderBubble = ({
           ref={bubbleRef}
           accessibilityLabel="Message bubble, long press to react"
         >
+          {currentMessage.reply?.sender_id && (
+            <RenderReply message={currentMessage.reply} />
+          )}
           {renderContent()}
-          <Text style={styles.time}>
+          <Text
+            style={[
+              styles.time,
+              isSent ? styles.timeSent : styles.timeReceived,
+            ]}
+          >
             {new Date(currentMessage.createdAt).toLocaleTimeString([], {
               hour: '2-digit',
               minute: '2-digit',
@@ -339,11 +349,14 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   sentContainer: {
+    backgroundColor: colors.lightblue,
+
     // WhatsApp green for sent
     alignSelf: 'flex-end',
   },
   receivedContainer: {
     alignSelf: 'flex-start',
+    backgroundColor: colors.lightGray,
   },
   text: {
     fontSize: 16,
@@ -355,14 +368,12 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   sentTextContainer: {
-    backgroundColor: colors.lightblue,
     padding: 10,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
     borderBottomLeftRadius: 8,
   },
   receivedTextContainer: {
-    backgroundColor: colors.lightGray,
     padding: 10,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
@@ -399,6 +410,12 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     marginTop: 4,
   },
+  timeSent: {
+    color: '#fff',
+  },
+  timeReceived: {
+    color: colors.lightblue,
+  },
   reactionsContainer: {
     flexDirection: 'row',
     marginTop: 4,
@@ -407,7 +424,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
     position: 'absolute',
-    bottom: 10,
+    bottom: -5,
     left: 10,
     zIndex: 1000,
   },

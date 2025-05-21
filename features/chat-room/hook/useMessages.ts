@@ -1,3 +1,4 @@
+import { ReplyType } from '@/types';
 import { useGetMessages } from '../api/use-get-messages';
 
 type Props = {
@@ -28,6 +29,7 @@ export const useMessages = ({ channel_id, more, loggedInUser }: Props) => {
     reactions: message.reactions,
     fileType: message.fileType,
     fileUrl: message.fileUrl,
+    reply: message.reply as ReplyType,
   }));
   return {
     data: {

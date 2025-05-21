@@ -35,6 +35,8 @@ type Props = {
   setSending: (sending: boolean) => void;
   isAttachImage: boolean;
   setIsAttachImage: (isAttachImage: boolean) => void;
+  replyMessage: IMessage | null;
+  setReplyMessage: (message: IMessage | null) => void;
   onOpenCamera: () => void;
   onPickImage: () => void;
   height: SharedValue<number>;
@@ -76,13 +78,15 @@ const ChatComponent = ({
   showActionSheetWithOptions,
   onCopy,
   handlePhotTaken,
+  replyMessage,
+  setReplyMessage,
   onPickDocument,
 }: Props) => {
   const loggedInUserId = useAuth((state) => state.user?.id!);
   const insets = useSafeAreaInsets();
   const [visible, setVisible] = useState(false);
   const disabled = (imagePaths.length < 1 && text.trim() === '') || sending;
-  const [replyMessage, setReplyMessage] = useState<IMessage | null>(null);
+
   const swipeableRowRef = useRef<SwipeableMethods | null>(null);
   const updateRowRef = useCallback(
     (ref: any) => {

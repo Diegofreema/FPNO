@@ -155,6 +155,7 @@ export type ChatMessageType = Models.Document & {
   fileType?: FileType;
   fileUrl?: string;
   fileId?: string;
+  replyTo?: string;
   // content_type: 'image' | 'text' | 'pdf';
 };
 
@@ -183,6 +184,7 @@ export type SendMessageType = {
   fileType?: FileType;
   fileUrl?: string;
   fileId?: string;
+  replyTo?: string;
 };
 
 export type MessageReactionsType = Models.Document & {
@@ -213,6 +215,7 @@ export interface IMessage {
   audio?: string;
   fileUrl?: string;
   reactions?: MessageReactionsType[];
+  reply?: ReplyType;
 }
 export interface SendIMessage {
   text: string;
@@ -222,6 +225,18 @@ export interface SendIMessage {
   audio?: string;
   fileUrl?: string;
   fileId?: string;
+  replyTo?: string;
 }
 
 export type FileType = 'pdf' | 'image' | 'audio';
+
+export type ReplyType = {
+  fileType: FileType;
+  fileUrl: string;
+  message: string;
+  sender_id: string;
+  user: {
+    name: string;
+    id: string;
+  };
+};
