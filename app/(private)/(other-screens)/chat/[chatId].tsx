@@ -9,6 +9,7 @@ import {
 import { useLeave } from '@/features/chat-room/api/use-leave';
 import { useSendMessage } from '@/features/chat-room/api/use-send-message';
 import { useMessages } from '@/features/chat-room/hook/useMessages';
+import { useDeleteMessage } from '@/features/chat/api/use-delete-message';
 import { useGetConversationWithMessages } from '@/features/chat/api/use-get-conversation';
 import ChatComponent from '@/features/chat/components/chat-component';
 import { ChatNav } from '@/features/chat/components/chat-nav';
@@ -37,7 +38,7 @@ const ChatId = () => {
   const { mutateAsync, isPending: isSendingMessage } = useSendMessage();
   const [isAttachImage, setIsAttachImage] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [messageId, setMessageId] = useState<string>('');
+
   const [replyMessage, setReplyMessage] = useState<IMessage | null>(null);
   const [imagePaths, setImagePaths] = useState<string[]>([]);
   const height = useSharedValue(0);
@@ -53,7 +54,8 @@ const ChatId = () => {
   const onOpenCamera = useCallback(() => {
     router.push(`/camera?path=${pathname}`);
   }, [router, pathname]);
-
+  const { mutateAsync: deleteAsync, isPending: isPendingDelete } =
+    useDeleteMessage();
   const [sending, setSending] = useState(false);
   const { data, isPending, isError, error, refetch } =
     useGetConversationWithMessages({ roomId: chatId, offSet: more });
@@ -74,6 +76,9 @@ const ChatId = () => {
   const { mutateAsync: leaveRoom, isPending: isLeaving } = useLeave();
   const onSend = useCallback(
     async (messages: SendIMessage[]) => {
+      if (replyMessage) {
+        setReplyMessage(null);
+      }
       messages.forEach(async (message) => {
         await mutateAsync({
           message: message.text,
@@ -86,7 +91,7 @@ const ChatId = () => {
         });
       });
     },
-    [chatId, loggedInUser, mutateAsync]
+    [chatId, loggedInUser, mutateAsync, replyMessage]
   );
   const handleSend = async (messages: IMessage[]) => {
     if (text.trim()) {
@@ -97,9 +102,6 @@ const ChatId = () => {
       };
       await onSend([message]);
       setText('');
-      if (replyMessage) {
-        setReplyMessage(null);
-      }
     }
   };
   useEffect(() => {
@@ -115,20 +117,23 @@ const ChatId = () => {
       toast.success('Copied to clipboard');
     }
   }, []);
-  const onDelete = useCallback(async (messageId: string) => {
-    Alert.alert('This is irreversible', 'Delete this message for everyone?', [
-      {
-        text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
-        style: 'cancel',
-      },
-      {
-        text: 'Delete',
-        onPress: () => {},
-        style: 'destructive',
-      },
-    ]);
-  }, []);
+  const onDelete = useCallback(
+    async (messageId: string) => {
+      Alert.alert('This is irreversible', 'Delete this message for everyone?', [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: () => deleteAsync({ messageId, userId: loggedInUser }),
+          style: 'destructive',
+        },
+      ]);
+    },
+    [loggedInUser, deleteAsync]
+  );
   const handlePhotoTaken = useCallback((message: IMessage) => {}, []);
   const handleFilePick = async () => {
     setSending(true);
@@ -245,7 +250,7 @@ const ChatId = () => {
       messageId: string;
     }) => {
       setIsEditing(true);
-      setMessageId(messageId);
+
       setText(textToEdit);
     },
     []
@@ -295,7 +300,7 @@ const ChatId = () => {
         isInPending={!!pendingMember.total}
         leaveRoom={() => leaveRoom({ memberId: loggedInUser, roomId: chatId })}
       />
-      <LoadingModal visible={isLeaving} />
+      <LoadingModal visible={isLeaving || isPendingDelete} />
       {isMember && (
         <ChatComponent
           replyMessage={replyMessage}

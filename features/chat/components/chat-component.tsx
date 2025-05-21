@@ -64,14 +64,14 @@ const ChatComponent = ({
   onSend,
   setText,
   imagePaths,
-  setImagePaths,
+
   sending,
-  setSending,
+
   text,
   isAttachImage,
-  setIsAttachImage,
+
   onOpenCamera,
-  height,
+
   onPickImage,
   onDelete,
   onEdit,

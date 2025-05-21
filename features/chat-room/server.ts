@@ -886,3 +886,52 @@ export const onReactToMessage = async ({
     throw new Error(generateErrorMessage(error, 'Failed to react to message'));
   }
 };
+
+export const deleteMessage = async ({
+  messageId,
+  userId,
+}: {
+  messageId: string;
+  userId: string;
+}) => {
+  try {
+    const messageToDelete = await databases.getDocument<ChatMessageType>(
+      DATABASE_ID,
+      CHAT_MESSAGES_COLLECTION_ID,
+      messageId
+    );
+
+    if (!messageToDelete) {
+      throw new Error('Message not fount');
+    }
+
+    if (messageToDelete.sender_id !== userId) {
+      throw new Error('You are not authorized to delete this message');
+    }
+    if (messageToDelete.fileId) {
+      await storage.deleteFile(BUCKET_ID, messageToDelete.fileId);
+    }
+    const isReplyTo = await databases.listDocuments<ChatMessageType>(
+      DATABASE_ID,
+      CHAT_MESSAGES_COLLECTION_ID,
+      [Query.equal('replyTo', messageToDelete.$id)]
+    );
+
+    isReplyTo.documents.forEach(
+      async (r) =>
+        await databases.updateDocument(
+          DATABASE_ID,
+          CHAT_MESSAGES_COLLECTION_ID,
+          r.$id,
+          { replyTo: null }
+        )
+    );
+    await databases.deleteDocument(
+      DATABASE_ID,
+      CHAT_MESSAGES_COLLECTION_ID,
+      messageToDelete.$id
+    );
+  } catch (error) {
+    throw new Error(generateErrorMessage(error, 'Failed to delete message'));
+  }
+};

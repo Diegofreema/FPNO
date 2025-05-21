@@ -10,7 +10,7 @@ import { useFileUrlStore } from '@/hooks/use-file-url';
 import { FileType, IMessage, Reaction_Enum } from '@/types';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { Reply } from 'lucide-react-native';
+import { CircleChevronDown, Reply } from 'lucide-react-native';
 import {
   Dimensions,
   StyleSheet,
@@ -27,6 +27,7 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import { toast } from 'sonner-native';
+import { ChatMenu } from './chat-menu';
 import { EmojiPickerModal } from './emoji-modal';
 import { InChatFileTransfer } from './in-chat-file-transfer';
 import { InChatViewFile } from './in-chat-view-file';
@@ -58,8 +59,7 @@ function LeftAction(
   swipeableMethods: SwipeableMethods
 ) {
   const styleAnimation = useAnimatedStyle(() => {
-    // console.log('showRightProgress:', prog.value);
-    // console.log('appliedTranslation:', drag.value);
+    console.log('showRightProgress:', prog.value);
 
     return {
       transform: [{ translateX: drag.value + 50 }],
@@ -87,7 +87,6 @@ export const RenderBubble = ({
   const [fileVisible, setFileVisible] = useState(false);
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
-  console.log(currentMessage.reply);
 
   const bubbleRef = useRef<View>(null);
   const router = useRouter();
@@ -263,6 +262,30 @@ export const RenderBubble = ({
       setReplyOnSwipeOpen({ ...currentMessage });
     }
   };
+
+  const isText = currentMessage.text.trim() !== '';
+  const isMine = currentMessage.user._id === loggedInUserId;
+  const menuItems = [
+    ...(isMine
+      ? [
+          {
+            text: 'Delete',
+            onSelect: () => onDelete(currentMessage._id as string),
+          },
+          {
+            text: 'Edit',
+            onSelect: () =>
+              onEdit({
+                messageId: currentMessage._id as string,
+                textToEdit: currentMessage.text,
+              }),
+          },
+        ]
+      : []),
+    ...(isText
+      ? [{ text: 'Copy', onSelect: () => onCopy(currentMessage.text) }]
+      : []),
+  ];
   return (
     <>
       <ReanimatedSwipeable
@@ -272,6 +295,8 @@ export const RenderBubble = ({
         leftThreshold={40}
         containerStyle={{ width: '100%', backgroundColor: 'transparent' }}
         onEnded={(event) => console.log('swiped ended')}
+        onSwipeableWillOpen={() => console.log('swipeable will open')}
+        shouldCancelWhenOutside
         ref={updateRowRef}
         onSwipeableOpen={onSwipeAction}
       >
@@ -289,6 +314,17 @@ export const RenderBubble = ({
           ref={bubbleRef}
           accessibilityLabel="Message bubble, long press to react"
         >
+          <ChatMenu
+            trigger={
+              <CircleChevronDown
+                color={isSent ? colors.white : colors.lightblue}
+                size={15}
+                style={{ alignSelf: 'flex-end', marginBottom: 3 }}
+              />
+            }
+            menuItems={menuItems}
+          />
+
           {currentMessage.reply?.sender_id && (
             <RenderReply message={currentMessage.reply} />
           )}
