@@ -240,3 +240,14 @@ export type ReplyType = {
     id: string;
   };
 };
+
+export type EditType = { text: string; senderId: string; senderName: string };
+
+export type EditType2 = {
+  textToEdit: string;
+  messageId: string;
+  senderId: string;
+  senderName: string;
+};
+
+export type ServerEdit = Omit<EditType2, 'senderName'>;

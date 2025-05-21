@@ -19,6 +19,7 @@ import {
   MessageReactionsType,
   Reaction_Enum,
   SendMessageType,
+  ServerEdit,
   UserType,
 } from '@/types';
 import { ID, Query } from 'react-native-appwrite';
@@ -933,5 +934,37 @@ export const deleteMessage = async ({
     );
   } catch (error) {
     throw new Error(generateErrorMessage(error, 'Failed to delete message'));
+  }
+};
+
+export const editMessage = async ({
+  messageId,
+  senderId,
+  textToEdit,
+}: ServerEdit) => {
+  try {
+    const messageToEdit = await databases.getDocument<ChatMessageType>(
+      DATABASE_ID,
+      CHAT_MESSAGES_COLLECTION_ID,
+      messageId
+    );
+
+    if (!messageToEdit) {
+      throw new Error('Message not found');
+    }
+
+    if (messageToEdit.sender_id !== senderId) {
+      throw new Error("You can't edit this message");
+    }
+    await databases.updateDocument(
+      DATABASE_ID,
+      CHAT_MESSAGES_COLLECTION_ID,
+      messageId,
+      {
+        message: textToEdit,
+      }
+    );
+  } catch (error) {
+    throw new Error(generateErrorMessage(error, 'Failed to edit message'));
   }
 };

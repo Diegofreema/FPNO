@@ -1,5 +1,6 @@
 import { colors } from '@/constants';
-import { IMessage } from '@/types';
+import { useAuth } from '@/lib/zustand/useAuth';
+import { EditType, IMessage } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -9,9 +10,17 @@ import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 type ReplyMessageBarProps = {
   clearReply: () => void;
   message: IMessage | null;
+  editText: EditType | null;
+  clearEdit: () => void;
 };
 
-const ReplyMessageBar = ({ clearReply, message }: ReplyMessageBarProps) => {
+const ReplyMessageBar = ({
+  clearReply,
+  message,
+  clearEdit,
+  editText,
+}: ReplyMessageBarProps) => {
+  const loggedInUser = useAuth((state) => state.user?.id);
   const renderContent = () => {
     if (message?.fileType === 'image' && message.fileUrl) {
       return (
@@ -37,11 +46,17 @@ const ReplyMessageBar = ({ clearReply, message }: ReplyMessageBarProps) => {
       );
     }
   };
-  const height =
-    message?.fileType === 'image' || message?.fileType === 'pdf' ? 70 : 50;
+  
+  // Determine which content to display (prioritize message over editText)
+  const displayMessage = message !== null;
+  const displayEditText = !displayMessage && editText !== null;
+  
+  // Calculate height based on the content being displayed
+  const height = displayMessage && (message?.fileType === 'image' || message?.fileType === 'pdf') ? 70 : 50;
+  
   return (
     <>
-      {message !== null && (
+      {displayMessage && (
         <Animated.View
           style={{
             height: height,
@@ -78,6 +93,59 @@ const ReplyMessageBar = ({ clearReply, message }: ReplyMessageBarProps) => {
             }}
           >
             <TouchableOpacity onPress={clearReply}>
+              <Ionicons
+                name="close-circle-outline"
+                color={colors.lightblue}
+                size={28}
+              />
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      )}
+
+      {displayEditText && (
+        <Animated.View
+          style={{
+            height: height,
+            flexDirection: 'row',
+            backgroundColor: '#E4E9EB',
+          }}
+          entering={FadeInDown}
+          exiting={FadeOutDown}
+        >
+          <View
+            style={{ height: height, width: 6, backgroundColor: '#89BC0C' }}
+          ></View>
+          <View>
+            <Text
+              style={{
+                color: '#89BC0C',
+                paddingLeft: 10,
+                paddingTop: 5,
+                fontWeight: '600',
+                fontSize: 15,
+              }}
+            >
+              {editText.senderId === loggedInUser ? 'You' : editText.senderName}
+            </Text>
+            <Text
+              style={{ color: colors.gray, paddingLeft: 10, paddingTop: 5 }}
+            >
+              {editText!.text.length > 40
+                ? editText?.text.substring(0, 40) + '...'
+                : editText.text}
+            </Text>
+          </View>
+
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              paddingRight: 10,
+            }}
+          >
+            <TouchableOpacity onPress={clearEdit}>
               <Ionicons
                 name="close-circle-outline"
                 color={colors.lightblue}

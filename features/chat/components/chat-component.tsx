@@ -1,6 +1,6 @@
 import { colors } from '@/constants';
 import { useAuth } from '@/lib/zustand/useAuth';
-import { IMessage } from '@/types';
+import { EditType, EditType2, IMessage } from '@/types';
 import { ActionSheetOptions } from '@expo/react-native-action-sheet';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -11,7 +11,6 @@ import {
   View,
 } from 'react-native';
 import { GiftedChat, SystemMessage, Time } from 'react-native-gifted-chat';
-import { SharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SwipeableMethods } from 'react-native-gesture-handler/lib/typescript/components/ReanimatedSwipeable';
@@ -26,11 +25,12 @@ type Props = {
   messages: IMessage[];
   loadEarlier: boolean;
   onLoadMore: () => void;
+  editText: EditType | null;
+  setEditText: (value: EditType | null) => void;
   onSend: (messages: IMessage[]) => void;
   setText: (text: string) => void;
   text: string;
-  imagePaths: string[];
-  setImagePaths: (imagePaths: string[]) => void;
+
   sending: boolean;
   setSending: (sending: boolean) => void;
   isAttachImage: boolean;
@@ -39,18 +39,12 @@ type Props = {
   setReplyMessage: (message: IMessage | null) => void;
   onOpenCamera: () => void;
   onPickImage: () => void;
-  height: SharedValue<number>;
+
   showActionSheetWithOptions: (
     options: ActionSheetOptions,
     callback: (i?: number) => void | Promise<void>
   ) => void;
-  onEdit: ({
-    textToEdit,
-    messageId,
-  }: {
-    textToEdit: string;
-    messageId: string;
-  }) => Promise<void>;
+  onEdit: (value: EditType2) => Promise<void>;
   onDelete: (messageId: string) => Promise<void>;
   onCopy: (textToCopy: string) => Promise<void>;
   handlePhotTaken: (message: IMessage) => void;
@@ -63,15 +57,11 @@ const ChatComponent = ({
   onLoadMore,
   onSend,
   setText,
-  imagePaths,
 
   sending,
-
   text,
   isAttachImage,
-
   onOpenCamera,
-
   onPickImage,
   onDelete,
   onEdit,
@@ -81,11 +71,13 @@ const ChatComponent = ({
   replyMessage,
   setReplyMessage,
   onPickDocument,
+  editText,
+  setEditText,
 }: Props) => {
   const loggedInUserId = useAuth((state) => state.user?.id!);
   const insets = useSafeAreaInsets();
   const [visible, setVisible] = useState(false);
-  const disabled = (imagePaths.length < 1 && text.trim() === '') || sending;
+  const disabled = sending;
 
   const swipeableRowRef = useRef<SwipeableMethods | null>(null);
   const updateRowRef = useCallback(
@@ -96,9 +88,12 @@ const ChatComponent = ({
         ref.props.children.props.currentMessage?._id === replyMessage?._id
       ) {
         swipeableRowRef.current = ref;
+        if (editText) {
+          setEditText(null);
+        }
       }
     },
-    [replyMessage]
+    [replyMessage, editText, setEditText]
   );
   useEffect(() => {
     if (replyMessage && swipeableRowRef.current) {
@@ -187,6 +182,8 @@ const ChatComponent = ({
             <ReplyMessageBar
               clearReply={() => setReplyMessage(null)}
               message={replyMessage}
+              editText={editText}
+              clearEdit={() => setEditText(null)}
             />
           )}
           renderSend={(props) => (

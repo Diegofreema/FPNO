@@ -7,7 +7,7 @@ import { colors } from '@/constants';
 import { emojis } from '@/data';
 import { onReactToMessage } from '@/features/chat-room/server';
 import { useFileUrlStore } from '@/hooks/use-file-url';
-import { FileType, IMessage, Reaction_Enum } from '@/types';
+import { EditType2, FileType, IMessage, Reaction_Enum } from '@/types';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { CircleChevronDown, Reply } from 'lucide-react-native';
@@ -42,13 +42,7 @@ type Props = BubbleProps<IMessage> & {
     options: ActionSheetOptions,
     callback: (i?: number) => void | Promise<void>
   ): void;
-  onEdit: ({
-    textToEdit,
-    messageId,
-  }: {
-    textToEdit: string;
-    messageId: string;
-  }) => void;
+  onEdit: (value: EditType2) => void;
   onDelete: (messageId: string) => void;
   loggedInUserId: string;
 };
@@ -278,6 +272,8 @@ export const RenderBubble = ({
               onEdit({
                 messageId: currentMessage._id as string,
                 textToEdit: currentMessage.text,
+                senderId: currentMessage.user._id,
+                senderName: currentMessage.user.name,
               }),
           },
         ]
