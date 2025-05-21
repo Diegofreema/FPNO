@@ -252,6 +252,7 @@ const ChatId = () => {
     async ({ textToEdit, messageId, senderId, senderName }: EditType2) => {
       setEditText({ text: textToEdit, senderId, senderName });
       setEdit({ messageId, senderId });
+      setText(textToEdit);
     },
     []
   );

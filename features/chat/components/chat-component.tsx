@@ -106,6 +106,7 @@ const ChatComponent = ({
     <>
       <View style={{ flex: 1 }}>
         <GiftedChat
+          text={text}
           messages={messages}
           loadEarlier={loadEarlier}
           onLoadEarlier={onLoadMore}
