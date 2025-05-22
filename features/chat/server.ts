@@ -1,6 +1,6 @@
 import { CHAT_COLLECTION_ID, DATABASE_ID, USER_COLLECTION_ID } from '@/config';
 import { databases } from '@/db/appwrite';
-import { generateErrorMessage } from '@/helper';
+import { deleteMessageHelpFn, generateErrorMessage } from '@/helper';
 import { ChannelType, UserType } from '@/types';
 import { Query } from 'react-native-appwrite';
 
@@ -52,7 +52,16 @@ export const getConversationWithMessages = async ({
   }
 };
 
-export const getMembers = async ({ channel_id }: { channel_id: string }) => {
+export const deleteMessages = async (
+  messageIds: string[],
+  loggedInUser: string
+) => {
   try {
-  } catch (error) {}
+    const messagesToDelete = messageIds.map(async (messageId) => {
+      await deleteMessageHelpFn(messageId, loggedInUser);
+    });
+    await Promise.all(messagesToDelete);
+  } catch (e) {
+    throw new Error(generateErrorMessage(e, 'Failed to delete messages'));
+  }
 };

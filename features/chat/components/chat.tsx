@@ -3,7 +3,8 @@ import { Loading } from '@/components/ui/loading';
 import { useGetChannelIAmIn } from '@/features/chat-room/api/use-get-channel-i-am-in';
 import { useGetTopChatRooms } from '@/features/chat-room/api/use-get-top-chat-rooms';
 import { RenderRooms } from '@/features/chat-room/components/render-rooms';
-import React, { useState } from 'react';
+import { useSelected } from '@/features/chat-room/hook/use-selected';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useDebounce } from 'use-debounce';
 import { ChatHeader } from './chat-header';
@@ -15,6 +16,8 @@ export const Chat = () => {
   const [search] = useDebounce(value, 500);
   const [more, setMore] = useState(0);
   const { data, isPending, isError, refetch, error } = useGetTopChatRooms();
+  const selectedMessages = useSelected((state) => state.selected);
+  const clearMessages = useSelected((state) => state.clear);
   const {
     data: channelData,
     isPending: isChannelPending,
@@ -27,6 +30,12 @@ export const Chat = () => {
     refetch();
     refetchChannel();
   };
+
+  useEffect(() => {
+    if (selectedMessages.length > 0) {
+      clearMessages();
+    }
+  }, [selectedMessages, clearMessages]);
 
   const errorMessage = channelError?.message || error?.message;
   if (isError || isChannelError) {

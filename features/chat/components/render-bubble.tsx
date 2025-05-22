@@ -5,6 +5,10 @@ import { BubbleProps } from 'react-native-gifted-chat';
 import { CustomPressable } from '@/components/ui/custom-pressable';
 import { colors } from '@/constants';
 import { emojis } from '@/data';
+import {
+  SelectedMessage,
+  useSelected,
+} from '@/features/chat-room/hook/use-selected';
 import { onReactToMessage } from '@/features/chat-room/server';
 import { useFileUrlStore } from '@/hooks/use-file-url';
 import { EditType2, FileType, IMessage, Reaction_Enum } from '@/types';
@@ -76,17 +80,40 @@ export const RenderBubble = ({
   currentMessage,
   updateRowRef,
   setReplyOnSwipeOpen,
-  ...props
 }: Props) => {
   const [fileVisible, setFileVisible] = useState(false);
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
+  const setSelected = useSelected((state) => state.setSelected);
+  const removeSelected = useSelected((state) => state.removeSelected);
+  const selected = useSelected((state) => state.selected);
+  const messageIsSelected = !!selected.find(
+    (message) => message.messageId === currentMessage._id
+  );
+  const selectedIsNotEmpty = selected.length > 0;
+  console.log({ selectedIsNotEmpty, length: selected.length });
 
   const bubbleRef = useRef<View>(null);
   const router = useRouter();
   const getFile = useFileUrlStore((state) => state.setFileUrl);
 
-  const onPress = (url: string | undefined, type: FileType | undefined) => {
+  const onPress = (
+    url: string | undefined,
+    type: FileType | undefined,
+    selectedMessage: SelectedMessage | undefined
+  ) => {
+    if (selectedIsNotEmpty && !messageIsSelected) {
+      setSelected({
+        messageId: currentMessage._id.toString(),
+        senderId: currentMessage.user._id.toString(),
+      });
+      return;
+    }
+    if (selectedIsNotEmpty && selectedMessage) {
+      removeSelected(selectedMessage);
+      return;
+    }
+
     if (!url || !type) return;
     getFile({ type, url });
     router.push('/preview-file');
@@ -143,6 +170,11 @@ export const RenderBubble = ({
     }
   };
   const handleLongPress = () => {
+    setSelected({
+      messageId: currentMessage._id as string,
+      senderId: currentMessage.user._id,
+    });
+    if (selected.length > 0) return;
     if (bubbleRef.current) {
       bubbleRef.current.measure((x, y, w, h, pageX, pageY) => {
         const bubbleCenter = pageX + width / 2;
@@ -289,17 +321,22 @@ export const RenderBubble = ({
         friction={2}
         enableTrackpadTwoFingerGesture
         leftThreshold={40}
-        containerStyle={{ width: '100%', backgroundColor: 'transparent' }}
-        onEnded={(event) => console.log('swiped ended')}
-        onSwipeableWillOpen={() => console.log('swipeable will open')}
-        shouldCancelWhenOutside
+        containerStyle={{
+          width: '100%',
+          backgroundColor: messageIsSelected
+            ? 'rgba(0,0,0, 0.2)'
+            : 'transparent',
+        }}
         ref={updateRowRef}
         onSwipeableOpen={onSwipeAction}
       >
         <TouchableOpacity
           onLongPress={handleLongPress}
           onPress={() =>
-            onPress(currentMessage.fileUrl, currentMessage.fileType)
+            onPress(currentMessage.fileUrl, currentMessage.fileType, {
+              messageId: currentMessage._id.toString(),
+              senderId: currentMessage.user._id.toString(),
+            })
           }
           delayLongPress={300}
           activeOpacity={0.8}
@@ -319,6 +356,7 @@ export const RenderBubble = ({
               />
             }
             menuItems={menuItems}
+            disable={selectedIsNotEmpty}
           />
 
           {currentMessage.reply?.sender_id && (
@@ -375,6 +413,7 @@ export const RenderBubble = ({
 const styles = StyleSheet.create({
   container: {
     maxWidth: width * 0.75,
+    minWidth: width * 0.25,
     marginVertical: 4,
     marginHorizontal: 8,
     borderRadius: 12,

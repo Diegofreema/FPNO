@@ -3,10 +3,15 @@ import { format, isToday, isYesterday, parseISO } from 'date-fns';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
-import { ID } from 'react-native-appwrite';
-import { BUCKET_ID, PROJECT_ID } from './config';
-import { storage } from './db/appwrite';
-import { MemberType, userData } from './types';
+import { ID, Query } from 'react-native-appwrite';
+import {
+  BUCKET_ID,
+  CHAT_MESSAGES_COLLECTION_ID,
+  DATABASE_ID,
+  PROJECT_ID,
+} from './config';
+import { databases, storage } from './db/appwrite';
+import { ChatMessageType, MemberType, userData } from './types';
 export const sendEmail = async (email: string, otp: string) => {
   const { data } = await axios.get(
     `https://estate.netpro.software/sendsms.aspx?email=${email}&otp=${otp}`
@@ -409,4 +414,52 @@ export const generateImageUrl = async (image: {
   const link = `https://fra.cloud.appwrite.io/v1/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}&mode=admin`;
 
   return { link, id };
+};
+
+export const findAndDeleteReplies = async (messageId: string) => {
+  const isReplyTo = await databases.listDocuments<ChatMessageType>(
+    DATABASE_ID,
+    CHAT_MESSAGES_COLLECTION_ID,
+    [Query.equal('replyTo', messageId)]
+  );
+  if (isReplyTo.total > 0) {
+    isReplyTo.documents.forEach(
+      async (r) =>
+        await databases.updateDocument(
+          DATABASE_ID,
+          CHAT_MESSAGES_COLLECTION_ID,
+          r.$id,
+          { replyTo: null }
+        )
+    );
+  }
+};
+
+export const deleteMessageHelpFn = async (
+  messageId: string,
+  loggedInUser: string
+) => {
+  const messageToDelete = await databases.getDocument<ChatMessageType>(
+    DATABASE_ID,
+    CHAT_MESSAGES_COLLECTION_ID,
+    messageId
+  );
+
+  if (!messageToDelete) {
+    throw new Error('Message not found');
+  }
+
+  if (messageToDelete.sender_id !== loggedInUser) {
+    throw new Error('You are not authorized to delete this message');
+  }
+  if (messageToDelete.fileId) {
+    await storage.deleteFile(BUCKET_ID, messageToDelete.fileId);
+  }
+  await findAndDeleteReplies(messageToDelete.$id);
+
+  await databases.deleteDocument(
+    DATABASE_ID,
+    CHAT_MESSAGES_COLLECTION_ID,
+    messageToDelete.$id
+  );
 };

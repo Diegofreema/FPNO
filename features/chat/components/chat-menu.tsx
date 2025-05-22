@@ -29,7 +29,14 @@ export const ChatMenu: React.FC<PopupMenuProps> = ({
   return (
     <Menu renderer={renderers.ContextMenu}>
       <MenuTrigger
-        customStyles={{ triggerTouchable: styles.trigger }}
+        customStyles={{
+          triggerTouchable: styles.trigger,
+          triggerOuterWrapper: {
+            width: 24,
+            alignSelf: 'flex-end',
+            borderRadius: 30,
+          },
+        }}
         disabled={disable}
       >
         {trigger ? (
@@ -55,6 +62,7 @@ export const ChatMenu: React.FC<PopupMenuProps> = ({
 const styles = StyleSheet.create({
   trigger: {
     padding: 8,
+    width: 30,
   },
 });
 

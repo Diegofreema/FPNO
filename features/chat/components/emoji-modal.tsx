@@ -75,7 +75,7 @@ const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)', // Semi-transparent overlay
+    backgroundColor: 'transparent', // Semi-transparent overlay
   },
   pickerContainer: {
     position: 'absolute',
