@@ -90,8 +90,8 @@ export const RenderBubble = ({
   const messageIsSelected = !!selected.find(
     (message) => message.messageId === currentMessage._id
   );
+
   const selectedIsNotEmpty = selected.length > 0;
-  console.log({ selectedIsNotEmpty, length: selected.length });
 
   const bubbleRef = useRef<View>(null);
   const router = useRouter();
@@ -169,11 +169,14 @@ export const RenderBubble = ({
       toast.error('Error adding reaction');
     }
   };
+
   const handleLongPress = () => {
-    setSelected({
-      messageId: currentMessage._id as string,
-      senderId: currentMessage.user._id,
-    });
+    if (isSent) {
+      setSelected({
+        messageId: currentMessage._id as string,
+        senderId: currentMessage.user._id,
+      });
+    }
     if (selected.length > 0) return;
     if (bubbleRef.current) {
       bubbleRef.current.measure((x, y, w, h, pageX, pageY) => {
@@ -194,6 +197,7 @@ export const RenderBubble = ({
       });
     }
   };
+
   const renderContent = () => {
     if (currentMessage.fileType === 'image' && currentMessage.fileUrl) {
       return (
@@ -292,12 +296,24 @@ export const RenderBubble = ({
   const isText = currentMessage.text.trim() !== '';
   const isMine = currentMessage.user._id === loggedInUserId;
   const menuItems = [
-    ...(isMine
+    ...(isMine && currentMessage._id
       ? [
           {
             text: 'Delete',
             onSelect: () => onDelete(currentMessage._id as string),
           },
+        ]
+      : []),
+    ...(isText && currentMessage.text
+      ? [
+          {
+            text: 'Copy',
+            onSelect: () => onCopy(currentMessage.text),
+          },
+        ]
+      : []),
+    ...(isText && isMine && currentMessage._id && currentMessage.text
+      ? [
           {
             text: 'Edit',
             onSelect: () =>
@@ -309,9 +325,6 @@ export const RenderBubble = ({
               }),
           },
         ]
-      : []),
-    ...(isText
-      ? [{ text: 'Copy', onSelect: () => onCopy(currentMessage.text) }]
       : []),
   ];
   return (

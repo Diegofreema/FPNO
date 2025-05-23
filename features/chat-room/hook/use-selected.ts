@@ -24,6 +24,7 @@ export const useSelected = create<Store>((set) => ({
       } else {
         selected.splice(index, 1);
       }
+
       return { selected };
     });
   },

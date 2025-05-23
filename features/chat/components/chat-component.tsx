@@ -39,7 +39,6 @@ type Props = {
   setReplyMessage: (message: IMessage | null) => void;
   onOpenCamera: () => void;
   onPickImage: () => void;
-
   showActionSheetWithOptions: (
     options: ActionSheetOptions,
     callback: (i?: number) => void | Promise<void>
@@ -57,7 +56,6 @@ const ChatComponent = ({
   onLoadMore,
   onSend,
   setText,
-
   sending,
   text,
   isAttachImage,

@@ -40,6 +40,9 @@ export const ChatNav = ({
 }: Props) => {
   const router = useRouter();
   const selectedMessages = useSelected((state) => state.selected);
+  const { selected } = useSelected();
+  console.log('selectedMessages', selectedMessages, selected);
+
   const clearMessages = useSelected((state) => state.clear);
   const messageIsSelected = selectedMessages.length > 0;
   const selectedMessageLength = selectedMessages.length;
