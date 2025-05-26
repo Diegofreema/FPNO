@@ -1,0 +1,37 @@
+{
+  "cli": {
+    "version": ">= 16.6.1",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development"
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_END_POINT": "https://fra.cloud.appwrite.io/v1",
+        "EXPO_PUBLIC_PROJECT_ID": "681b3f0a00211d68896c",
+        "EXPO_PUBLIC_DATABASE_ID": "681c76800011535079c6",
+        "EXPO_PUBLIC_PROJECT_NAME": "com.diegodark.FPNO",
+        "EXPO_PUBLIC_CHAT_ROOM_COLLECTION_ID": "681c76bb0038418063a2",
+        "EXPO_PUBLIC_USERS_COLLECTION_ID": "681c77ad003c8d72f38f",
+        "EXPO_PUBLIC_MESSAGES_COLLECTION_ID": "681c798800002f8f7a71",
+        "EXPO_PUBLIC_PENDING_ID": "682414b30036d8553cce",
+        "EXPO_PUBLIC_MEMBER_ID": "6825e890003cbc62bba8",
+        "EXPO_PUBLIC_BUCKET_ID": "682472b9002fe0b9b8b7",
+        "EXPO_PUBLIC_REACTIONS_ID": "682ae8a7000e9acbb57f"
+      },
+      "channel": "preview"
+    },
+    "production": {
+      "autoIncrement": true,
+      "channel": "production"
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

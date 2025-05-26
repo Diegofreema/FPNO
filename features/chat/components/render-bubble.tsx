@@ -2,8 +2,8 @@ import { ActionSheetOptions } from '@expo/react-native-action-sheet';
 import React, { useRef, useState } from 'react';
 import { BubbleProps } from 'react-native-gifted-chat';
 
-import { CustomPressable } from '@/components/ui/custom-pressable';
 import { colors } from '@/constants';
+// import { emojis } from '@/data';
 import { emojis } from '@/data';
 import {
   SelectedMessage,
@@ -33,8 +33,6 @@ import Animated, {
 import { toast } from 'sonner-native';
 import { ChatMenu } from './chat-menu';
 import { EmojiPickerModal } from './emoji-modal';
-import { InChatFileTransfer } from './in-chat-file-transfer';
-import { InChatViewFile } from './in-chat-view-file';
 import { RenderReply } from './render-reply';
 
 const { width } = Dimensions.get('window');
@@ -73,7 +71,6 @@ function LeftAction(
 
 export const RenderBubble = ({
   onCopy,
-  showActionSheetWithOptions,
   onEdit,
   onDelete,
   loggedInUserId,
@@ -81,15 +78,14 @@ export const RenderBubble = ({
   updateRowRef,
   setReplyOnSwipeOpen,
 }: Props) => {
-  const [fileVisible, setFileVisible] = useState(false);
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
-  const setSelected = useSelected((state) => state.setSelected);
-  const removeSelected = useSelected((state) => state.removeSelected);
-  const selected = useSelected((state) => state.selected);
+
+  const { selected, setSelected, removeSelected } = useSelected();
   const messageIsSelected = !!selected.find(
     (message) => message.messageId === currentMessage._id
   );
+  console.log({ selected });
 
   const selectedIsNotEmpty = selected.length > 0;
 
@@ -123,42 +119,9 @@ export const RenderBubble = ({
   );
 
   const isSent = currentMessage.user._id === loggedInUserId;
-  // const onPress = () => {
-  //   const options = ['Delete', 'Copy text', 'Edit', 'Cancel'];
-  //   const destructiveButtonIndex = 0;
-  //   const cancelButtonIndex = 3;
 
-  //   showActionSheetWithOptions(
-  //     {
-  //       options,
-  //       cancelButtonIndex,
-  //       destructiveButtonIndex,
-  //     },
-  //     (selectedIndex?: number) => {
-  //       console.log(selectedIndex);
-  //       switch (selectedIndex) {
-  //         case 1:
-  //           onCopy(currentMessage.text);
-  //           break;
-  //         case 2:
-  //           onEdit({
-  //             textToEdit: currentMessage.text,
-  //             messageId: currentMessage._id as string,
-  //           });
-  //           break;
-  //         case destructiveButtonIndex:
-  //           onDelete(currentMessage._id as string);
-  //           break;
-
-  //         case cancelButtonIndex:
-  //         // Canceled
-  //       }
-  //     }
-  //   );
-  // };
   const handleEmojiSelect = async (emoji: string) => {
     try {
-      console.log(emoji);
       await onReactToMessage({
         messageId: currentMessage._id as string,
         reaction: emoji as Reaction_Enum,
@@ -197,6 +160,7 @@ export const RenderBubble = ({
       });
     }
   };
+  // console.log({ a: array });
 
   const renderContent = () => {
     if (currentMessage.fileType === 'image' && currentMessage.fileUrl) {
@@ -261,32 +225,7 @@ export const RenderBubble = ({
       </View>
     );
   };
-  if (currentMessage.audio) {
-    return (
-      <CustomPressable
-        style={{
-          backgroundColor:
-            currentMessage.user._id === loggedInUserId ? '#2e64e5' : '#efefef',
-          borderBottomLeftRadius:
-            currentMessage.user._id === loggedInUserId ? 15 : 5,
-          borderBottomRightRadius:
-            currentMessage.user._id === loggedInUserId ? 5 : 15,
-          height: 100,
-        }}
-        onPress={() => setFileVisible(true)}
-      >
-        <InChatFileTransfer
-          style={{ marginTop: -10 }}
-          filePath={currentMessage.audio}
-        />
-        <InChatViewFile
-          uri={currentMessage.audio}
-          visible={fileVisible}
-          onClose={() => setFileVisible(false)}
-        />
-      </CustomPressable>
-    );
-  }
+
   const onSwipeAction = () => {
     if (currentMessage) {
       setReplyOnSwipeOpen({ ...currentMessage });

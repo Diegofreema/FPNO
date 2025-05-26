@@ -8,11 +8,11 @@ import {
   Stack,
   useSegments,
 } from 'expo-router';
+import * as Updates from 'expo-updates';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { MenuProvider } from 'react-native-popup-menu';
 import { Toaster } from 'sonner-native';
-
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   return <ErrorComponent onPress={retry} title={error.message} />;
 }
@@ -30,6 +30,22 @@ export default function RootLayout() {
     NunitoBold: require('../assets/fonts/NunitoBold.ttf'),
   });
 
+  useEffect(() => {
+    async function onFetchUpdateAsync() {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+        }
+      } catch (error) {
+        // You can also add an alert() to see the error message in case of an error when fetching updates.
+        console.log(error);
+      }
+    }
+    onFetchUpdateAsync();
+  }, []);
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();

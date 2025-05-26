@@ -2,8 +2,6 @@ import { colors } from '@/constants';
 import React from 'react';
 import { Composer, ComposerProps } from 'react-native-gifted-chat';
 
-import { CustomPressable } from '@/components/ui/custom-pressable';
-import { IconCamera } from '@tabler/icons-react-native';
 import { View } from 'react-native';
 import { FilePickerPanel } from './file-picker-panel';
 
@@ -43,9 +41,9 @@ export const RenderComposer = ({
         }}
       >
         <Composer {...props} multiline />
-        <CustomPressable onPress={onOpenCamera}>
+        {/* <CustomPressable onPress={onOpenCamera}>
           <IconCamera size={24} color={colors.lightblue} strokeWidth={1.5} />
-        </CustomPressable>
+        </CustomPressable> */}
       </View>
     </>
   );

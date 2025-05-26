@@ -15,17 +15,9 @@ export const useSelected = create<Store>((set) => ({
   selected: [],
   setSelected: (selectedMessage) => {
     set((state) => {
-      const selected = [...state.selected];
-      const index = selected.findIndex(
-        (message) => message.messageId === selectedMessage.messageId
-      );
-      if (index === -1) {
-        selected.push(selectedMessage);
-      } else {
-        selected.splice(index, 1);
-      }
+      console.log('setSelected', selectedMessage);
 
-      return { selected };
+      return { selected: [...state.selected, selectedMessage] };
     });
   },
   clear: () => {
