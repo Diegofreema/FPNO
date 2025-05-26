@@ -1,12 +1,14 @@
-import React from 'react';
-import { Text, View } from 'react-native';
+import { CustomBackgroundImage } from '@/components/ui/custom-background';
+import { LockComponent } from '@/components/ui/lock-component';
 
-const LockScreen = () => {
+const Lock = () => {
   return (
-    <View>
-      <Text>LockScreen</Text>
-    </View>
+    <CustomBackgroundImage
+      text={'Login to your Account'}
+      text2={'Welcome Back'}
+    >
+      <LockComponent />
+    </CustomBackgroundImage>
   );
 };
-
-export default LockScreen;
+export default Lock;
