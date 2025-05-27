@@ -1,3 +1,4 @@
+import { colors } from '@/constants';
 import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -34,7 +35,7 @@ export const PendingMemberBanner = ({ pendingMemberCount, roomId }: Props) => {
   return (
     <AnimatedTouchableOpacity style={animatedStyle} onPress={onPress}>
       <View style={{ padding: 10, backgroundColor: '#f0f0f0' }}>
-        <Text>
+        <Text style={{ color: colors.black }}>
           {pendingMemberCount} {pendingMemberCount === 1 ? 'member' : 'members'}{' '}
           pending
         </Text>

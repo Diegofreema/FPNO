@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
     fontFamily: 'NunitoRegular',
     fontSize: RFPercentage(1.7),
     textAlign: 'center',
+    color: colors.black,
   },
   text2: {
     fontFamily: 'NunitoBold',

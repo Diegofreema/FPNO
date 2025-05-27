@@ -64,7 +64,12 @@ export const CustomInput = ({
               <TextInput
                 placeholder={placeholder}
                 style={[
-                  { flex: 1, fontFamily: 'NunitoRegular', fontSize: 15 },
+                  {
+                    flex: 1,
+                    fontFamily: 'NunitoRegular',
+                    fontSize: 15,
+                    color: 'black',
+                  },
                   rest.style,
                 ]}
                 placeholderTextColor={colors.gray}

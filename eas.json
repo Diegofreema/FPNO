@@ -11,6 +11,7 @@
     },
     "preview": {
       "distribution": "internal",
+      "environment": "preview",
       "env": {
         "EXPO_PUBLIC_API_END_POINT": "https://fra.cloud.appwrite.io/v1",
         "EXPO_PUBLIC_PROJECT_ID": "681b3f0a00211d68896c",
