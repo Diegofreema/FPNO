@@ -8,7 +8,7 @@ type Props = {
 export const Resend = ({ resend, disabled }: Props) => {
   return (
     <View style={styles.resendContainer}>
-      <Text style={{ fontFamily: 'NunitoRegular' }}>
+      <Text style={{ fontFamily: 'NunitoRegular', color: 'black' }}>
         Didn’t receive the code?
       </Text>
       <TouchableOpacity

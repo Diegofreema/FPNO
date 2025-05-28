@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: RFPercentage(1.6),
     fontWeight: 'bold',
+    color: '#000',
   },
 });
 
