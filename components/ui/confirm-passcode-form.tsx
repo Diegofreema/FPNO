@@ -193,6 +193,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: dialPadItemSize,
     fontFamily: 'NunitoRegular',
+    color: colors.black,
   },
   pinContainer: {
     flexDirection: 'row',

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { DimensionValue, FlexAlignType, StyleSheet } from 'react-native';
 
 import {
   Menu,
@@ -19,12 +19,16 @@ interface PopupMenuProps {
   menuItems: MenuItem[];
   disable?: boolean;
   trigger?: React.ReactNode;
+  width?: DimensionValue | undefined;
+  alignSelf?: 'auto' | FlexAlignType | undefined;
 }
 
 export const ChatMenu: React.FC<PopupMenuProps> = ({
   menuItems,
   disable,
   trigger,
+  width,
+  alignSelf,
 }) => {
   return (
     <Menu renderer={renderers.ContextMenu}>
@@ -32,8 +36,8 @@ export const ChatMenu: React.FC<PopupMenuProps> = ({
         customStyles={{
           triggerTouchable: styles.trigger,
           triggerOuterWrapper: {
-            width: 24,
-            alignSelf: 'flex-end',
+            width,
+            alignSelf,
             borderRadius: 30,
           },
         }}

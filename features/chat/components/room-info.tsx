@@ -125,6 +125,10 @@ export const RoomInfo = ({
                 },
               ]}
             />
+            // <User
+            //   user={item.user}
+            //   rightContent={<ChatRoleDisplay role={roleText} />}
+            // />
           );
         }}
         keyExtractor={(item) => item.$id}

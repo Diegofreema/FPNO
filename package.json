@@ -13,7 +13,8 @@
     "prebuild": "npx expo prebuild",
     "build:preview": "eas build --profile preview",
     "build:prod": "eas build --profile production",
-    "build:dev": "eas build --profile development"
+    "build:dev": "eas build --profile development",
+    "update:preview": "eas update --branch preview --message"
   },
   "dependencies": {
     "@expo/react-native-action-sheet": "^4.1.1",

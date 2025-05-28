@@ -300,6 +300,8 @@ export const RenderBubble = ({
           accessibilityLabel="Message bubble, long press to react"
         >
           <ChatMenu
+            width={24}
+            alignSelf="flex-end"
             trigger={
               <CircleChevronDown
                 color={isSent ? colors.white : colors.lightblue}
