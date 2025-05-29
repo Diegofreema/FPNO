@@ -121,10 +121,12 @@ const styles = StyleSheet.create({
     fontSize: RFPercentage(2),
     fontFamily: 'NunitoRegular',
     flex: 1,
+    color: colors.black,
   },
   value: {
     fontSize: RFPercentage(2.5),
     textAlign: 'center',
     fontFamily: 'NunitoBold',
+    color: colors.black,
   },
 });

@@ -38,7 +38,7 @@ export const IDModal = () => {
       </View>
       <View
         style={{
-          marginTop: 15,
+          marginTop: 100,
           gap: 10,
           paddingHorizontal: 20,
           paddingBottom: 20,

@@ -13,6 +13,7 @@ export const FlexText = ({
 }) => {
   return (
     <HStack
+      width={'100%'}
       leftContent={() => (
         <Text style={[styles.text, { color: color || 'black' }]}>{text}</Text>
       )}

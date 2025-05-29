@@ -4,6 +4,7 @@ import { RFPercentage } from 'react-native-responsive-fontsize';
 
 import { Avatar } from '@/components/ui/avatar';
 import { HStack } from '@/components/ui/h-stack';
+import { colors } from '@/constants';
 import { getName, getStudentData } from '@/helper';
 import { useAuth } from '@/lib/zustand/useAuth';
 import { router } from 'expo-router';
@@ -48,9 +49,11 @@ const styles = StyleSheet.create({
   name: {
     fontFamily: 'NunitoBold',
     fontSize: RFPercentage(2.2),
+    color: colors.black,
   },
   matricNumber: {
     fontFamily: 'NunitoRegular',
     fontSize: RFPercentage(1.7),
+    color: colors.black,
   },
 });

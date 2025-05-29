@@ -3,7 +3,6 @@ import React from 'react';
 
 import { colors } from '@/constants';
 import { useAuth } from '@/lib/zustand/useAuth';
-import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { HapticTab } from '@/components/HapticTab';
@@ -69,7 +68,7 @@ export default function TabLayout() {
 
   return (
     <>
-      <StatusBar backgroundColor="white" style="dark" />
+      {/* <StatusBar backgroundColor="white" style="dark" /> */}
       <SafeAreaView style={{ flex: 1 }}>
         <Tabs
           screenOptions={{
@@ -97,7 +96,7 @@ export default function TabLayout() {
                     // @ts-ignore
                     name={tab.icon}
                     id="in"
-                    size={size}
+                    size={20}
                     color={focused ? colors.lightblue : colors.gray}
                   />
                 ),

@@ -1,4 +1,4 @@
-import { StyleProp, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Pressable, StyleProp, View, ViewStyle } from 'react-native';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 
 import { SubTitle } from '@/components/typography/subtitle';
@@ -23,6 +23,8 @@ export const NavHeader = ({
   onPress: handlePress,
 }: NavHeaderProps) => {
   const onPress = (): void => {
+    console.log('pressed');
+
     handlePress && handlePress();
     router.back();
   };
@@ -39,13 +41,13 @@ export const NavHeader = ({
         style,
       ]}
     >
-      <TouchableOpacity
+      <Pressable
         onPress={onPress}
         style={{ padding: 5, flexDirection: 'row', alignItems: 'center' }}
       >
         <AntDesign name="arrowleft" color={color} size={25} />
         {AvatarContent && AvatarContent}
-      </TouchableOpacity>
+      </Pressable>
       <SubTitle
         text={title}
         textStyle={{

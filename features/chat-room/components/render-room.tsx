@@ -128,6 +128,7 @@ const Right = ({ name, lastMessage, isMember, membersCount }: RightProps) => {
           fontSize: RFPercentage(1.6),
           fontWeight: 'bold',
           lineHeight: RFPercentage(1.8),
+          color: colors.black,
         }}
       >
         {name}
