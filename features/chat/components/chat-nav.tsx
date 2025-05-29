@@ -10,7 +10,6 @@ import { useRouter } from 'expo-router';
 import { Trash } from 'lucide-react-native';
 import React from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
-import Animated from 'react-native-reanimated';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import { useDeleteMessages } from '../api/use-delete-messages';
 import { ChatMenu } from './chat-menu';
@@ -95,12 +94,9 @@ export const ChatNav = ({
             <View
               style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
             >
-              <Animated.View
-                sharedTransitionTag="avatar"
-                style={{ width: 50, height: 50 }}
-              >
+              <View style={{ width: 50, height: 50 }}>
                 <Avatar imgSrc={imageUrl} size={50} />
-              </Animated.View>
+              </View>
               <View>
                 <SubTitle
                   text={name}

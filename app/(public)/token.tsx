@@ -6,6 +6,7 @@ import React from 'react';
 
 const TokenScreen = () => {
   const user = useTempData((state) => state.user);
+
   return (
     <ScrollWrapper styles={{ paddingHorizontal: 0 }}>
       <CustomBackgroundImage

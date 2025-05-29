@@ -7,6 +7,7 @@ import Modal from 'react-native-modal';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 
 import { useId } from '@/lib/zustand/useId';
+import { useRouter } from 'expo-router';
 import { Text } from 'react-native';
 
 type Props = {
@@ -18,13 +19,12 @@ export const LogoutModal = ({ onClose, visible }: Props) => {
   const removeUser = useAuth((state) => state.removeUser);
 
   const onRemoveId = useId((state) => state.removeId);
-
+  const router = useRouter();
   const onPress = async () => {
     removeUser();
-
     onClose();
-
     onRemoveId();
+    router.replace('/login');
   };
 
   return (

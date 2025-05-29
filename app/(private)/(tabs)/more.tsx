@@ -52,7 +52,7 @@ const More = () => {
   };
 
   const onEdit = () => {
-    router.push('/check-password?action=change');
+    router.push('/check-passcode?action=change');
   };
 
   // const onTerms = () => {};

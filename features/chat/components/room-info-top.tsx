@@ -4,7 +4,7 @@ import { ChannelType } from '@/types';
 import { Image } from 'expo-image';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import Animated from 'react-native-reanimated';
+
 import { RFPercentage } from 'react-native-responsive-fontsize';
 
 type Props = {
@@ -16,17 +16,14 @@ export const RoomInfoTop = ({ data }: Props) => {
   return (
     <View style={{ gap: 10 }}>
       <View style={styles.container}>
-        <Animated.View
-          sharedTransitionTag="avatar"
-          style={{ width: 100, height: 100 }}
-        >
+        <View style={{ width: 100, height: 100 }}>
           <Image
             source={data.image_url}
             placeholder={require('@/assets/images/place-user.jpeg')}
             style={styles.image}
             contentFit="cover"
           />
-        </Animated.View>
+        </View>
         <SubTitle
           text={data.channel_name}
           textStyle={[styles.name, { textAlign: 'center' }]}
