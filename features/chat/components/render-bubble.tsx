@@ -16,7 +16,7 @@ import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { CircleChevronDown, Reply } from 'lucide-react-native';
 import {
-  Dimensions,
+  Dimensions, Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -55,7 +55,7 @@ function LeftAction(
   swipeableMethods: SwipeableMethods
 ) {
   const styleAnimation = useAnimatedStyle(() => {
-    console.log('showRightProgress:', prog.value);
+
 
     return {
       transform: [{ translateX: drag.value + 50 }],
@@ -85,7 +85,7 @@ export const RenderBubble = ({
   const messageIsSelected = !!selected.find(
     (message) => message.messageId === currentMessage._id
   );
-  console.log({ selected });
+
 
   const selectedIsNotEmpty = selected.length > 0;
 
@@ -160,7 +160,8 @@ export const RenderBubble = ({
       });
     }
   };
-  // console.log({ a: array });
+
+
 
   const renderContent = () => {
     if (currentMessage.fileType === 'image' && currentMessage.fileUrl) {
@@ -181,12 +182,15 @@ export const RenderBubble = ({
         </View>
       );
     } else if (currentMessage.fileType === 'pdf' && currentMessage.fileUrl) {
+      const pdfUrl = currentMessage.fileUrl?.split('&mode=admin')[0]
+      console.log(pdfUrl)
       return (
         <View style={styles.pdfContainer}>
           <Pdf
-            source={{ uri: currentMessage.fileUrl }}
+            source={{ uri: pdfUrl, cache: true }}
             style={styles.pdf}
             singlePage
+            trustAllCerts={Platform.OS !== 'android'}
           />
         </View>
       );
@@ -317,6 +321,7 @@ export const RenderBubble = ({
             <RenderReply message={currentMessage.reply} />
           )}
           {renderContent()}
+
           <Text
             style={[
               styles.time,

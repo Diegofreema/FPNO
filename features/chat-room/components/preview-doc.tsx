@@ -2,7 +2,7 @@ import { ActionIcon } from '@/components/ui/action-icon';
 import { DownloadBlurView } from '@/features/chat/components/download-blur';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Dimensions, StyleSheet } from 'react-native';
+import {Dimensions, Platform, StyleSheet} from 'react-native';
 import Pdf from 'react-native-pdf';
 
 type Props = {
@@ -27,9 +27,10 @@ export const PreviewDoc = ({ uri }: Props) => {
   return (
     <>
       <Pdf
-        source={{ uri }}
+        source={{ uri, cache: true }}
         style={styles.pdf}
         enableDoubleTapZoom
+        trustAllCerts={Platform.OS !== 'android'}
         enablePaging
         minScale={0.5}
         maxScale={5}

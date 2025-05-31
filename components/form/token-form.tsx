@@ -28,6 +28,7 @@ export const TokenForm = () => {
   const setDetails = useStoreId((state) => state.setDetails);
   const details = useStoreId((state) => state.details);
   const { token } = useLocalSearchParams<{ token: string }>();
+  console.log({token})
   const router = useRouter();
   const offset = useSharedValue(0);
   const [timeLeft, setTimeLeft] = useState(60);

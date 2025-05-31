@@ -12,6 +12,7 @@ import {
 } from './config';
 import { databases, storage } from './db/appwrite';
 import { ChatMessageType, MemberType, userData } from './types';
+import {Platform} from "react-native";
 export const sendEmail = async (email: string, otp: string) => {
   const { data } = await axios.get(
     `https://estate.netpro.software/sendsms.aspx?email=${email}&otp=${otp}`
@@ -135,8 +136,8 @@ export const downloadPdf = async (fileUrl: string) => {
         }`
       );
     }
-
-    return save(result.uri);
+    await save(result.uri, filename, 'application/pdf')
+    return 'saved' ;
   } catch (error) {
     console.error(`Download Error (${fileType}):`, error);
     throw new Error(
@@ -147,9 +148,34 @@ export const downloadPdf = async (fileUrl: string) => {
   }
 };
 
-const save = async (uri: string) => {
-  await Sharing.shareAsync(uri);
-  return 'saved';
+const save = async (uri: string, filename: string, mimeType: string) => {
+  if (Platform.OS === 'android') {
+    try {
+      const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+      if (permissions.granted) {
+        const base64 = await FileSystem.readAsStringAsync(uri, {
+          encoding: FileSystem.EncodingType.Base64
+        });
+
+        const newFileUri = await FileSystem.StorageAccessFramework.createFileAsync(
+            permissions.directoryUri,
+            filename,
+            mimeType
+        );
+
+        // Write the base64 content to the NEW file URI, not the original URI
+        await FileSystem.writeAsStringAsync(
+            newFileUri,
+            base64,
+            { encoding: FileSystem.EncodingType.Base64 }
+        );
+      }
+    } catch (error) {
+      console.error('Error saving file:', error);
+    }
+  } else {
+    await Sharing.shareAsync(uri);
+  }
 };
 
 export const downloadAndSaveFile = async (

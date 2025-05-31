@@ -91,7 +91,7 @@ const ChatId = () => {
         if (replyMessage) {
           setReplyMessage(null);
         }
-        messages.forEach(async (message) => {
+        for (const message of messages) {
           await mutateAsync({
             message: message.text,
             channel_id: chatId,
@@ -101,7 +101,7 @@ const ChatId = () => {
             fileId: message.fileId,
             replyTo: message.replyTo,
           });
-        });
+        }
       }
     },
     [chatId, loggedInUser, mutateAsync, replyMessage, edit, editAsync, text]
@@ -184,7 +184,7 @@ const ChatId = () => {
             fileType: 'pdf' as FileType,
           };
         });
-        onSend(messages);
+       void onSend(messages);
       }
     } catch (error) {
       console.error('Error picking file:', error);
