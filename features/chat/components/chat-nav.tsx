@@ -1,18 +1,18 @@
-import { SubTitle } from '@/components/typography/subtitle';
-import { Avatar } from '@/components/ui/avatar';
-import { CustomPressable } from '@/components/ui/custom-pressable';
-import { colors } from '@/constants';
-import { JoinBtn } from '@/features/chat-room/components/join-room-btn';
-import { useSelected } from '@/features/chat-room/hook/use-selected';
-import { useAuth } from '@/lib/zustand/useAuth';
-import { AntDesign } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { Trash } from 'lucide-react-native';
+import {SubTitle} from '@/components/typography/subtitle';
+import {Avatar} from '@/components/ui/avatar';
+import {CustomPressable} from '@/components/ui/custom-pressable';
+import {colors} from '@/constants';
+import {JoinBtn} from '@/features/chat-room/components/join-room-btn';
+import {useSelected} from '@/features/chat-room/hook/use-selected';
+import {useAuth} from '@/lib/zustand/useAuth';
+import {AntDesign} from '@expo/vector-icons';
+import {useRouter} from 'expo-router';
+import {Trash} from 'lucide-react-native';
 import React from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
-import { RFPercentage } from 'react-native-responsive-fontsize';
-import { useDeleteMessages } from '../api/use-delete-messages';
-import { ChatMenu } from './chat-menu';
+import {Alert, StyleSheet, View} from 'react-native';
+import {RFPercentage} from 'react-native-responsive-fontsize';
+import {useDeleteMessages} from '../api/use-delete-messages';
+import Menu from "@/components/animated/custom-menu";
 
 type Props = {
   imageUrl: string;
@@ -131,7 +131,7 @@ export const ChatNav = ({
                 <Trash />
               </CustomPressable>
             )}
-            <ChatMenu menuItems={menuItems} />
+            <Menu items={menuItems} />
           </View>
         ) : (
           <JoinBtn roomId={channelId} isInPending={isInPending} />

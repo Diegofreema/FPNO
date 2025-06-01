@@ -37,8 +37,12 @@ export const LoginForm = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    await mutateAsync(values);
-    reset();
+    await mutateAsync(values, {
+      onSuccess: () => {
+
+        reset();
+      }
+    });
   };
   const onPress = async () => {
     await openURL(mail);

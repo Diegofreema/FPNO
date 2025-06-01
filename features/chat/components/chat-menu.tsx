@@ -81,6 +81,7 @@ const menuOptionsStyles = {
     elevation: 5,
     width: 150,
     marginTop: 5,
+    zIndex: 1000,
   },
 };
 
