@@ -8,8 +8,8 @@ import {
   PROJECT_ID,
   USER_COLLECTION_ID,
 } from '@/config';
-import { databases, storage } from '@/db/appwrite';
-import { deleteMessageHelpFn, generateErrorMessage } from '@/helper';
+import {databases, storage} from '@/db/appwrite';
+import {deleteMessageHelpFn, generateErrorMessage, getChatRoom} from '@/helper';
 import {
   ChannelType,
   ChatMessageType,
@@ -22,8 +22,8 @@ import {
   ServerEdit,
   UserType,
 } from '@/types';
-import { ID, Query } from 'react-native-appwrite';
-import { CreateChatRoomSchema, JoinType } from './schema';
+import {ID, Query} from 'react-native-appwrite';
+import {CreateChatRoomSchema, JoinType} from './schema';
 
 export const createChatRoom = async ({
   name,
@@ -46,7 +46,7 @@ export const createChatRoom = async ({
       [Query.equal('channel_name', name)]
     );
     if (chatRoomInDb.documents.length > 0) {
-      throw new Error('Chat room with name already exists');
+       new Error('Chat room with name already exists');
     }
     const chatRoom = await databases.createDocument<ChannelType>(
       DATABASE_ID,
@@ -98,11 +98,11 @@ export const editChatRoom = async ({
     );
 
     if (!channelExists) {
-      throw new Error('Chat room not found');
+       new Error('Chat room not found');
     }
 
     if (channelExists.creator_id !== creatorId) {
-      throw new Error('You are not the creator of this chat room');
+       new Error('You are not the creator of this chat room');
     }
 
     let id;
@@ -115,7 +115,7 @@ export const editChatRoom = async ({
       link = image;
     }
 
-    const chatRoom = await databases.updateDocument<ChannelType>(
+    return await databases.updateDocument<ChannelType>(
       DATABASE_ID,
       CHAT_COLLECTION_ID,
       channel_id,
@@ -127,21 +127,20 @@ export const editChatRoom = async ({
       }
     );
 
-    return chatRoom;
   } catch (error: unknown) {
-    throw new Error(generateErrorMessage(error, 'Failed to update chat room'));
+throw new Error(generateErrorMessage(error, 'Failed to update chat room'));
   }
 };
 
 export const getTopChatRooms = async () => {
   try {
-    const chatRooms = await databases.listDocuments<ChannelType>(
+    return await databases.listDocuments<ChannelType>(
       DATABASE_ID,
       CHAT_COLLECTION_ID,
       [Query.limit(5), Query.orderDesc('members_count')]
     );
 
-    return chatRooms;
+     ;
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Failed to get top chat rooms';
@@ -192,12 +191,12 @@ export const getChannelsIamIn = async ({
     query.push(Query.limit(BASE_LIMIT + more));
 
     // Fetch channels
-    const chatRooms = await databases.listDocuments<ChannelType>(
+    return await databases.listDocuments<ChannelType>(
       DATABASE_ID,
       CHAT_COLLECTION_ID,
       query
     );
-    return chatRooms;
+
   } catch (error) {
     console.log(error);
     const errorMessage =
@@ -285,10 +284,10 @@ export const joinRoom = async ({
       ]
     );
     if (isAlreadyInPendingList.documents.length > 0) {
-      throw new Error('You have already sent a request to join this room');
+     new Error('You have already sent a request to join this room');
     }
 
-    const pending = await databases.createDocument<MemberType>(
+    return await databases.createDocument<MemberType>(
       DATABASE_ID,
       MEMBER_ID,
       ID.unique(),
@@ -298,7 +297,7 @@ export const joinRoom = async ({
       }
     );
 
-    return pending;
+
   } catch (error) {
     throw new Error(generateErrorMessage(error, 'Failed to send request'));
   }
@@ -320,7 +319,7 @@ export const getMembers = async ({
       channel_id
     );
     if (!channel) {
-      throw new Error('Channel not found');
+       new Error('Channel not found');
     }
     const members = await databases.listDocuments<MemberType>(
       DATABASE_ID,
@@ -367,9 +366,9 @@ export const getMember = async ({
       channel_id
     );
     if (!channel) {
-      throw new Error('Channel not found');
+       new Error('Channel not found');
     }
-    const member = await databases.listDocuments<MemberType>(
+    return await databases.listDocuments<MemberType>(
       DATABASE_ID,
       MEMBER_ID,
       [
@@ -379,7 +378,7 @@ export const getMember = async ({
       ]
     );
 
-    return member;
+
   } catch (error) {
     throw new Error(generateErrorMessage(error, 'Failed to get member'));
   }
@@ -398,9 +397,9 @@ export const getPendingMember = async ({
       channel_id
     );
     if (!channel) {
-      throw new Error('Channel not found');
+      new Error('Channel not found');
     }
-    const member = await databases.listDocuments<MemberType>(
+    return await databases.listDocuments<MemberType>(
       DATABASE_ID,
       MEMBER_ID,
       [
@@ -410,7 +409,7 @@ export const getPendingMember = async ({
       ]
     );
 
-    return member;
+
   } catch (error) {
     throw new Error(generateErrorMessage(error, 'Failed to get member'));
   }
@@ -418,13 +417,13 @@ export const getPendingMember = async ({
 
 export const getRoomInfo = async ({ roomId }: { roomId: string }) => {
   try {
-    const room = await databases.getDocument<ChannelType>(
+    return await databases.getDocument<ChannelType>(
       DATABASE_ID,
       CHAT_COLLECTION_ID,
       roomId
     );
 
-    return room;
+
   } catch (error) {
     throw new Error(generateErrorMessage(error, 'Failed to get room info'));
   }
@@ -444,7 +443,7 @@ export const acceptRequest = async ({
       roomId
     );
     if (!roomExists) {
-      throw new Error('Chat room does not exist');
+     new Error('Chat room does not exist');
     }
 
     const pendingMember = await databases.listDocuments<MemberType>(
@@ -453,7 +452,7 @@ export const acceptRequest = async ({
       [Query.equal('channel_id', roomId), Query.equal('member_id', memberId)]
     );
     if (pendingMember.total === 0) {
-      throw new Error('Pending member does not exist');
+      new Error('Pending member does not exist');
     }
 
     await databases.updateDocument(
@@ -492,7 +491,7 @@ export const declineRequest = async ({
       roomId
     );
     if (!roomExists) {
-      throw new Error('Chat room does not exist');
+       new Error('Chat room does not exist');
     }
 
     const pendingMember = await databases.listDocuments<MemberType>(
@@ -501,7 +500,7 @@ export const declineRequest = async ({
       [Query.equal('channel_id', roomId), Query.equal('member_id', memberId)]
     );
     if (pendingMember.total === 0) {
-      throw new Error('Pending member does not exist');
+       new Error('Pending member does not exist');
     }
 
     await databases.deleteDocument(
@@ -524,11 +523,7 @@ export const removeMember = async ({
   actionUserId: string;
 }) => {
   try {
-    const chatRoom = await databases.getDocument<ChannelType>(
-      DATABASE_ID,
-      CHAT_COLLECTION_ID,
-      roomId
-    );
+    const chatRoom = await getChatRoom(roomId)
 
     if (!chatRoom) {
       throw new Error('Chat room does not exist');
@@ -632,11 +627,8 @@ export const updateMemberRole = async ({
   console.log({ roomId, memberId, actionUserId });
 
   try {
-    const chatRoom = await databases.getDocument<ChannelType>(
-      DATABASE_ID,
-      CHAT_COLLECTION_ID,
-      roomId
-    );
+    const chatRoom = await getChatRoom(roomId);
+
     if (!chatRoom) {
       throw new Error('Chat room does not exist');
     }
@@ -817,6 +809,7 @@ export const sendMessage = async ({
       }
     );
   } catch (error) {
+    console.log({backendError: error})
     throw new Error(generateErrorMessage(error, 'Failed to send message'));
   }
 };

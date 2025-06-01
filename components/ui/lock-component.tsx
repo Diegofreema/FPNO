@@ -1,24 +1,24 @@
-import { Image } from 'expo-image';
+import {Image} from 'expo-image';
 import * as LocalAuthentication from 'expo-local-authentication';
-import { Href, router, useLocalSearchParams } from 'expo-router';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {Href, router, useLocalSearchParams} from 'expo-router';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
-import { colors } from '@/constants';
+import {colors} from '@/constants';
 
-import { RFPercentage } from 'react-native-responsive-fontsize';
+import {RFPercentage} from 'react-native-responsive-fontsize';
 
-import { ProfileDetail } from '@/features/profile/components/profile-details';
-import { getLecturerData, getStudentData } from '@/helper';
-import { useAuth } from '@/lib/zustand/useAuth';
-import { useFingerPrint } from '@/lib/zustand/useFingerPrint';
-import { usePassCode } from '@/lib/zustand/usePasscode';
-import { useIsLocked, usePath } from '@/lib/zustand/usePath';
-import { useShowToast } from '@/lib/zustand/useShowToast';
+import {ProfileDetail} from '@/features/profile/components/profile-details';
+import {getLecturerData, getStudentData} from '@/helper';
+import {useAuth} from '@/lib/zustand/useAuth';
+import {useFingerPrint} from '@/lib/zustand/useFingerPrint';
+import {usePassCode} from '@/lib/zustand/usePasscode';
+import {useIsLocked, usePath} from '@/lib/zustand/usePath';
+import {useShowToast} from '@/lib/zustand/useShowToast';
 import React from 'react';
-import { AnimatedContainer } from '../animated/animated-container';
-import { SubTitle } from '../typography/subtitle';
-import { Avatar } from './avatar';
-import { Divider } from './divider';
+import {AnimatedContainer} from '../animated/animated-container';
+import {SubTitle} from '../typography/subtitle';
+import {Avatar} from './avatar';
+import {Divider} from './divider';
 
 export const LockComponent = () => {
   const { off } = useLocalSearchParams<{ off?: string }>();
@@ -104,7 +104,7 @@ export const LockComponent = () => {
             <View style={styles.or}>
               <Divider />
               <Text
-                style={{ fontFamily: 'NunitoRegular', textAlign: 'center' }}
+                style={{ fontFamily: 'NunitoRegular', textAlign: 'center', color: colors.black }}
               >
                 Or
               </Text>
@@ -119,7 +119,7 @@ export const LockComponent = () => {
               }}
             >
               <TouchableOpacity onPress={onPasswordLogin}>
-                <Text style={{ fontFamily: 'NunitoRegular' }}>
+                <Text style={{ fontFamily: 'NunitoRegular', color: colors.black }}>
                   Login with password
                 </Text>
               </TouchableOpacity>
@@ -127,7 +127,7 @@ export const LockComponent = () => {
                 style={{ width: 1, height: 20, backgroundColor: colors.border }}
               />
               <TouchableOpacity onPress={() => router.push('/check-passcode')}>
-                <Text style={{ fontFamily: 'NunitoRegular' }}>
+                <Text style={{ fontFamily: 'NunitoRegular', color: colors.black }}>
                   Login with pin
                 </Text>
               </TouchableOpacity>

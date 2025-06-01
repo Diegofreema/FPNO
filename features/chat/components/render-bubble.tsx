@@ -1,39 +1,25 @@
-import { ActionSheetOptions } from '@expo/react-native-action-sheet';
-import React, { useRef, useState } from 'react';
-import { BubbleProps } from 'react-native-gifted-chat';
+import {ActionSheetOptions} from '@expo/react-native-action-sheet';
+import React, {useRef, useState} from 'react';
+import {BubbleProps} from 'react-native-gifted-chat';
 
-import { colors } from '@/constants';
+import {colors} from '@/constants';
 // import { emojis } from '@/data';
-import { emojis } from '@/data';
-import {
-  SelectedMessage,
-  useSelected,
-} from '@/features/chat-room/hook/use-selected';
-import { onReactToMessage } from '@/features/chat-room/server';
-import { useFileUrlStore } from '@/hooks/use-file-url';
-import { EditType2, FileType, IMessage, Reaction_Enum } from '@/types';
-import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
-import { CircleChevronDown, Reply } from 'lucide-react-native';
-import {
-  Dimensions, Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import ReanimatedSwipeable, {
-  SwipeableMethods,
-} from 'react-native-gesture-handler/ReanimatedSwipeable';
+import {emojis} from '@/data';
+import {SelectedMessage, useSelected,} from '@/features/chat-room/hook/use-selected';
+import {onReactToMessage} from '@/features/chat-room/server';
+import {useFileUrlStore} from '@/hooks/use-file-url';
+import {EditType2, FileType, IMessage, Reaction_Enum} from '@/types';
+import {Image} from 'expo-image';
+import {useRouter} from 'expo-router';
+import {CircleChevronDown, Reply} from 'lucide-react-native';
+import {Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View,} from 'react-native';
+import ReanimatedSwipeable, {SwipeableMethods,} from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Pdf from 'react-native-pdf';
-import Animated, {
-  SharedValue,
-  useAnimatedStyle,
-} from 'react-native-reanimated';
-import { toast } from 'sonner-native';
-import { ChatMenu } from './chat-menu';
-import { EmojiPickerModal } from './emoji-modal';
-import { RenderReply } from './render-reply';
+import Animated, {SharedValue, useAnimatedStyle,} from 'react-native-reanimated';
+import {toast} from 'sonner-native';
+import {EmojiPickerModal} from './emoji-modal';
+import {RenderReply} from './render-reply';
+import {ChatMenu} from "@/features/chat/components/chat-menu";
 
 const { width } = Dimensions.get('window');
 type Props = BubbleProps<IMessage> & {
@@ -269,6 +255,7 @@ export const RenderBubble = ({
           },
         ]
       : []),
+
   ];
   return (
     <>
@@ -286,55 +273,58 @@ export const RenderBubble = ({
         ref={updateRowRef}
         onSwipeableOpen={onSwipeAction}
       >
-        <TouchableOpacity
-          onLongPress={handleLongPress}
-          onPress={() =>
-            onPress(currentMessage.fileUrl, currentMessage.fileType, {
-              messageId: currentMessage._id.toString(),
-              senderId: currentMessage.user._id.toString(),
-            })
-          }
-          delayLongPress={300}
-          activeOpacity={0.8}
-          style={[
-            styles.container,
-            isSent ? styles.sentContainer : styles.receivedContainer,
-          ]}
-          ref={bubbleRef}
-          accessibilityLabel="Message bubble, long press to react"
-        >
+        <View  style={[
+          styles.container,
+          isSent ? styles.sentContainer : styles.receivedContainer,
+        ]}>
           <ChatMenu
-            width={24}
-            alignSelf="flex-end"
-            trigger={
-              <CircleChevronDown
-                color={isSent ? colors.white : colors.lightblue}
-                size={15}
-                style={{ alignSelf: 'flex-end', marginBottom: 3 }}
-              />
-            }
-            menuItems={menuItems}
-            disable={selectedIsNotEmpty}
+              alignSelf={'flex-end'}
+              trigger={
+                <CircleChevronDown
+                    color={isSent ? colors.white : colors.lightblue}
+                    size={20}
+                    style={{ alignSelf: 'flex-end', marginBottom: 3 }}
+                />
+              }
+              menuItems={menuItems}
+              disable={selectedIsNotEmpty}
           />
+          <TouchableOpacity
+              onLongPress={handleLongPress}
+              onPress={() =>
+                  onPress(currentMessage.fileUrl, currentMessage.fileType, {
+                    messageId: currentMessage._id.toString(),
+                    senderId: currentMessage.user._id.toString(),
+                  })
+              }
+              delayLongPress={300}
+              activeOpacity={0.8}
 
-          {currentMessage.reply?.sender_id && (
-            <RenderReply message={currentMessage.reply} />
-          )}
-          {renderContent()}
-
-          <Text
-            style={[
-              styles.time,
-              isSent ? styles.timeSent : styles.timeReceived,
-            ]}
+              ref={bubbleRef}
+              accessibilityLabel="Message bubble, long press to react"
           >
-            {new Date(currentMessage.createdAt).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </Text>
-          {renderReactions()}
-        </TouchableOpacity>
+
+
+            {currentMessage.reply?.sender_id && (
+                <RenderReply message={currentMessage.reply} />
+            )}
+            {renderContent()}
+
+            <Text
+                style={[
+                  styles.time,
+                  isSent ? styles.timeSent : styles.timeReceived,
+                ]}
+            >
+              {new Date(currentMessage.createdAt).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </Text>
+            {renderReactions()}
+          </TouchableOpacity>
+        </View>
+
       </ReanimatedSwipeable>
       <EmojiPickerModal
         visible={isPickerVisible}

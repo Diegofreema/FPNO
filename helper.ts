@@ -1,18 +1,14 @@
 import axios from 'axios';
-import { format, isToday, isYesterday, parseISO } from 'date-fns';
+import {format, isToday, isYesterday, parseISO} from 'date-fns';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
-import { ID, Query } from 'react-native-appwrite';
-import {
-  BUCKET_ID,
-  CHAT_MESSAGES_COLLECTION_ID,
-  DATABASE_ID,
-  PROJECT_ID,
-} from './config';
-import { databases, storage } from './db/appwrite';
-import { ChatMessageType, MemberType, userData } from './types';
+import {ID, Query} from 'react-native-appwrite';
+import {BUCKET_ID, CHAT_COLLECTION_ID, CHAT_MESSAGES_COLLECTION_ID, DATABASE_ID, PROJECT_ID,} from './config';
+import {databases, storage} from './db/appwrite';
+import {ChannelType, ChatMessageType, MemberType, userData} from './types';
 import {Platform} from "react-native";
+
 export const sendEmail = async (email: string, otp: string) => {
   const { data } = await axios.get(
     `https://estate.netpro.software/sendsms.aspx?email=${email}&otp=${otp}`
@@ -48,26 +44,7 @@ export const textToRender = (text: string) => {
   return finalText;
 };
 
-export const breakSentenceToAnewLineIfAfterAPoint = (sentence: string) => {
-  const words = sentence.match(/\S+/g) || [];
 
-  return words.reduce((result, word, index) => {
-    // Check if previous word ends with a period and is followed by multiple spaces
-    const lineBreak =
-      index > 0 &&
-      words[index - 1].endsWith('.') &&
-      sentence
-        .slice(
-          sentence.indexOf(words[index - 1]) + words[index - 1].length,
-          sentence.indexOf(word)
-        )
-        .trim().length > 1
-        ? '\n'
-        : ' ';
-
-    return result + (index > 0 ? lineBreak : '') + word;
-  }, '');
-};
 
 export const trimText = (text: string, length: number = 100) => {
   if (text.length > length) {
@@ -77,41 +54,9 @@ export const trimText = (text: string, length: number = 100) => {
   return text;
 };
 
-export const uploadDoc = async (
-  url: string,
-  generateUploadUrl: any
-): Promise<{ storageId: string; uploadUrl: string }> => {
-  const uploadUrl = await generateUploadUrl();
 
-  const response = await fetch(url);
-  const blob = await response.blob();
-  const result = await fetch(uploadUrl, {
-    method: 'POST',
-    body: blob,
-    headers: { 'Content-Type': 'pdf' },
-  });
-  const { storageId } = await result.json();
 
-  return { storageId, uploadUrl };
-};
-export const uploadProfilePicture = async (
-  selectedImage: string,
-  generateUploadUrl: any
-): Promise<{ storageId: string; uploadUrl: string }> => {
-  const uploadUrl = await generateUploadUrl();
 
-  const response = await fetch(selectedImage);
-  const blob = await response.blob();
-
-  const result = await fetch(uploadUrl, {
-    method: 'POST',
-    body: blob,
-    headers: { 'Content-Type': 'image/jpeg' },
-  });
-  const { storageId } = await result.json();
-
-  return { storageId, uploadUrl };
-};
 
 export const downloadPdf = async (fileUrl: string) => {
   const filename = `${new Date().getTime()}.pdf`;
@@ -119,7 +64,7 @@ export const downloadPdf = async (fileUrl: string) => {
   try {
     const { status } = await MediaLibrary.requestPermissionsAsync();
     if (status !== 'granted') {
-      throw new Error(
+       new Error(
         status === 'denied'
           ? 'Please allow permissions to save files'
           : 'Permission request failed'
@@ -130,7 +75,7 @@ export const downloadPdf = async (fileUrl: string) => {
       FileSystem.documentDirectory + filename
     );
     if (result.status !== 200) {
-      throw new Error(
+       new Error(
         `Download failed with status ${result.status}: ${
           result.headers['Status-Message'] || 'Unknown error'
         }`
@@ -194,7 +139,7 @@ export const downloadAndSaveFile = async (
     // Request permissions for both image and PDF
     const { status } = await MediaLibrary.requestPermissionsAsync();
     if (status !== 'granted') {
-      throw new Error(
+       new Error(
         status === 'denied'
           ? 'Please allow permissions to save files'
           : 'Permission request failed'
@@ -216,7 +161,7 @@ export const downloadAndSaveFile = async (
     });
 
     if (res.status !== 200) {
-      throw new Error(
+       new Error(
         `Download failed with status ${res.status}: ${
           res.headers['Status-Message'] || 'Unknown error'
         }`
@@ -227,7 +172,7 @@ export const downloadAndSaveFile = async (
     const fileInfo = await FileSystem.getInfoAsync(fileUri);
     console.log('File Info:', fileInfo);
     if (!fileInfo.exists || fileInfo.size === 0) {
-      throw new Error(`Downloaded file is empty or missing: ${fileUri}`);
+       new Error(`Downloaded file is empty or missing: ${fileUri}`);
     }
 
     // Verify MIME type
@@ -236,7 +181,7 @@ export const downloadAndSaveFile = async (
       res.headers['Content-Type'] &&
       !res.headers['Content-Type'].includes('application/pdf')
     ) {
-      throw new Error(
+       new Error(
         `Downloaded file is not a PDF: Content-Type=${res.headers['Content-Type']}`
       );
     } else if (
@@ -244,7 +189,7 @@ export const downloadAndSaveFile = async (
       res.headers['Content-Type'] &&
       !res.headers['Content-Type'].includes('image/jpeg')
     ) {
-      throw new Error(
+       new Error(
         `Downloaded file is not an image: Content-Type=${res.headers['Content-Type']}`
       );
     }
@@ -320,7 +265,7 @@ const saveFile = async (
       const targetInfo = await FileSystem.getInfoAsync(targetUri);
       console.log('Target File Info:', targetInfo);
       if (!targetInfo.exists || targetInfo.size === 0) {
-        throw new Error(`Failed to move PDF to ${targetUri}`);
+         new Error(`Failed to move PDF to ${targetUri}`);
       }
 
       console.log(`PDF saved to ${downloadsDir}: ${fileName}`);
@@ -366,38 +311,18 @@ export const formatNumber = (num: number): string => {
   return num.toString();
 };
 
-export function trimTextByWidth(
-  text: string,
-  availableWidth: number,
-  fontSize: number
-): string {
-  // Average character width is approximately 0.5 * fontSize in pixels (heuristic)
-  const avgCharWidth = fontSize * 0.5;
-  // Calculate max characters that fit in availableWidth, reserving space for '...'
-  const ellipsisWidth = avgCharWidth * 3; // Approximate width of '...'
-  const maxWidth = availableWidth - ellipsisWidth;
-  const maxChars = Math.floor(maxWidth / avgCharWidth);
 
-  if (text.length <= maxChars || maxWidth <= 0) {
-    return text;
-  }
-
-  // Trim text to fit within maxChars and append '...'
-  return `${text.substring(0, maxChars)}...`;
-}
 
 export const generateErrorMessage = (
   error: unknown,
   message: string
 ): string => {
-  const errorMessage = error instanceof Error ? error.message : message;
+  return error instanceof Error ? error.message : message;
 
-  return errorMessage;
+
 };
 
-export const checkIfIsMember = (members: string[], userId: string) => {
-  return members.includes(userId);
-};
+
 
 export const checkIfIsInPending = (
   pendingMembers: MemberType[] = [],
@@ -435,11 +360,14 @@ export const generateImageUrl = async (image: {
   size: number;
   uri: string;
 }) => {
-  const file = await storage.createFile(BUCKET_ID, ID.unique(), image);
-  const id = file.$id;
-  const link = `https://fra.cloud.appwrite.io/v1/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}&mode=admin`;
+  console.log({image})
 
-  return { link, id };
+    const file = await storage.createFile(BUCKET_ID, ID.unique(), image);
+    const id = file.$id;
+    const link = `https://fra.cloud.appwrite.io/v1/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}&mode=admin`;
+  console.log({file, id, link})
+    return { link, id };
+
 };
 
 export const findAndDeleteReplies = async (messageId: string) => {
@@ -449,15 +377,14 @@ export const findAndDeleteReplies = async (messageId: string) => {
     [Query.equal('replyTo', messageId)]
   );
   if (isReplyTo.total > 0) {
-    isReplyTo.documents.forEach(
-      async (r) =>
-        await databases.updateDocument(
+    for (const r of isReplyTo.documents) {
+      await databases.updateDocument(
           DATABASE_ID,
           CHAT_MESSAGES_COLLECTION_ID,
           r.$id,
-          { replyTo: null }
-        )
-    );
+          {replyTo: null}
+      );
+    }
   }
 };
 
@@ -489,3 +416,13 @@ export const deleteMessageHelpFn = async (
     messageToDelete.$id
   );
 };
+
+
+export const getChatRoom = async (roomId: string) => {
+  return databases.getDocument<ChannelType>(
+      DATABASE_ID,
+      CHAT_COLLECTION_ID,
+      roomId
+  );
+
+}

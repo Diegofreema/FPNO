@@ -1,36 +1,32 @@
 import * as Haptics from 'expo-haptics';
-import { Href, useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import {
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
+import {Href, useLocalSearchParams, useRouter} from 'expo-router';
+import {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import {withRepeat, withSequence, withTiming,} from 'react-native-reanimated';
 
-import { dialPads, OFFSET, pinLength, TIME } from '@/constants';
-import { OtpButtons } from '@/features/auth/components/otp-buttons';
-import { OtpForm } from '@/features/auth/components/otp-input';
-import { sendEmail } from '@/helper';
-import { useAuth } from '@/lib/zustand/useAuth';
+import {dialPads, OFFSET, pinLength, TIME} from '@/constants';
+import {OtpButtons} from '@/features/auth/components/otp-buttons';
+import {OtpForm} from '@/features/auth/components/otp-input';
+import {sendEmail} from '@/helper';
+import {useAuth} from '@/lib/zustand/useAuth';
 
-import { useStoreId } from '@/lib/zustand/useStoreId';
-import { useTempData } from '@/lib/zustand/useTempData';
-import { toast } from 'sonner-native';
-import { AnimatedContainerToken } from '../animated/animated-container';
-import { Resend } from '../resend';
+import {useStoreId} from '@/lib/zustand/useStoreId';
+import {useTempData} from '@/lib/zustand/useTempData';
+import {toast} from 'sonner-native';
+import {AnimatedContainerToken} from '../animated/animated-container';
+import {Resend} from '../resend';
+import {usePassCode} from "@/lib/zustand/usePasscode";
+import {useOtpCodes} from "@/hooks/useOtpCodes";
 
 export const TokenForm = () => {
-  const [code, setCode] = useState<number[]>([]);
 
+const {code, onPress, setCode,offset,animatedStyle} = useOtpCodes()
   const setDetails = useStoreId((state) => state.setDetails);
   const details = useStoreId((state) => state.details);
   const { token } = useLocalSearchParams<{ token: string }>();
-  console.log({token})
+
   const router = useRouter();
-  const offset = useSharedValue(0);
+  const {isPassCode} = usePassCode()
   const [timeLeft, setTimeLeft] = useState(60);
   const [sending, setSending] = useState(false);
   const [isActive, setIsActive] = useState(true);
@@ -39,17 +35,8 @@ export const TokenForm = () => {
 
   const path: Href =
     user?.variant === 'STUDENT' ? '/(private)/(tabs)' : '/chat';
-  const animatedStyle = useAnimatedStyle(() => {
-    return { transform: [{ translateX: offset.value }] };
-  });
-  const onPress = (item: (typeof dialPads)[number]) => {
-    if (item === 'del' && code.length > 0) {
-      setCode((prev) => prev?.slice(0, prev?.length - 1));
-    } else if (typeof item === 'number') {
-      if (code.length === pinLength) return;
-      setCode((prev) => [...prev, item]);
-    }
-  };
+
+
   console.log({ token, variant: user?.variant });
   useEffect(() => {
     let interval: NodeJS.Timeout | null | number = null;
@@ -76,7 +63,7 @@ export const TokenForm = () => {
   useEffect(() => {
     const isValid = token === code.join('');
     const isFilled = code.length === pinLength;
-    const onSetOnline = async () => {};
+
     if (isFilled && isValid) {
       if (!user) return;
       setTimeout(() => {
@@ -84,8 +71,12 @@ export const TokenForm = () => {
           setDetails(user.id);
         }
         getUser(user);
-        onSetOnline();
+
+        if(isPassCode) {
         router.push(path);
+        } else  {
+          router.push('/passcode')
+        }
         toast.success('Success', {
           description: 'Welcome back',
         });
@@ -98,13 +89,13 @@ export const TokenForm = () => {
         withRepeat(withTiming(OFFSET, { duration: TIME }), 4, true),
         withTiming(0, { duration: TIME / 2 })
       );
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       toast.error('Error', {
         description: 'Token does not match',
       });
       setTimeout(() => setCode([]), TIME * 2);
     }
-  }, [code, offset, token, user, getUser, details, setDetails, router, path]);
+  }, [code, offset, token, user, getUser, details, setDetails, router, path, isPassCode, setCode]);
   const resend = async () => {
     if (!user) return;
     setSending(true);

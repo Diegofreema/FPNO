@@ -1,13 +1,13 @@
-import { zodResolver } from '@hookform/resolvers/zod';
+import {zodResolver} from '@hookform/resolvers/zod';
 import * as ImagePicker from 'expo-image-picker';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import {useForm} from 'react-hook-form';
 
-import { useAuth } from '@/lib/zustand/useAuth';
-import { View } from 'react-native';
-import { useCreateChatRoom } from '../api/use-create-chat-room';
-import { CreateChatRoomSchema, createChatRoomSchema } from '../schema';
-import { RoomForm } from './room-form';
+import {useAuth} from '@/lib/zustand/useAuth';
+import {View} from 'react-native';
+import {useCreateChatRoom} from '../api/use-create-chat-room';
+import {CreateChatRoomSchema, createChatRoomSchema} from '../schema';
+import {RoomForm} from './room-form';
 
 type MimeType = 'image/jpeg' | 'image/png';
 export const CreateChatRoom = () => {
@@ -33,7 +33,7 @@ export const CreateChatRoom = () => {
       allowsEditing: true,
       quality: 0.5,
     });
-
+    console.log('image url',result?.assets?.[0].uri)
     if (!result.canceled) {
       setValue('image', {
         type: result.assets[0].mimeType as MimeType,

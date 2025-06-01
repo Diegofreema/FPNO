@@ -1,32 +1,30 @@
-import { LoadingModal } from '@/components/typography/loading-modal';
-import { ErrorComponent } from '@/components/ui/error-component';
-import { Loading } from '@/components/ui/loading';
-import { Wrapper } from '@/components/ui/wrapper';
-import {
-  useGetMember,
-  useGetPendingMember,
-} from '@/features/chat-room/api/use-get-member';
-import { useLeave } from '@/features/chat-room/api/use-leave';
-import { useSendMessage } from '@/features/chat-room/api/use-send-message';
-import { useMessages } from '@/features/chat-room/hook/useMessages';
-import { useDeleteMessage } from '@/features/chat/api/use-delete-message';
-import { useEditMessage } from '@/features/chat/api/use-edit-message';
-import { useGetConversationWithMessages } from '@/features/chat/api/use-get-conversation';
+import {LoadingModal} from '@/components/typography/loading-modal';
+import {ErrorComponent} from '@/components/ui/error-component';
+import {Loading} from '@/components/ui/loading';
+import {Wrapper} from '@/components/ui/wrapper';
+import {useGetMember, useGetPendingMember,} from '@/features/chat-room/api/use-get-member';
+import {useLeave} from '@/features/chat-room/api/use-leave';
+import {useSendMessage} from '@/features/chat-room/api/use-send-message';
+import {useMessages} from '@/features/chat-room/hook/useMessages';
+import {useDeleteMessage} from '@/features/chat/api/use-delete-message';
+import {useEditMessage} from '@/features/chat/api/use-edit-message';
+import {useGetConversationWithMessages} from '@/features/chat/api/use-get-conversation';
 import ChatComponent from '@/features/chat/components/chat-component';
-import { ChatNav } from '@/features/chat/components/chat-nav';
-import { formatNumber, generateImageUrl } from '@/helper';
-import { useIsCreator } from '@/hooks/useIsCreator';
-import { useAuth } from '@/lib/zustand/useAuth';
-import { EditType, EditType2, FileType, IMessage, SendIMessage } from '@/types';
-import { useActionSheet } from '@expo/react-native-action-sheet';
+import {ChatNav} from '@/features/chat/components/chat-nav';
+import {formatNumber, generateImageUrl} from '@/helper';
+import {useIsCreator} from '@/hooks/useIsCreator';
+import {useAuth} from '@/lib/zustand/useAuth';
+import {EditType, EditType2, FileType, IMessage, SendIMessage} from '@/types';
+import {useActionSheet} from '@expo/react-native-action-sheet';
 import * as Clipboard from 'expo-clipboard';
 import * as DocumentPicker from 'expo-document-picker';
 
 import * as ImagePicker from 'expo-image-picker';
-import { useLocalSearchParams, usePathname, useRouter } from 'expo-router';
-import React, { useCallback, useState } from 'react';
-import { Alert } from 'react-native';
-import { toast } from 'sonner-native';
+import {useLocalSearchParams, usePathname, useRouter} from 'expo-router';
+import React, {useCallback, useState} from 'react';
+import {Alert} from 'react-native';
+import {toast} from 'sonner-native';
+
 const ChatId = () => {
   const { chatId } = useLocalSearchParams<{ chatId: string }>();
   const loggedInUser = useAuth((state) => state.user?.id!);
@@ -79,6 +77,7 @@ const ChatId = () => {
   const { mutateAsync: leaveRoom, isPending: isLeaving } = useLeave();
   const onSend = useCallback(
     async (messages: SendIMessage[]) => {
+    try {
       if (edit) {
         await editAsync({
           messageId: edit.messageId,
@@ -103,10 +102,13 @@ const ChatId = () => {
           });
         }
       }
+    }catch (e) {
+      console.log('Error message', e)
+    }
     },
     [chatId, loggedInUser, mutateAsync, replyMessage, edit, editAsync, text]
   );
-  const handleSend = async (messages: IMessage[]) => {
+  const handleSend = async () => {
     if (text.trim()) {
       const message = {
         text,
@@ -141,7 +143,9 @@ const ChatId = () => {
     },
     [loggedInUser, deleteAsync]
   );
-  const handlePhotoTaken = useCallback((message: IMessage) => {}, []);
+  const handlePhotoTaken = useCallback((message: IMessage) => {
+    console.log(message)
+  }, []);
   const handleFilePick = async () => {
     setSending(true);
     try {
@@ -199,15 +203,18 @@ const ChatId = () => {
         mediaTypes: ['images'],
         quality: 0.5,
         allowsMultipleSelection: true,
+        base64: false,
+
       });
 
       if (!result.canceled) {
         const { assets } = result;
+        console.log({result})
         const filePromises = assets.map(async (asset) => {
           const file = {
-            name: asset.fileName || new Date().toISOString(),
+            type: asset.mimeType || 'image/jpeg',
             uri: asset.uri,
-            type: asset.type || 'image/jpeg',
+            name: new Date().toISOString(),
             size: asset.fileSize || 0,
           };
 
@@ -230,7 +237,7 @@ const ChatId = () => {
             fileType: 'image' as FileType,
           };
         });
-        onSend(messages);
+       await onSend(messages);
       }
     } catch (error) {
       console.error('Error picking image:', error);

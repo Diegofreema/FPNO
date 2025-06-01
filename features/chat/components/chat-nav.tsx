@@ -12,7 +12,8 @@ import React from 'react';
 import {Alert, StyleSheet, View} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
 import {useDeleteMessages} from '../api/use-delete-messages';
-import Menu from "@/components/animated/custom-menu";
+import {Menu} from "@/components/dropdown-menu";
+
 
 type Props = {
   imageUrl: string;
@@ -39,8 +40,8 @@ export const ChatNav = ({
 }: Props) => {
   const router = useRouter();
   const selectedMessages = useSelected((state) => state.selected);
-  const { selected } = useSelected();
-  console.log('selectedMessages', selectedMessages, selected);
+
+
 
   const clearMessages = useSelected((state) => state.clear);
   const messageIsSelected = selectedMessages.length > 0;
@@ -131,7 +132,7 @@ export const ChatNav = ({
                 <Trash />
               </CustomPressable>
             )}
-            <Menu items={menuItems} />
+            <Menu menuOptions={menuItems} />
           </View>
         ) : (
           <JoinBtn roomId={channelId} isInPending={isInPending} />

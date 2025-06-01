@@ -1,5 +1,10 @@
 PODS:
   - boost (1.84.0)
+  - ComputableLayout (0.7.0):
+    - DGSwiftUtilities (~> 0.11)
+  - ContextMenuAuxiliaryPreview (0.5.2):
+    - DGSwiftUtilities (~> 0.29)
+  - DGSwiftUtilities (0.46.4)
   - DoubleConversion (1.1.6)
   - EASClient (0.14.3):
     - ExpoModulesCore
@@ -1506,6 +1511,61 @@ PODS:
     - React-Core
   - react-native-get-random-values (1.11.0):
     - React-Core
+  - react-native-ios-context-menu (3.1.0):
+    - ContextMenuAuxiliaryPreview (~> 0.5)
+    - DGSwiftUtilities
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - react-native-ios-utilities
+    - React-NativeModulesApple
+    - React-RCTAppDelegate
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - react-native-ios-utilities (5.1.2):
+    - ComputableLayout (~> 0.7)
+    - DGSwiftUtilities (~> 0.46)
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTAppDelegate
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - react-native-keyboard-controller (1.17.1):
     - DoubleConversion
     - glog
@@ -1530,6 +1590,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-menu (1.2.2):
+    - React
   - react-native-pdf (6.7.7):
     - React-Core
   - react-native-safe-area-context (5.4.0):
@@ -2156,7 +2218,10 @@ DEPENDENCIES:
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - react-native-blob-util (from `../node_modules/react-native-blob-util`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
+  - react-native-ios-context-menu (from `../node_modules/react-native-ios-context-menu`)
+  - react-native-ios-utilities (from `../node_modules/react-native-ios-utilities`)
   - react-native-keyboard-controller (from `../node_modules/react-native-keyboard-controller`)
+  - "react-native-menu (from `../node_modules/@react-native-menu/menu`)"
   - react-native-pdf (from `../node_modules/react-native-pdf`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-webview (from `../node_modules/react-native-webview`)
@@ -2202,6 +2267,9 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - ComputableLayout
+    - ContextMenuAuxiliaryPreview
+    - DGSwiftUtilities
     - libavif
     - libdav1d
     - libwebp
@@ -2364,8 +2432,14 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-blob-util"
   react-native-get-random-values:
     :path: "../node_modules/react-native-get-random-values"
+  react-native-ios-context-menu:
+    :path: "../node_modules/react-native-ios-context-menu"
+  react-native-ios-utilities:
+    :path: "../node_modules/react-native-ios-utilities"
   react-native-keyboard-controller:
     :path: "../node_modules/react-native-keyboard-controller"
+  react-native-menu:
+    :path: "../node_modules/@react-native-menu/menu"
   react-native-pdf:
     :path: "../node_modules/react-native-pdf"
   react-native-safe-area-context:
@@ -2453,6 +2527,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
+  ComputableLayout: c50faffac4ed9f8f05b0ce5e6f3a60df1f6042c8
+  ContextMenuAuxiliaryPreview: 20be0be795b783b68f8792732eed4bed9f202c1c
+  DGSwiftUtilities: 536456ae3d0e5083ac42e06b6b720921601864b5
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
   EASClient: 83423c51dde4c5504cb4186e1f39728273ed334b
   EXApplication: b28de982d44768fc593de9d19ca5a7a0e49685b1
@@ -2531,7 +2608,10 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: ca2804a25fdcefffa0aa942aa23ab53b99614a34
   react-native-blob-util: 64a732c0b8bb7f4928905e16ea8dc5cde6fb4832
   react-native-get-random-values: 21325b2244dfa6b58878f51f9aa42821e7ba3d06
+  react-native-ios-context-menu: 7c806df3005f7d2b35d2d21f472d5df2c0be40cf
+  react-native-ios-utilities: 2122d5cff7f74d71c42babea11a3735aa7fdbb38
   react-native-keyboard-controller: 1204bae4f5c3d5460eed907e72c52cb15a08f624
+  react-native-menu: 27f634374481525b27e2123611aa4c6477324f92
   react-native-pdf: 73accc61238e8e9bc6e376191225028af20b996e
   react-native-safe-area-context: 8870dc3e45c8d241336cd8ee3fa3fc76f3a040ac
   react-native-webview: bfc7322cc9f570bc5b5b2251fb38a08da718d00a

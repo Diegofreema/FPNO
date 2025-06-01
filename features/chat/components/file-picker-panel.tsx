@@ -1,8 +1,9 @@
-import { colors } from '@/constants';
-import { File, ImageIcon } from 'lucide-react-native';
-import { AnimatePresence, View } from 'moti';
+import {colors} from '@/constants';
+import {File, ImageIcon} from 'lucide-react-native';
+import {AnimatePresence, View} from 'moti';
 import React from 'react';
-import { Dimensions, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import {Dimensions, StyleSheet, Text, TouchableOpacity} from 'react-native';
+
 interface FilePickerPanelProps {
   visible: boolean;
   onClose: () => void;
@@ -105,5 +106,6 @@ const styles = StyleSheet.create({
   },
   text: {
     textAlign: 'center',
+    color: colors.black
   },
 });

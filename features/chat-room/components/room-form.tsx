@@ -1,23 +1,12 @@
-import { CustomInput } from '@/components/form/custom-input';
-import { Button } from '@/components/ui/button';
-import { colors } from '@/constants';
-import { Feather } from '@expo/vector-icons';
-import { Image } from 'expo-image';
+import {CustomInput} from '@/components/form/custom-input';
+import {Button} from '@/components/ui/button';
+import {colors} from '@/constants';
+import {Feather} from '@expo/vector-icons';
+import {Image} from 'expo-image';
 import React from 'react';
-import {
-  Control,
-  FieldErrors,
-  SubmitErrorHandler,
-  SubmitHandler,
-} from 'react-hook-form';
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { CreateChatRoomSchema } from '../schema';
+import {Control, FieldErrors, SubmitErrorHandler, SubmitHandler,} from 'react-hook-form';
+import {Dimensions, StyleSheet, Text, TouchableOpacity, View,} from 'react-native';
+import {CreateChatRoomSchema} from '../schema';
 
 const { width } = Dimensions.get('window');
 type Props = {
@@ -101,6 +90,7 @@ export const RoomForm = ({
         multiline
         style={{
           height: 150,
+          textAlignVertical: 'top'
         }}
         containerStyle={{
           height: 150,

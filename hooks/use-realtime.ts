@@ -1,13 +1,7 @@
-import {
-  CHAT_COLLECTION_ID,
-  CHAT_MESSAGES_COLLECTION_ID,
-  DATABASE_ID,
-  MEMBER_ID,
-  MESSAGE_REACTIONS,
-} from '@/config';
-import { client } from '@/db/appwrite';
-import { useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import {CHAT_COLLECTION_ID, CHAT_MESSAGES_COLLECTION_ID, DATABASE_ID, MEMBER_ID, MESSAGE_REACTIONS,} from '@/config';
+import {client} from '@/db/appwrite';
+import {useQueryClient} from '@tanstack/react-query';
+import {useEffect} from 'react';
 
 const keys = [
   'pending_member',
@@ -29,10 +23,10 @@ export const useRealtime = () => {
     const likeChannel = `databases.${DATABASE_ID}.collections.${MESSAGE_REACTIONS}.documents`;
     const unsubscribe = client.subscribe(
       [roomChannel, messageChannel, memberChannel, likeChannel],
-      (response) => {
-        console.log(response, 'pending');
+      () => {
+
         keys.forEach((key) => {
-          queryClient.invalidateQueries({ queryKey: [key] });
+        void queryClient.invalidateQueries({ queryKey: [key] });
         });
       }
     );

@@ -1,20 +1,17 @@
-import { ErrorComponent } from '@/components/ui/error-component';
-import { Loading } from '@/components/ui/loading';
-import { NavHeader } from '@/components/ui/nav-header';
-import { ScrollWrapper } from '@/components/ui/wrapper';
-import {
-  useGetMembers,
-  useGetPendingMembers,
-} from '@/features/chat-room/api/use-get-members';
-import { useGetRoomInfo } from '@/features/chat-room/api/use-get-room-info';
-import { PendingMemberBanner } from '@/features/chat-room/components/pending-member-banner';
-import { ChatMenu } from '@/features/chat/components/chat-menu';
-import { RoomInfo } from '@/features/chat/components/room-info';
-import { RoomInfoTop } from '@/features/chat/components/room-info-top';
-import { useAuth } from '@/lib/zustand/useAuth';
-import { MemberAccessRole } from '@/types';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import {ErrorComponent} from '@/components/ui/error-component';
+import {Loading} from '@/components/ui/loading';
+import {NavHeader} from '@/components/ui/nav-header';
+import {ScrollWrapper} from '@/components/ui/wrapper';
+import {useGetMembers, useGetPendingMembers,} from '@/features/chat-room/api/use-get-members';
+import {useGetRoomInfo} from '@/features/chat-room/api/use-get-room-info';
+import {PendingMemberBanner} from '@/features/chat-room/components/pending-member-banner';
+import {RoomInfo} from '@/features/chat/components/room-info';
+import {RoomInfoTop} from '@/features/chat/components/room-info-top';
+import {useAuth} from '@/lib/zustand/useAuth';
+import {MemberAccessRole} from '@/types';
+import {useLocalSearchParams, useRouter} from 'expo-router';
+import React, {useState} from 'react';
+import {Menu} from "@/components/dropdown-menu";
 
 const RoomInfoScreen = () => {
   const { roomId } = useLocalSearchParams<{ roomId: string }>();
@@ -65,9 +62,9 @@ const RoomInfoScreen = () => {
     isPendingMemberRefetchError;
   const isPending = isPendingData || isPendingMember || isPendingPendingMember;
   const handleRefetch = () => {
-    refetch();
-    refetchMember();
-    refetchPendingMember();
+    void refetch();
+    void refetchMember();
+    void refetchPendingMember();
   };
   if (isError) {
     return <ErrorComponent onPress={handleRefetch} title={errorMessage} />;
@@ -103,7 +100,7 @@ const RoomInfoScreen = () => {
         title=""
         leftContent={() =>
           isCreator ? (
-            <ChatMenu menuItems={[{ onSelect: onSelect, text: 'Edit' }]} />
+            <Menu menuOptions={[{ onSelect: onSelect, text: 'Edit' }]} />
           ) : null
         }
       />

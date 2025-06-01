@@ -1,21 +1,21 @@
 import * as LocalAuthentication from 'expo-local-authentication';
 
-import { LogoutModal } from '@/components/logout-modal';
-import { Title } from '@/components/typography/title';
-import { HStack } from '@/components/ui/h-stack';
-import { Stack } from '@/components/ui/stack';
-import { Wrapper } from '@/components/ui/wrapper';
-import { colors } from '@/constants';
-import { useFingerPrint } from '@/lib/zustand/useFingerPrint';
-import { usePassCode } from '@/lib/zustand/usePasscode';
+import {LogoutModal} from '@/components/logout-modal';
+import {Title} from '@/components/typography/title';
+import {Stack} from '@/components/ui/stack';
+import {Wrapper} from '@/components/ui/wrapper';
+import {colors} from '@/constants';
+import {useFingerPrint} from '@/lib/zustand/useFingerPrint';
+import {usePassCode} from '@/lib/zustand/usePasscode';
 
-import { AntDesign, Entypo, EvilIcons } from '@expo/vector-icons';
-import { openURL } from 'expo-linking';
-import { router } from 'expo-router';
-import { useState } from 'react';
-import { StyleSheet, Switch, TouchableOpacity } from 'react-native';
-import { RFPercentage } from 'react-native-responsive-fontsize';
-import { toast } from 'sonner-native';
+import {AntDesign, Entypo, EvilIcons} from '@expo/vector-icons';
+import {openURL} from 'expo-linking';
+import {router} from 'expo-router';
+import {useState} from 'react';
+import {Platform, StyleSheet, Switch, Text, TouchableOpacity} from 'react-native';
+import {RFPercentage} from 'react-native-responsive-fontsize';
+import {toast} from 'sonner-native';
+import {Flex} from "@/components/ui/flex";
 
 export const mail = 'mailto:student.ictsupport@fpno.edu.ng';
 const More = () => {
@@ -61,25 +61,29 @@ const More = () => {
   };
   // const onPrivacy = () => {};
   return (
-    <Wrapper>
+    <Wrapper styles={{backgroundColor: 'white'}}>
       <LogoutModal visible={visible} onClose={() => setVisible(false)} />
+      {Platform.OS === 'android' && <Text style={styles.header}>More</Text>}
       <Stack style={{ marginTop: 30 }}>
-        <HStack
-          style={styles.container}
-          leftContent={() => (
-            <Title text={'Finger Print'} textStyle={styles.title} />
-          )}
-          rightContent={() => (
-            <Switch
-              trackColor={{ false: '#767577', true: '#81b0ff' }}
-              thumbColor={lock ? colors.lightblue : '#f4f3f4'}
-              ios_backgroundColor="#3e3e3e"
-              // @ts-ignore
-              onChange={onLock}
-              value={lock}
-            />
-          )}
-        />
+        <Flex
+            leftContent={
+                <Title text={'Finger Print'} textStyle={styles.title} />
+            }
+            rightContent={
+                  <Switch
+                      trackColor={{ false: '#767577', true: '#81b0ff' }}
+                      thumbColor={lock ? colors.lightblue : '#f4f3f4'}
+                      ios_backgroundColor="#3e3e3e"
+            // @ts-ignore
+                      onChange={onLock}
+                      value={lock}
+                  />
+        }
+            styles={styles.container} />
+
+
+
+
         {passCode && (
           <TouchableOpacity
             onPress={onEdit}
@@ -167,4 +171,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
   },
+  header: {marginBottom: 20, fontSize: RFPercentage(3), fontFamily: 'NunitoBold', color: colors.black}
 });

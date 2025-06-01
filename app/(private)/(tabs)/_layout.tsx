@@ -1,16 +1,16 @@
-import { Href, Tabs } from 'expo-router';
+import {Href, Tabs} from 'expo-router';
 import React from 'react';
 
-import { colors } from '@/constants';
-import { useAuth } from '@/lib/zustand/useAuth';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {colors} from '@/constants';
+import {useAuth} from '@/lib/zustand/useAuth';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
-import { HapticTab } from '@/components/HapticTab';
-import { ErrorComponent } from '@/components/ui/error-component';
-import { Loading } from '@/components/ui/loading';
-import { useGetUserByUserId } from '@/features/auth/api/use-get-user-by-user-id';
-import { AntDesign } from '@expo/vector-icons';
-import { RFPercentage } from 'react-native-responsive-fontsize';
+import {HapticTab} from '@/components/HapticTab';
+import {ErrorComponent} from '@/components/ui/error-component';
+import {Loading} from '@/components/ui/loading';
+import {useGetUserByUserId} from '@/features/auth/api/use-get-user-by-user-id';
+import {AntDesign} from '@expo/vector-icons';
+import {RFPercentage} from 'react-native-responsive-fontsize';
 
 export default function TabLayout() {
   const variant = useAuth((state) => state.user?.variant);
@@ -80,7 +80,7 @@ export default function TabLayout() {
               fontFamily: 'NunitoBold',
               fontSize: RFPercentage(1.2),
             },
-            tabBarStyle: { backgroundColor: 'white', paddingTop: 10 },
+            tabBarStyle: { backgroundColor: 'white',  },
             tabBarLabelPosition: 'below-icon',
           }}
         >

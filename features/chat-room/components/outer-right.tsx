@@ -1,7 +1,8 @@
-import { formatMessageTime } from '@/helper';
-import { Text, View } from 'react-native';
-import { RFPercentage } from 'react-native-responsive-fontsize';
-import { JoinBtn } from './join-room-btn';
+import {formatMessageTime} from '@/helper';
+import {Text, View} from 'react-native';
+import {RFPercentage} from 'react-native-responsive-fontsize';
+import {JoinBtn} from './join-room-btn';
+import {colors} from "@/constants";
 
 type OuterRightProps = {
   isMember: boolean;
@@ -19,7 +20,7 @@ export const OuterRight = ({
     return (
       <View>
         <Text
-          style={{ fontSize: RFPercentage(1.3), fontFamily: 'NunitoLight' }}
+          style={{ fontSize: RFPercentage(1.3), fontFamily: 'NunitoLight', color: colors.black }}
         >
           {formatMessageTime(lastMessageTime)}
         </Text>

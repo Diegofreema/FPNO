@@ -1,6 +1,7 @@
-import { Feather } from '@expo/vector-icons';
+import {Feather} from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import {StyleSheet, TextInput, View} from 'react-native';
+import {colors} from "@/constants";
 
 type Props = {
   placeholder: string;
@@ -27,6 +28,7 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     borderColor: 'transparent',
+    color: colors.black
   },
   container: {
     flexDirection: 'row',

@@ -1,21 +1,20 @@
-import { ActionIcon } from '@/components/ui/action-icon';
-import { DownloadBlurView } from '@/features/chat/components/download-blur';
-import { ImageZoom } from '@likashefqet/react-native-image-zoom';
-import { useRouter } from 'expo-router';
+import {DownloadBlurView} from '@/features/chat/components/download-blur';
+import {ImageZoom} from '@likashefqet/react-native-image-zoom';
+import {useRouter} from 'expo-router';
 import React from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import {View} from 'react-native';
 
 type Props = {
   url: string;
 };
 
-const { height } = Dimensions.get('window');
+
 
 export const PreviewChatImage = ({ url }: Props) => {
-  const router = useRouter();
-  const onPress = () => {
-    router.back();
-  };
+    const router = useRouter();
+    const onPress = () => {
+        router.back();
+    };
   return (
     <View style={{ flex: 1 }}>
       <ImageZoom
@@ -31,16 +30,9 @@ export const PreviewChatImage = ({ url }: Props) => {
         resizeMode="cover"
       />
       <DownloadBlurView url={url} onClose={onPress} type="image" />
-      <ActionIcon name="times" onPress={onPress} style={styles.abs} />
+
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  abs: {
-    zIndex: 2,
-    position: 'absolute',
-    top: height * 0.03,
-    right: 15,
-  },
-});
+
