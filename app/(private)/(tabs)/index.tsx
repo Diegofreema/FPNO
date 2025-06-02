@@ -10,7 +10,7 @@ import React, {useEffect, useState} from 'react';
 
 const HomeScreen = () => {
   const variant = useAuth((state) => state.user?.variant);
-  const convexId = useAuth(state => state.user?.convexId)
+
 
   const [visible, setVisible] = useState(false);
   const isFirstTime = useFirstTimeModal((state) => state.isFirstTime);

@@ -8,6 +8,7 @@ import {BUCKET_ID, CHAT_COLLECTION_ID, CHAT_MESSAGES_COLLECTION_ID, DATABASE_ID,
 import {databases, storage} from './db/appwrite';
 import {ChannelType, ChatMessageType, MemberType, userData} from './types';
 import {Platform} from "react-native";
+import {Id} from "@/convex/_generated/dataModel";
 
 export const sendEmail = async (email: string, otp: string) => {
   const { data } = await axios.get(
@@ -426,3 +427,22 @@ export const getChatRoom = async (roomId: string) => {
   );
 
 }
+export const uploadProfilePicture = async (
+    generateUploadUrl: any,
+    selectedImage?: string,
+): Promise<{ storageId: Id<'_storage'>; uploadUrl: string } | undefined> => {
+  if(!selectedImage) return
+  const uploadUrl = await generateUploadUrl();
+
+  const response = await fetch(selectedImage);
+  const blob = await response.blob();
+
+  const result = await fetch(uploadUrl, {
+    method: 'POST',
+    body: blob,
+    headers: { 'Content-Type': 'image/jpeg' },
+  });
+  const { storageId } = await result.json();
+
+  return { storageId, uploadUrl };
+};

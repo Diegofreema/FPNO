@@ -1,33 +1,51 @@
-import { ErrorComponent } from '@/components/ui/error-component';
-import { Loading } from '@/components/ui/loading';
-import { NavHeader } from '@/components/ui/nav-header';
-import { SearchInput } from '@/features/chat/components/search-converstion';
-import React, { useState } from 'react';
-import { View } from 'react-native';
-import { useDebounce } from 'use-debounce';
-import { useExploreRooms } from '../api/use-explore-rooms';
-import { RenderRooms } from './render-rooms';
+import {Loading} from "@/components/ui/loading";
+import {NavHeader} from "@/components/ui/nav-header";
+import {SearchInput} from "@/features/chat/components/search-converstion";
+import React, {useState} from "react";
+import {View} from "react-native";
+import {useDebounce} from "use-debounce";
+import {RenderRooms} from "./render-rooms";
+import {usePaginatedQuery} from "convex/react";
+import {api} from "@/convex/_generated/api";
+import {useAuth} from "@/lib/zustand/useAuth";
 
 export const Explore = () => {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState("");
   const [search] = useDebounce(value, 500);
-  const [more, setMore] = useState(0);
-  const { data, isPending, isError, refetch } = useExploreRooms({
-    more,
-    search,
-  });
-  if (isError) {
-    return <ErrorComponent onPress={refetch} />;
-  }
 
-  if (isPending) {
+  const convexId = useAuth((state) => state.user?.convexId!);
+  const rooms = usePaginatedQuery(
+    api.room.exploreRooms,
+    { user_id: convexId },
+    { initialNumItems: 30 },
+  );
+  const searchRooms = usePaginatedQuery(
+    api.room.exploreRoomsSearch,
+    { user_id: convexId, name: search },
+    { initialNumItems: 30 },
+  );
+
+  const { isLoading, loadMore, status, results } = rooms;
+  const {
+    isLoading: isLoadingSearch,
+    loadMore: loadMoreSearch,
+    status: searchStatus,
+    results: searchResults,
+  } = searchRooms;
+  const pending = isLoading || isLoadingSearch;
+  if (pending) {
     return <Loading />;
   }
 
-  const { documents, total } = data;
   const handleMore = () => {
-    if (documents.length >= total) return;
-    setMore(more + 10);
+    if (!isLoading && status === "CanLoadMore") {
+      loadMore(25);
+    }
+  };
+  const handleMoreSearch = () => {
+    if (!isLoadingSearch && searchStatus === "CanLoadMore") {
+      loadMoreSearch(25);
+    }
   };
 
   return (
@@ -39,7 +57,11 @@ export const Explore = () => {
         onChangeText={setValue}
       />
 
-      <RenderRooms channels={documents} handleLoadMore={handleMore} />
+      {search ? (
+        <RenderRooms rooms={searchResults} handleLoadMore={handleMoreSearch} />
+      ) : (
+        <RenderRooms rooms={results} handleLoadMore={handleMore} />
+      )}
     </View>
   );
 };

@@ -85,5 +85,5 @@ export default defineSchema({
       searchField: "room_name",
     }),
   pendingMembers: defineTable(PendingMember).index("by_room_id", ["room_id"]),
-  members: defineTable(Member).index("by_room_id", ["room_id"]),
+  members: defineTable(Member).index("by_room_id", ["room_id"]).index('by_user_and_room_id', ['room_id','member_id', 'status']),
 });

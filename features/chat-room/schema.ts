@@ -1,5 +1,5 @@
-import { Models } from 'react-native-appwrite';
-import { z } from 'zod';
+import {Models} from 'react-native-appwrite';
+import {z} from 'zod';
 // Custom validator for ImagePickerAsset
 export const imagePickerAssetSchema = z
   .object({
@@ -19,10 +19,7 @@ export const createChatRoomSchema = z.object({
     .string()
     .max(200, { message: 'Description must be at most 200 characters' })
     .optional(),
-  image: z.union([
-    imagePickerAssetSchema,
-    z.string().transform((value) => (value === '' ? undefined : value)),
-  ]),
+  image: z.string().optional(),
 });
 
 // Export inferred TypeScript type

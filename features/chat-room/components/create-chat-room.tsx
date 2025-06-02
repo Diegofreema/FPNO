@@ -1,58 +1,82 @@
-import {zodResolver} from '@hookform/resolvers/zod';
-import * as ImagePicker from 'expo-image-picker';
-import React from 'react';
-import {useForm} from 'react-hook-form';
+import {zodResolver} from "@hookform/resolvers/zod";
+import * as ImagePicker from "expo-image-picker";
+import React from "react";
+import {useForm} from "react-hook-form";
 
-import {useAuth} from '@/lib/zustand/useAuth';
-import {View} from 'react-native';
-import {useCreateChatRoom} from '../api/use-create-chat-room';
-import {CreateChatRoomSchema, createChatRoomSchema} from '../schema';
-import {RoomForm} from './room-form';
+import {useAuth} from "@/lib/zustand/useAuth";
+import {View} from "react-native";
+import {CreateChatRoomSchema, createChatRoomSchema} from "../schema";
+import {RoomForm} from "./room-form";
+import {useMutation} from "convex/react";
+import {api} from "@/convex/_generated/api";
+import {uploadProfilePicture} from "@/helper";
+import {useRouter} from "expo-router";
 
-type MimeType = 'image/jpeg' | 'image/png';
+import {ConvexError} from "convex/values";
+import {toast} from "sonner-native";
+
 export const CreateChatRoom = () => {
-  const { mutateAsync } = useCreateChatRoom();
+  const generateUploadUrl = useMutation(api.user.generateUploadUrl);
+  const createRoom = useMutation(api.room.createRoom);
   const user = useAuth((state) => state.user);
+  const router = useRouter();
   const {
     control,
     formState: { errors, isSubmitting },
     handleSubmit,
     setValue,
     watch,
+    reset,
   } = useForm<CreateChatRoomSchema>({
     defaultValues: {
-      name: '',
-      description: '',
+      name: "",
+      description: "",
+      image: "",
     },
     resolver: zodResolver(createChatRoomSchema),
   });
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+      mediaTypes: ["images"],
       allowsEditing: true,
       quality: 0.5,
     });
-    console.log('image url',result?.assets?.[0].uri)
+    console.log("image url", result?.assets?.[0].uri);
     if (!result.canceled) {
-      setValue('image', {
-        type: result.assets[0].mimeType as MimeType,
-        uri: result.assets[0].uri,
-        name: new Date().toISOString(),
-        size: result.assets[0].fileSize!,
-      });
+      setValue("image", result.assets?.[0]?.uri);
     }
   };
   const onSubmit = async (data: CreateChatRoomSchema) => {
-    await mutateAsync({ ...data, creatorId: user?.id! });
+    try {
+      const res = await uploadProfilePicture(generateUploadUrl, data.image);
+
+      const roomId = await createRoom({
+        room_name: data.name,
+        description: data.description,
+        creator_id: user?.convexId!,
+        image_url: res?.uploadUrl,
+        image_id: res?.storageId,
+      });
+      router.replace(`/chat/${roomId}`);
+      reset();
+      // router.back()
+      toast.success("Chat room created successfully");
+    } catch (error) {
+      console.log(error);
+      const errorMessage =
+        error instanceof ConvexError
+          ? (error.data as string)
+          : "Failed to create chat room";
+      toast.error(errorMessage);
+    }
   };
   const { image } = watch();
-  const imageUrl = typeof image === 'string' ? image : image?.uri;
 
   return (
     <View style={{ flex: 1 }}>
       <RoomForm
-        imageUrl={imageUrl}
+        imageUrl={image}
         control={control}
         errors={errors}
         handleSubmit={handleSubmit}

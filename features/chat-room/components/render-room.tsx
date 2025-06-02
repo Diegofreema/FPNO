@@ -9,36 +9,36 @@ import {router, usePathname} from 'expo-router';
 import {File} from 'lucide-react-native';
 import {Text, View} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
-import {useGetMember} from '../api/use-get-member';
 import {OuterRight} from './outer-right';
 import {Doc} from "@/convex/_generated/dataModel";
+import {useQuery} from "convex/react";
+import {api} from "@/convex/_generated/api";
 
 type Props = {
   room: Doc<'rooms'>;
 };
 
 export const RenderRoom = ({ room }: Props) => {
-  const userId = useAuth((state) => state.user?.id!);
-  const {
-    data: member,
-    isPending: isPendingMember,
-    isError: isErrorMember,
-  } = useGetMember({ channel_id: room._id });
+  const convexId = useAuth((state) => state.user?.convexId!);
+
+  const isMember = useQuery(api.room.isMember, {room_id: room._id, member_id: convexId})
+  const isInPending = useQuery(api.room.isInPending, {room_id: room._id, member_id: convexId})
+
   const pathname = usePathname();
-  const isMember = !!member?.total;
-  const isInPending = false;
+
+
   const membersCount = room.member_count;
   const disabled = pathname === '/explore';
-  if (isErrorMember) {
-    throw new Error('Failed to get data');
-  }
 
-  if (isPendingMember) {
+
+  if (isInPending === undefined || isMember === undefined) {
     return <ChatLoader length={1} />;
   }
   const onPress = () => {
     router.push(`/chat/${room._id}`);
   };
+
+    console.log({isMember, id: room._id})
   return (
     <CustomPressable disabled={disabled} onPress={onPress}>
       <HStack
