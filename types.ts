@@ -1,6 +1,7 @@
-import { ImagePickerAsset } from 'expo-image-picker';
-import { Models } from 'react-native-appwrite';
-import { upcoming } from './data';
+import {ImagePickerAsset} from 'expo-image-picker';
+import {Models} from 'react-native-appwrite';
+import {upcoming} from './data';
+import {Id} from "@/convex/_generated/dataModel";
 
 export type DataType = (typeof upcoming)[0];
 
@@ -105,6 +106,20 @@ export type LecturerData = {
   fullname: string;
   phone: string;
 };
+
+export type User = {
+  name: string;
+  email: string;
+  id: string;
+  variant: "LECTURER" | "STUDENT";
+  Department: string;
+  Faculty: string;
+  birthday: string;
+  matricnumber: string;
+  phone: string;
+  programtype: string;
+  convexId: Id<'users'>
+}
 
 export type userData = StudentData | LecturerData;
 

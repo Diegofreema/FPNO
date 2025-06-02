@@ -1,15 +1,15 @@
-import { CustomPressable } from '@/components/ui/custom-pressable';
-import { colors } from '@/constants';
-import { ChannelType } from '@/types';
-import { FontAwesome } from '@expo/vector-icons';
-import { LegendList } from '@legendapp/list';
-import { useRouter } from 'expo-router';
+import {CustomPressable} from '@/components/ui/custom-pressable';
+import {colors} from '@/constants';
+import {FontAwesome} from '@expo/vector-icons';
+import {LegendList} from '@legendapp/list';
+import {useRouter} from 'expo-router';
 import React from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
-import { TopChannel } from './top-channel';
+import {Dimensions, StyleSheet, View} from 'react-native';
+import {TopChannel} from './top-channel';
+import {Doc} from "@/convex/_generated/dataModel";
 
 type Props = {
-  channels: ChannelType[];
+  channels: Doc<'rooms'>[];
 };
 
 const { width, height } = Dimensions.get('window');
@@ -24,7 +24,7 @@ export const TopChannels = ({ channels }: Props) => {
       <LegendList
         data={channels}
         renderItem={({ item }) => <TopChannel channel={item} />}
-        keyExtractor={(item) => item.$id}
+        keyExtractor={(item) => item._id}
         recycleItems
         horizontal
         showsHorizontalScrollIndicator={false}

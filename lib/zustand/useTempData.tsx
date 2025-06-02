@@ -1,9 +1,9 @@
-import { userData } from '@/types';
-import { create } from 'zustand';
+import {User} from '@/types';
+import {create} from 'zustand';
 
 type Store = {
-  user: userData | null;
-  getUser: (user: userData) => void;
+  user: User | null;
+  getUser: (user: User) => void;
   removeUser: () => void;
 };
 

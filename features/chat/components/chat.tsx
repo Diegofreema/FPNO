@@ -1,59 +1,49 @@
-import { ErrorComponent } from '@/components/ui/error-component';
-import { Loading } from '@/components/ui/loading';
-import { useGetChannelIAmIn } from '@/features/chat-room/api/use-get-channel-i-am-in';
-import { useGetTopChatRooms } from '@/features/chat-room/api/use-get-top-chat-rooms';
-import { RenderRooms } from '@/features/chat-room/components/render-rooms';
-import { useSelected } from '@/features/chat-room/hook/use-selected';
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { useDebounce } from 'use-debounce';
-import { ChatHeader } from './chat-header';
-import { SearchInput } from './search-converstion';
-import { TopChannels } from './top-channels';
+import {Loading} from "@/components/ui/loading";
+import {useSelected} from "@/features/chat-room/hook/use-selected";
+import React, {useEffect, useState} from "react";
+import {View} from "react-native";
+import {useDebounce} from "use-debounce";
+import {ChatHeader} from "./chat-header";
+import {SearchInput} from "./search-converstion";
+import {TopChannels} from "./top-channels";
+import {usePaginatedQuery, useQuery} from "convex/react";
+import {api} from "@/convex/_generated/api";
+import {useAuth} from "@/lib/zustand/useAuth";
+import {RenderRooms} from "@/features/chat-room/components/render-rooms";
 
 export const Chat = () => {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState("");
+  const conexId = useAuth((state) => state?.user?.convexId!);
   const [search] = useDebounce(value, 500);
-  const [more, setMore] = useState(0);
-  const { data, isPending, isError, refetch, error } = useGetTopChatRooms();
+
+  const topRooms = useQuery(api.room.getTopRooms);
   const selectedMessages = useSelected((state) => state.selected);
   const clearMessages = useSelected((state) => state.clear);
-  const {
-    data: channelData,
-    isPending: isChannelPending,
-    isError: isChannelError,
-    refetch: refetchChannel,
-    error: channelError,
-  } = useGetChannelIAmIn({ more, search });
+  const channelsThatIamIn = usePaginatedQuery(
+    api.room.getRoomsThatIamIn,
+    { user_id: conexId },
+    { initialNumItems: 20 },
+  );
 
-  const handleRefetch = () => {
-    refetch();
-    refetchChannel();
-  };
 
   useEffect(() => {
     if (selectedMessages.length > 0) {
       clearMessages();
     }
   }, [selectedMessages, clearMessages]);
-
-  const errorMessage = channelError?.message || error?.message;
-  if (isError || isChannelError) {
-    return <ErrorComponent onPress={handleRefetch} title={errorMessage} />;
-  }
-
-  if (isPending || isChannelPending) {
+const {results,status,loadMore,isLoading} = channelsThatIamIn
+  const isPending = topRooms === undefined || isLoading
+  if (isPending) {
     return <Loading />;
   }
 
-  const { documents, total } = channelData;
 
   const handleLoadMore = () => {
-    if (documents.length >= total || total === 0) {
-      return;
+    if(status === 'CanLoadMore' && !isLoading) {
+      loadMore(20)
     }
-    setMore((prev) => prev + 10);
-  };
+  }
+
   return (
     <View style={{ gap: 10, flex: 1 }}>
       <ChatHeader />
@@ -62,8 +52,8 @@ export const Chat = () => {
         value={value}
         onChangeText={setValue}
       />
-      <TopChannels channels={data.documents} />
-      <RenderRooms channels={documents} handleLoadMore={handleLoadMore} />
+      <TopChannels channels={topRooms} />
+      <RenderRooms rooms={results} handleLoadMore={handleLoadMore} />
     </View>
   );
 };

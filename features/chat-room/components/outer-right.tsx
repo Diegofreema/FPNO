@@ -8,7 +8,7 @@ type OuterRightProps = {
   isMember: boolean;
   roomId: string;
   isInPending: boolean;
-  lastMessageTime: string;
+  lastMessageTime: number;
 };
 export const OuterRight = ({
   isMember,
@@ -22,7 +22,7 @@ export const OuterRight = ({
         <Text
           style={{ fontSize: RFPercentage(1.3), fontFamily: 'NunitoLight', color: colors.black }}
         >
-          {formatMessageTime(lastMessageTime)}
+          {formatMessageTime(new Date(lastMessageTime))}
         </Text>
       </View>
     );

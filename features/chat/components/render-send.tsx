@@ -1,8 +1,9 @@
-import { colors } from '@/constants';
-import { IconSend } from '@tabler/icons-react-native';
+import {colors} from '@/constants';
+import {IconSend} from '@tabler/icons-react-native';
 import React from 'react';
-import { ActivityIndicator, StyleSheet } from 'react-native';
-import { IMessage, Send, SendProps } from 'react-native-gifted-chat';
+import {ActivityIndicator, StyleSheet} from 'react-native';
+import {IMessage, Send, SendProps} from 'react-native-gifted-chat';
+
 type Props = SendProps<IMessage> & {
   disabled: boolean;
   sending: boolean;
@@ -37,7 +38,7 @@ export const RenderSend = ({
   return (
     <Send
       {...props}
-      disabled={false}
+      disabled={disabled}
       sendButtonProps={{
         ...sendButtonProps,
         onPress: () => customSendPress(onSend, text),

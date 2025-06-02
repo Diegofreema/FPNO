@@ -1590,7 +1590,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-menu (1.2.2):
+  - react-native-menu (1.2.3):
     - React
   - react-native-pdf (6.7.7):
     - React-Core
@@ -2611,7 +2611,7 @@ SPEC CHECKSUMS:
   react-native-ios-context-menu: 7c806df3005f7d2b35d2d21f472d5df2c0be40cf
   react-native-ios-utilities: 2122d5cff7f74d71c42babea11a3735aa7fdbb38
   react-native-keyboard-controller: 1204bae4f5c3d5460eed907e72c52cb15a08f624
-  react-native-menu: 27f634374481525b27e2123611aa4c6477324f92
+  react-native-menu: 3c82c11b003b77a3cc1885b48906dd631a07a736
   react-native-pdf: 73accc61238e8e9bc6e376191225028af20b996e
   react-native-safe-area-context: 8870dc3e45c8d241336cd8ee3fa3fc76f3a040ac
   react-native-webview: bfc7322cc9f570bc5b5b2251fb38a08da718d00a

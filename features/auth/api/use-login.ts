@@ -1,14 +1,17 @@
-import { generateFromRandomNumbersOtp, sendEmail } from '@/helper';
-import { useTempData } from '@/lib/zustand/useTempData';
-import { Variants } from '@/types';
-import { useMutation } from '@tanstack/react-query';
+import {generateFromRandomNumbersOtp, sendEmail} from '@/helper';
+import {useTempData} from '@/lib/zustand/useTempData';
+import {Variants} from '@/types';
+import {useMutation} from '@tanstack/react-query';
+import {useMutation as useConvexMutation} from 'convex/react'
 import axios from 'axios';
-import { useRouter } from 'expo-router';
-import { toast } from 'sonner-native';
+import {useRouter} from 'expo-router';
+import {toast} from 'sonner-native';
+import {api} from "@/convex/_generated/api";
 
 export const useLogin = (variant: Variants) => {
   const router = useRouter();
   const getTempUser = useTempData((state) => state.getUser);
+  const createUser = useConvexMutation(api.user.createUser)
   return useMutation({
     mutationFn: async (values: { email: string; password: string }) => {
       const baseApi = variant === 'LECTURER' ? 'lecturerlogin' : 'userlogin';
@@ -34,7 +37,34 @@ export const useLogin = (variant: Variants) => {
       const otp = generateFromRandomNumbersOtp();
       await sendEmail(data.email, otp);
       router.push(`/token?token=${otp}`);
-      getTempUser({ variant, ...data });
+      let userData;
+      if (variant === 'LECTURER') {
+          const name = data.fullname;
+          userData = {
+            ...data,
+            name
+          }
+      }
+      if( variant === 'STUDENT' ) {
+        const name = `${data.fname} ${data.mname} ${data.lname}`
+        userData = {
+          ...data,
+          name
+        }
+      }
+
+      const isStudent = variant === 'STUDENT';
+     const id = await createUser({
+          user_id: data.id,
+          email: data.email,
+          name: userData.name,
+          department: isStudent ? userData?.Department : undefined,
+          faculty: isStudent ? userData.Faculty : undefined,
+          imageUrl: isStudent ? `https://fpn.netpro.software/Uploads/${data.id}.jpeg` : undefined,
+          program_type: isStudent ? userData.programtype : undefined,
+          matriculation_number: isStudent ? userData.matricnumber : undefined
+      })
+      getTempUser({ variant, convexId: id, ...userData });
       toast.success('Success', {
         description: 'An otp was sent to your email',
       });

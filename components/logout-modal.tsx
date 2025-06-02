@@ -1,14 +1,15 @@
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { HStack } from '@/components/ui/h-stack';
-import { colors } from '@/constants';
-import { useAuth } from '@/lib/zustand/useAuth';
+import {Button} from '@/components/ui/button';
+import {Card} from '@/components/ui/card';
+import {HStack} from '@/components/ui/h-stack';
+import {colors} from '@/constants';
+import {useAuth} from '@/lib/zustand/useAuth';
 import Modal from 'react-native-modal';
-import { RFPercentage } from 'react-native-responsive-fontsize';
+import {RFPercentage} from 'react-native-responsive-fontsize';
 
-import { useId } from '@/lib/zustand/useId';
-import { useRouter } from 'expo-router';
-import { Text } from 'react-native';
+import {useId} from '@/lib/zustand/useId';
+import {useRouter} from 'expo-router';
+import {Text} from 'react-native';
+import {usePath} from "@/lib/zustand/usePath";
 
 type Props = {
   visible: boolean;
@@ -17,13 +18,14 @@ type Props = {
 
 export const LogoutModal = ({ onClose, visible }: Props) => {
   const removeUser = useAuth((state) => state.removeUser);
-
+  const setPath = usePath((state) => state.setPath);
   const onRemoveId = useId((state) => state.removeId);
   const router = useRouter();
   const onPress = async () => {
     removeUser();
     onClose();
     onRemoveId();
+    setPath('/')
     router.replace('/login');
   };
 

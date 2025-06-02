@@ -1,9 +1,9 @@
-import { colors } from '@/constants';
+import {colors} from '@/constants';
 import React from 'react';
-import { Composer, ComposerProps } from 'react-native-gifted-chat';
+import {Composer, ComposerProps} from 'react-native-gifted-chat';
 
-import { View } from 'react-native';
-import { FilePickerPanel } from './file-picker-panel';
+import {View} from 'react-native';
+import {FilePickerPanel} from './file-picker-panel';
 
 type Props = ComposerProps & {
   onPickImage: () => void;
@@ -40,7 +40,7 @@ export const RenderComposer = ({
           alignItems: 'center',
         }}
       >
-        <Composer {...props} multiline />
+        <Composer {...props} multiline textInputStyle={{color: colors.black}} />
         {/* <CustomPressable onPress={onOpenCamera}>
           <IconCamera size={24} color={colors.lightblue} strokeWidth={1.5} />
         </CustomPressable> */}

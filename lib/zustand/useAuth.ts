@@ -1,11 +1,11 @@
-import { userData } from '@/types';
+import {User} from '@/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import {create} from 'zustand';
+import {createJSONStorage, persist} from 'zustand/middleware';
 
 type Store = {
-  user: userData | null;
-  getUser: (user: userData) => void;
+  user: User | null;
+  getUser: (user: User) => void;
   removeUser: () => void;
 };
 

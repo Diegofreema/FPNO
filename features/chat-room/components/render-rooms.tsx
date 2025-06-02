@@ -1,25 +1,26 @@
-import { Title } from '@/components/typography/title';
-import { Button } from '@/components/ui/button';
-import { colors } from '@/constants';
-import { ChannelTypeWithPendingMembers } from '@/types';
-import { LegendList } from '@legendapp/list';
-import { Href, usePathname, useRouter } from 'expo-router';
-import { View } from 'react-native';
-import { RenderRoom } from './render-room';
+import {Title} from '@/components/typography/title';
+import {Button} from '@/components/ui/button';
+import {colors} from '@/constants';
+import {LegendList} from '@legendapp/list';
+import {Href, usePathname, useRouter} from 'expo-router';
+import {View} from 'react-native';
+import {RenderRoom} from './render-room';
+import {Doc} from "@/convex/_generated/dataModel";
 
 type Props = {
-  channels: ChannelTypeWithPendingMembers[];
+  rooms: Doc<'rooms'>[];
   handleLoadMore: () => void;
 };
 
-export const RenderRooms = ({ channels, handleLoadMore }: Props) => {
+export const RenderRooms = ({ rooms, handleLoadMore }: Props) => {
   return (
     <View style={{ flex: 1 }}>
       <LegendList
-        data={channels}
+        data={rooms}
         renderItem={({ item }) => <RenderRoom room={item} />}
-        keyExtractor={(item) => item.$id}
+        keyExtractor={(item) => item._id}
         onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ gap: 15 }}
         ListEmptyComponent={EmptyComponent}

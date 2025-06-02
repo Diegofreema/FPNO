@@ -1,4 +1,3 @@
-import {useRealtime} from '@/hooks/use-realtime';
 import {useAuth} from '@/lib/zustand/useAuth';
 import {useFingerPrint} from '@/lib/zustand/useFingerPrint';
 import {usePassCode} from '@/lib/zustand/usePasscode';
@@ -9,7 +8,7 @@ import {AppState, AppStateStatus} from 'react-native';
 
 const PrivateLayout = () => {
   const id = useAuth((state) => state.user?.id);
-  useRealtime();
+
   const router = useRouter();
 
   const lock = useFingerPrint((state) => state.lock);
