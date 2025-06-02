@@ -38,7 +38,7 @@ export const RenderRoom = ({ room }: Props) => {
     router.push(`/chat/${room._id}`);
   };
 
-    console.log({isMember, id: room._id})
+
   return (
     <CustomPressable disabled={disabled} onPress={onPress}>
       <HStack

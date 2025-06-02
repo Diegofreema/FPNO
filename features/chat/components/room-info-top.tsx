@@ -1,18 +1,18 @@
-import { SubTitle } from '@/components/typography/subtitle';
-import { colors } from '@/constants';
-import { ChannelType } from '@/types';
-import { Image } from 'expo-image';
+import {SubTitle} from '@/components/typography/subtitle';
+import {colors} from '@/constants';
+import {Image} from 'expo-image';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import {StyleSheet, View} from 'react-native';
 
-import { RFPercentage } from 'react-native-responsive-fontsize';
+import {RFPercentage} from 'react-native-responsive-fontsize';
+import {Doc} from "@/convex/_generated/dataModel";
 
 type Props = {
-  data: ChannelType;
+  data: Doc<'rooms'>;
 };
 
 export const RoomInfoTop = ({ data }: Props) => {
-  const memberText = data.members_count > 1 ? 'members' : 'member';
+  const memberText = data.member_count > 1 ? 'members' : 'member';
   return (
     <View style={{ gap: 10 }}>
       <View style={styles.container}>
@@ -25,12 +25,12 @@ export const RoomInfoTop = ({ data }: Props) => {
           />
         </View>
         <SubTitle
-          text={data.channel_name}
+          text={data.room_name}
           textStyle={[styles.name, { textAlign: 'center' }]}
           numberOfLines={1}
         />
         <SubTitle
-          text={`${data.members_count} ${memberText} `}
+          text={`${data.member_count} ${memberText} `}
           textStyle={styles.count}
           numberOfLines={1}
         />

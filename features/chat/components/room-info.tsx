@@ -1,30 +1,30 @@
-import { LoadingModal } from '@/components/typography/loading-modal';
-import { SubTitle } from '@/components/typography/subtitle';
-import { CustomPressable } from '@/components/ui/custom-pressable';
-import { HStack } from '@/components/ui/h-stack';
-import { colors } from '@/constants';
-import { useLeave } from '@/features/chat-room/api/use-leave';
-import { useRemoveMember } from '@/features/chat-room/api/use-remove-member';
-import { useUpdateMemberRole } from '@/features/chat-room/api/use-update-member-role';
-import { ChatRoleDisplay } from '@/features/chat-room/components/role';
-import { useAuth } from '@/lib/zustand/useAuth';
-import { MemberAccessRole, MemberWithUserProfile } from '@/types';
-import { Feather } from '@expo/vector-icons';
-import { LegendList } from '@legendapp/list';
+import {LoadingModal} from '@/components/typography/loading-modal';
+import {SubTitle} from '@/components/typography/subtitle';
+import {CustomPressable} from '@/components/ui/custom-pressable';
+import {HStack} from '@/components/ui/h-stack';
+import {colors} from '@/constants';
+import {useLeave} from '@/features/chat-room/api/use-leave';
+import {useRemoveMember} from '@/features/chat-room/api/use-remove-member';
+import {useUpdateMemberRole} from '@/features/chat-room/api/use-update-member-role';
+import {ChatRoleDisplay} from '@/features/chat-room/components/role';
+import {useAuth} from '@/lib/zustand/useAuth';
+import {MemberAccessRole, RoomMemberType} from '@/types';
+import {Feather} from '@expo/vector-icons';
+import {LegendList} from '@legendapp/list';
 import React from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
-import { Models } from 'react-native-appwrite';
-import { RFPercentage } from 'react-native-responsive-fontsize';
-import { ChatMenu } from './chat-menu';
-import { User } from './user';
+import {Alert, StyleSheet, View} from 'react-native';
+import {RFPercentage} from 'react-native-responsive-fontsize';
+import {ChatMenu} from './chat-menu';
+import {User} from './user';
 
 type Props = {
-  infoData: Models.DocumentList<MemberWithUserProfile>;
+  infoData: RoomMemberType[];
   handleMore: () => void;
   creatorId: string;
   roomId: string;
   disableAction: boolean;
   loggedInUser: string;
+  show: boolean;
 };
 
 export const RoomInfo = ({
@@ -34,9 +34,10 @@ export const RoomInfo = ({
   roomId,
   disableAction,
   loggedInUser,
+    show
 }: Props) => {
-  const { documents, total } = infoData;
-  const show = documents.length < total;
+
+
   const { mutateAsync: removeMember, isPending: isRemoving } =
     useRemoveMember();
   const { mutateAsync: updateMember, isPending: isUpdating } =
@@ -91,26 +92,26 @@ export const RoomInfo = ({
     <View style={{ flex: 1 }}>
       <LoadingModal visible={isVisible} />
       <LegendList
-        data={documents}
+        data={infoData}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => {
           const isAdmin = item.access_role === MemberAccessRole.ADMIN;
           const roleText =
-            creatorId === item.user.userId
+            creatorId === item.user?._id
               ? 'owner'
               : isAdmin
               ? 'admin'
               : 'member';
-          const disabled = creatorId === item.user.userId;
+          const disabled = creatorId === item.user?._id;
           const text = isAdmin ? 'Member' : 'Admin';
           return (
             <ChatMenu
               disable={
-                disabled || disableAction || item.user.userId === loggedInUser
+                disabled || disableAction || item.user?._id === loggedInUser
               }
               trigger={
                 <User
-                  user={item.user}
+                  user={item.user!}
                   rightContent={<ChatRoleDisplay role={roleText} />}
                 />
               }
@@ -131,7 +132,7 @@ export const RoomInfo = ({
             // />
           );
         }}
-        keyExtractor={(item) => item.$id}
+        keyExtractor={(item) => item._id}
         ListFooterComponent={() => (
           <ListFooterComponent
             show={show}

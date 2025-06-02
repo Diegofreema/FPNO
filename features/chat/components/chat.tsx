@@ -35,7 +35,7 @@ export const Chat = () => {
   }, [selectedMessages, clearMessages]);
   const { results, status, loadMore, isLoading } = channelsThatIamIn;
   const isPending =
-    topRooms === undefined || isLoading || searchedRooms === undefined;
+    topRooms === undefined
   if (isPending) {
     return <Loading />;
   }
@@ -56,7 +56,7 @@ export const Chat = () => {
         onChangeText={setValue}
       />
       <TopChannels channels={topRooms} />
-      {search ? (
+      {search && searchedRooms ? (
         <RenderRooms rooms={searchedRooms} handleLoadMore={handleLoadMore} />
       ) : (
         <RenderRooms rooms={results} handleLoadMore={handleLoadMore} />

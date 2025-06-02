@@ -10,9 +10,10 @@ import {Doc} from "@/convex/_generated/dataModel";
 type Props = {
   rooms: Doc<'rooms'>[];
   handleLoadMore: () => void;
+  errorText?: string
 };
 
-export const RenderRooms = ({ rooms, handleLoadMore }: Props) => {
+export const RenderRooms = ({ rooms, handleLoadMore,errorText }: Props) => {
   return (
     <View style={{ flex: 1 }}>
       <LegendList
@@ -29,7 +30,7 @@ export const RenderRooms = ({ rooms, handleLoadMore }: Props) => {
   );
 };
 
-export const EmptyComponent = () => {
+export const EmptyComponent = ({errorText}  : {errorText?: string}) => {
   const router = useRouter();
   const pathname = usePathname();
   const isExplorePage = pathname === '/explore';

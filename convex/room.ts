@@ -2,6 +2,7 @@ import {mutation, query} from "@/convex/_generated/server";
 import {ConvexError, v} from "convex/values";
 import {paginationOptsValidator} from "convex/server";
 import {filter} from "convex-helpers/server/filter";
+import {getUserProfile} from "@/convex/user";
 
 export const getTopRooms = query({
   args: {},
@@ -85,7 +86,10 @@ export const isMember = query({
     const memberIsAccepted = await ctx.db
       .query("members")
       .withIndex("by_user_and_room_id", (q) =>
-        q.eq("room_id", args.room_id).eq("member_id", args.member_id).eq('status', 'ACCEPTED'),
+        q
+          .eq("room_id", args.room_id)
+          .eq("member_id", args.member_id)
+          .eq("status", "ACCEPTED"),
       )
       .first();
     return !!memberIsAccepted;
@@ -101,13 +105,68 @@ export const isInPending = query({
     if (!room) return false;
 
     const memberIsAccepted = await ctx.db
-        .query("members")
-        .withIndex("by_user_and_room_id", (q) =>
-            q.eq("room_id", args.room_id).eq("member_id", args.member_id).eq('status', 'PENDING'),
-        )
-        .first();
+      .query("members")
+      .withIndex("by_user_and_room_id", (q) =>
+        q
+          .eq("room_id", args.room_id)
+          .eq("member_id", args.member_id)
+          .eq("status", "PENDING"),
+      )
+      .first();
 
     return !!memberIsAccepted;
+  },
+});
+
+export const getRoomMembers = query({
+  args: {
+    room_id: v.id("rooms"),
+    status: v.union(v.literal("ACCEPTED"), v.literal("PENDING")),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const members = await ctx.db
+      .query("members")
+      .withIndex("by_room_id", (q) =>
+        q.eq("room_id", args.room_id).eq("status", args.status),
+      )
+      .order("desc")
+      .paginate(args.paginationOpts);
+    const page = await Promise.all(
+      members.page.map(async (member) => {
+        const user = await getUserProfile(ctx, member.member_id);
+        return {
+          ...member,
+          user,
+        };
+      }),
+    );
+
+    return {
+      ...members,
+      page,
+    };
+  },
+});
+export const getRoomPendingMembersCount = query({
+  args: { room_id: v.id("rooms") },
+  handler: async (ctx, args) => {
+    const pendingMembers = await ctx.db
+      .query("members")
+      .withIndex("by_room_id", (q) =>
+        q.eq("room_id", args.room_id).eq("status", "PENDING"),
+      )
+      .collect();
+    return pendingMembers.length;
+  },
+});
+
+export const room = query({
+  args: {
+    room_id: v.id("rooms"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.room_id);
   },
 });
 // mutations

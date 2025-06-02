@@ -1,34 +1,32 @@
 import {LoadingModal} from '@/components/typography/loading-modal';
-import {ErrorComponent} from '@/components/ui/error-component';
 import {Loading} from '@/components/ui/loading';
 import {Wrapper} from '@/components/ui/wrapper';
-import {useGetMember, useGetPendingMember,} from '@/features/chat-room/api/use-get-member';
 import {useLeave} from '@/features/chat-room/api/use-leave';
 import {useSendMessage} from '@/features/chat-room/api/use-send-message';
-import {useMessages} from '@/features/chat-room/hook/useMessages';
 import {useDeleteMessage} from '@/features/chat/api/use-delete-message';
 import {useEditMessage} from '@/features/chat/api/use-edit-message';
-import {useGetConversationWithMessages} from '@/features/chat/api/use-get-conversation';
 import ChatComponent from '@/features/chat/components/chat-component';
 import {ChatNav} from '@/features/chat/components/chat-nav';
 import {formatNumber, generateImageUrl} from '@/helper';
-import {useIsCreator} from '@/hooks/useIsCreator';
 import {useAuth} from '@/lib/zustand/useAuth';
-import {EditType, EditType2, FileType, IMessage, SendIMessage} from '@/types';
+import {EditType, EditType2, FileType, IMessage, ReplyType, SendIMessage} from '@/types';
 import {useActionSheet} from '@expo/react-native-action-sheet';
 import * as Clipboard from 'expo-clipboard';
 import * as DocumentPicker from 'expo-document-picker';
-
+import {usePaginatedQuery, useQuery as useConvexQuery} from 'convex/react'
 import * as ImagePicker from 'expo-image-picker';
-import {useLocalSearchParams, usePathname, useRouter} from 'expo-router';
+import {Redirect, useLocalSearchParams, usePathname, useRouter} from 'expo-router';
 import React, {useCallback, useState} from 'react';
 import {Alert} from 'react-native';
 import {toast} from 'sonner-native';
+import {api} from "@/convex/_generated/api";
+import {Id} from "@/convex/_generated/dataModel";
 
 const ChatId = () => {
-  const { chatId } = useLocalSearchParams<{ chatId: string }>();
+  const { chatId } = useLocalSearchParams<{ chatId: Id<'rooms'> }>();
   const loggedInUser = useAuth((state) => state.user?.id!);
-  const [more, setMore] = useState(0);
+  const convexIdOfLoggedInUser = useAuth((state) => state.user?.convexId!);
+
   const [text, setText] = useState('');
   const router = useRouter();
   const pathname = usePathname();
@@ -44,35 +42,21 @@ const ChatId = () => {
 
   const { showActionSheetWithOptions } = useActionSheet();
 
-  const {
-    data: messageData,
-    error: messageError,
-    isError: isMessageError,
-    isPending: isMessagePending,
-    isRefetchError,
-  } = useMessages({ channel_id: chatId, more, loggedInUser });
+
   const onOpenCamera = useCallback(() => {
     router.push(`/camera?path=${pathname}`);
   }, [router, pathname]);
   const { mutateAsync: deleteAsync, isPending: isPendingDelete } =
     useDeleteMessage();
   const [sending, setSending] = useState(false);
-  const { data, isPending, isError, error, refetch } =
-    useGetConversationWithMessages({ roomId: chatId, offSet: more });
-  const {
-    data: member,
-    isPending: isPendingMember,
-    isError: isErrorMember,
-    error: errorMember,
-  } = useGetMember({ channel_id: chatId });
-  const {
-    data: pendingMember,
-    isPending: isPendingPendingMember,
-    isError: isErrorPendingMember,
-    error: errorPendingMember,
-  } = useGetPendingMember({ channel_id: chatId });
+
+ const room = useConvexQuery(api.room.room, {room_id: chatId})
+  const isMember = useConvexQuery(api.room.isMember, {room_id: chatId, member_id: convexIdOfLoggedInUser})
+  const pendingMember = useConvexQuery(api.room.isInPending, {room_id: chatId, member_id: convexIdOfLoggedInUser})
+  const messages = usePaginatedQuery(api.message.getMessages,  {room_id: chatId}, {initialNumItems: 50})
+
   const { mutateAsync: editAsync, isPending: isPendingEdit } = useEditMessage();
-  const isCreator = useIsCreator({ creatorId: data?.creator_id });
+  const isCreator = room?.creator_id === convexIdOfLoggedInUser
 
   const { mutateAsync: leaveRoom, isPending: isLeaving } = useLeave();
   const onSend = useCallback(
@@ -209,7 +193,7 @@ const ChatId = () => {
 
       if (!result.canceled) {
         const { assets } = result;
-        console.log({result})
+
         const filePromises = assets.map(async (asset) => {
           const file = {
             type: asset.mimeType || 'image/jpeg',
@@ -246,15 +230,26 @@ const ChatId = () => {
       setSending(false);
     }
   };
+  const {status,loadMore,isLoading,results} = messages
+  const loadEarlier = status === 'CanLoadMore' && !isLoading;
   const onLoadMore = useCallback(async () => {
-    if (
-      messageData.messages &&
-      messageData?.messages?.length === messageData.total
-    ) {
-      return;
-    }
-    setMore((prev) => prev + 50);
-  }, [messageData]);
+   if(loadEarlier) {
+     loadMore(100)
+   }
+  }, [loadEarlier, loadMore]);
+  const formattedMessages = results.map((message) => ({
+    _id: message?._id,
+    text: message?.message,
+    createdAt: new Date(message?._creationTime),
+    user: {
+      _id: message?.user?._id!,
+      name: message.sender_id === convexIdOfLoggedInUser ? 'You' : message?.user?.name as string,
+    },
+    reactions: message.reactions,
+    fileType: message.file_type,
+    fileUrl: message.file_url,
+    reply: message.reply as ReplyType,
+  }));
   const onEdit = useCallback(
     async ({ textToEdit, messageId, senderId, senderName }: EditType2) => {
       setEditText({ text: textToEdit, senderId, senderName });
@@ -263,49 +258,38 @@ const ChatId = () => {
     },
     []
   );
-  const errorMessage =
-    error?.message ||
-    errorMember?.message ||
-    errorPendingMember?.message ||
-    messageError?.message;
+
+
+
 
   if (
-    isError ||
-    isErrorMember ||
-    isErrorPendingMember ||
-    isMessageError ||
-    isRefetchError
-  ) {
-    return <ErrorComponent onPress={refetch} title={errorMessage} />;
-  }
-
-  if (
-    isPending ||
-    isPendingMember ||
-    isPendingPendingMember ||
-    isMessagePending
+      room === undefined || isMember === undefined || pendingMember === undefined
   ) {
     return <Loading />;
   }
 
-  const followersText = `${formatNumber(data?.members_count)} ${
-    data?.members_count > 1 ? 'members' : 'member'
+  if(room === null) {
+    toast('Room does not exist!!!')
+    return <Redirect href={'/chat'} />
+  }
+
+  const followersText = `${formatNumber(room?.member_count)} ${
+    room?.member_count > 1 ? 'members' : 'member'
   }`;
 
-  const loadEarlier =
-    (messageData.messages?.length || 0) < (messageData.total || 0);
-  const isMember = !!member.total;
+
+
 
   return (
     <Wrapper>
       <ChatNav
-        name={data.channel_name}
+        name={room.room_name}
         subText={followersText}
-        imageUrl={data.image_url}
+        imageUrl={room.image_url!}
         channelId={chatId}
         isCreator={isCreator}
         isMember={isMember}
-        isInPending={!!pendingMember.total}
+        isInPending={pendingMember}
         leaveRoom={() => leaveRoom({ memberId: loggedInUser, roomId: chatId })}
       />
       <LoadingModal visible={isLeaving || isPendingDelete} />
@@ -317,7 +301,7 @@ const ChatId = () => {
           setReplyMessage={setReplyMessage}
           handlePhotTaken={handlePhotoTaken}
           loadEarlier={loadEarlier}
-          messages={messageData.messages || []}
+          messages={formattedMessages || []}
           onLoadMore={onLoadMore}
           onSend={handleSend}
           setText={setText}

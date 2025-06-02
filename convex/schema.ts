@@ -78,12 +78,15 @@ export default defineSchema({
     .index("by_sender_id", ["user_id"]),
   rooms: defineTable(Room)
     .index("by_creator_id", ["creator_id"])
-      .index('by_member_count', ['member_count'])
-      .index('by_last_message', ['last_message_time'])
-      .index('name', ['room_name'])
+    .index("by_member_count", ["member_count"])
+    .index("by_last_message", ["last_message_time"])
+    .index("name", ["room_name"])
     .searchIndex("room_name", {
       searchField: "room_name",
     }),
   pendingMembers: defineTable(PendingMember).index("by_room_id", ["room_id"]),
-  members: defineTable(Member).index("by_room_id", ["room_id"]).index('by_user_and_room_id', ['room_id','member_id', 'status']),
+  members: defineTable(Member)
+    .index("by_room_id", ["room_id", "status"])
+    .index("by_user_and_room_id", ["room_id", "member_id", "status"])
+
 });

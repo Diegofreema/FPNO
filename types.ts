@@ -1,7 +1,8 @@
 import {ImagePickerAsset} from 'expo-image-picker';
 import {Models} from 'react-native-appwrite';
 import {upcoming} from './data';
-import {Id} from "@/convex/_generated/dataModel";
+import {Doc, Id} from "@/convex/_generated/dataModel";
+import {Infer, v} from "convex/values";
 
 export type DataType = (typeof upcoming)[0];
 
@@ -202,10 +203,10 @@ export type SendMessageType = {
   replyTo?: string;
 };
 
-export type MessageReactionsType = Models.Document & {
+export type MessageReactionsType = {
   message_id: string;
   user_id: string;
-  emoji: Reaction_Enum;
+  emoji: EmojiType;
 };
 
 export enum Reaction_Enum {
@@ -217,8 +218,22 @@ export enum Reaction_Enum {
   LAUGH = 'LAUGH',
 }
 
+export const emojiType = v.union(
+    v.literal("LIKE"),
+    v.literal("SAD"),
+    v.literal("LOVE"),
+    v.literal("WOW"),
+    v.literal("ANGRY"),
+    v.literal("LAUGH"),
+);
+
+export type RoomMemberType = Doc<'members'> & {
+  user: Doc<'users'> | null
+}
+
+export type EmojiType = Infer<typeof emojiType>;
 export interface IMessage {
-  _id: string | number;
+  _id: Id<'messages'>;
   text: string;
   createdAt: Date | number;
   user: {

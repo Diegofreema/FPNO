@@ -1,5 +1,6 @@
-import {mutation} from "@/convex/_generated/server";
+import {mutation, QueryCtx} from "@/convex/_generated/server";
 import {v} from "convex/values";
+import {Id} from "@/convex/_generated/dataModel";
 
 export const createUser = mutation({
   args: {
@@ -30,3 +31,9 @@ export const createUser = mutation({
 export const generateUploadUrl = mutation(async (ctx) => {
     return await ctx.storage.generateUploadUrl();
 });
+
+
+export const getUserProfile = async (ctx: QueryCtx, userId: Id<'users'>) => {
+  return await ctx.db.get(userId);
+}
+
