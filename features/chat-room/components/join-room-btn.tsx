@@ -8,6 +8,7 @@ import {api} from "@/convex/_generated/api";
 import {Id} from "@/convex/_generated/dataModel";
 import {generateErrorMessage} from "@/helper";
 import {toast} from "sonner-native";
+import {RFPercentage} from "react-native-responsive-fontsize";
 
 type Props = {
   roomId: Id<"rooms">;
@@ -54,5 +55,6 @@ const styles = StyleSheet.create({
   },
   followText: {
     color: colors.white,
+    fontSize: RFPercentage(1.4)
   },
 });

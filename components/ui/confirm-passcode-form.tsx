@@ -13,6 +13,7 @@ import {useAuth} from "@/lib/zustand/useAuth";
 import {OtpForm} from "@/features/auth/components/otp-input";
 import {OtpButtons} from "@/features/auth/components/otp-buttons";
 import {useOtpCodes} from "@/hooks/useOtpCodes";
+import {toast} from "sonner-native";
 
 
 const pinLength = 4;
@@ -52,13 +53,12 @@ export const ConfirmPassCode = () => {
           togglePassCode(true);
         }
 
-        onShowToast({
-          message: 'Success',
+
+        toast.success('Success', {
           description: `Pass code ${
-            action === 'change' ? 'edited' : 'created'
-          } successfully`,
-          type: 'success',
-        });
+              action === 'change' ? 'edited' : 'created'
+          } successfully`
+        })
 
         router.replace(path);
         setPath(path);
@@ -70,11 +70,10 @@ export const ConfirmPassCode = () => {
         withTiming(0, { duration: TIME / 2 })
       );
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      onShowToast({
-        message: 'Error',
-        description: 'Pin does not match',
-        type: 'error',
-      });
+
+      toast.error('Error', {
+        description: 'Pin does not match'
+      })
 
       setTimeout(() => setCode([]), TIME * 2);
     }

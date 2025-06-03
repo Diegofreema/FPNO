@@ -82,7 +82,7 @@ export default function TabLayout() {
               key={tab.name}
               name={tab.name}
               options={{
-                title: tab.title,
+                title: '',
                 href: tab.href,
                 tabBarIcon: ({  focused }) => (
                   <AntDesign

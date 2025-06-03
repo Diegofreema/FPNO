@@ -37,7 +37,8 @@ const PrivateLayout = () => {
         if (
           pathname.includes('chat') ||
           pathname.includes('group-chat') ||
-          pathname.includes('camera')
+          pathname.includes('camera') ||
+          pathname.includes('preview-file')
         )
           return;
         if (lock && pathname !== '/lock' && pathname !== '/check-passcode') {

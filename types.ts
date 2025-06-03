@@ -1,19 +1,19 @@
-import {ImagePickerAsset} from 'expo-image-picker';
-import {Models} from 'react-native-appwrite';
-import {upcoming} from './data';
+import {ImagePickerAsset} from "expo-image-picker";
+
+import {upcoming} from "./data";
 import {Doc, Id} from "@/convex/_generated/dataModel";
 import {Infer, v} from "convex/values";
 
 export type DataType = (typeof upcoming)[0];
 
 export enum MemberAccessRole {
-  ADMIN = 'ADMIN',
-  MEMBER = 'MEMBER',
+  ADMIN = "ADMIN",
+  MEMBER = "MEMBER",
 }
 
 export enum MemberStatus {
-  PENDING = 'PENDING',
-  ACCEPTED = 'ACCEPTED',
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
 }
 export type DashBoardType = {
   outstandingassignment: string;
@@ -63,15 +63,15 @@ export type GroupMessageType = {
   recipient: string[];
   conversationId: string;
   content: string;
-  contentType: 'image' | 'text' | 'pdf';
+  contentType: "image" | "text" | "pdf";
   seenId: string[];
   image?: string;
   pdf?: string;
 };
 
-export type SingleMessageType = Omit<GroupMessageType, 'senderName'>;
+export type SingleMessageType = Omit<GroupMessageType, "senderName">;
 export type NewConversationType = {
-  id: Id<'users'>;
+  id: Id<"users">;
   name: string;
   image: string;
   userId: string;
@@ -80,13 +80,13 @@ export type NewConversationType = {
 export type PaginateType = {
   isLoading: boolean;
   loadMore: (numItems: number) => void;
-  status: 'LoadingFirstPage' | 'CanLoadMore' | 'LoadingMore' | 'Exhausted';
+  status: "LoadingFirstPage" | "CanLoadMore" | "LoadingMore" | "Exhausted";
 };
 
-export type Variants = 'LECTURER' | 'STUDENT';
+export type Variants = "LECTURER" | "STUDENT";
 
 export type StudentData = {
-  variant: 'STUDENT';
+  variant: "STUDENT";
   Department: string;
   Faculty: string;
   birthday: string;
@@ -101,7 +101,7 @@ export type StudentData = {
 };
 
 export type LecturerData = {
-  variant: 'LECTURER';
+  variant: "LECTURER";
   email: string;
   id: string;
   fullname: string;
@@ -119,88 +119,13 @@ export type User = {
   matricnumber: string;
   phone: string;
   programtype: string;
-  convexId: Id<'users'>
-}
+  convexId: Id<"users">;
+};
 
 export type userData = StudentData | LecturerData;
 
-export type UserType = Models.Document & {
-  name: string;
-  userId: string;
-  email: string;
-  is_online: boolean;
-  image_url?: string;
-  faculty?: string;
-  department?: string;
-  program_type?: string;
-  matriculation_number?: string;
-};
-
-export type ChannelType = Models.Document & {
-  channel_name: string;
-  creator_id: string;
-  last_message: string;
-  last_message_time: string;
-  description: string;
-  image_url: string;
-  members_count: number;
-};
-
-export type PendingMembersType = Models.Document & {
-  channel_id: string;
-  member_to_join: string;
-};
-
-export type ChannelTypeWithPendingMembers = ChannelType & {
-  pendingMembers?: MemberType[];
-};
-
-export type MemberType = Models.Document & {
-  access_role: MemberAccessRole;
-  channel_id: string;
-  member_id: string;
-  status: MemberStatus;
-};
-
-export type ChatMessageType = Models.Document & {
-  sender_id: string;
-  channel_id: string;
-  message: string;
-  seen_ids: string[];
-  sent_to: string[];
-  fileType?: FileType;
-  fileUrl?: string;
-  fileId?: string;
-  replyTo?: string;
-  // content_type: 'image' | 'text' | 'pdf';
-};
-
 export type ErrorType = {
   message: string;
-};
-
-export type MemberWithUserProfile = {
-  user: UserType;
-  $id: string;
-  $collectionId: string;
-  $databaseId: string;
-  $createdAt: string;
-  $updatedAt: string;
-  $permissions: string[];
-  access_role: MemberAccessRole;
-  channel_id: string;
-  member_id: string;
-  status: MemberStatus;
-};
-
-export type SendMessageType = {
-  senderId: string;
-  channel_id: string;
-  message: string;
-  fileType?: FileType;
-  fileUrl?: string;
-  fileId?: string;
-  replyTo?: string;
 };
 
 export type MessageReactionsType = {
@@ -210,34 +135,34 @@ export type MessageReactionsType = {
 };
 
 export enum Reaction_Enum {
-  LIKE = 'LIKE',
-  LOVE = 'LOVE',
-  WOW = 'WOW',
-  SAD = 'SAD',
-  ANGRY = 'ANGRY',
-  LAUGH = 'LAUGH',
+  LIKE = "LIKE",
+  LOVE = "LOVE",
+  WOW = "WOW",
+  SAD = "SAD",
+  ANGRY = "ANGRY",
+  LAUGH = "LAUGH",
 }
 
 export const emojiType = v.union(
-    v.literal("LIKE"),
-    v.literal("SAD"),
-    v.literal("LOVE"),
-    v.literal("WOW"),
-    v.literal("ANGRY"),
-    v.literal("LAUGH"),
+  v.literal("LIKE"),
+  v.literal("SAD"),
+  v.literal("LOVE"),
+  v.literal("WOW"),
+  v.literal("ANGRY"),
+  v.literal("LAUGH"),
 );
 
-export type RoomMemberType = Doc<'members'> & {
-  user: Doc<'users'> | null
-}
+export type RoomMemberType = Doc<"members"> & {
+  user: Doc<"users"> | null;
+};
 
 export type EmojiType = Infer<typeof emojiType>;
 export interface IMessage {
-  _id: Id<'messages'>;
+  _id: Id<"messages">;
   text: string;
   createdAt: Date | number;
   user: {
-    _id: string;
+    _id: Id<"users">;
     name: string;
   };
   image?: string;
@@ -254,11 +179,11 @@ export interface SendIMessage {
   fileType?: FileType;
   audio?: string;
   fileUrl?: string;
-  fileId?: Id<'_storage'>;
-  replyTo?: Id<'messages'>;
+  fileId?: Id<"_storage">;
+  replyTo?: Id<"messages">;
 }
 
-export type FileType = 'pdf' | 'image' | 'audio';
+export type FileType = "pdf" | "image" | "audio";
 
 export type ReplyType = {
   fileType: FileType;
@@ -275,9 +200,9 @@ export type EditType = { text: string; senderId: string; senderName: string };
 
 export type EditType2 = {
   textToEdit: string;
-  messageId: string;
-  senderId: string;
+  messageId: Id<"messages">;
+  senderId: Id<"users">;
   senderName: string;
 };
 
-export type ServerEdit = Omit<EditType2, 'senderName'>;
+export type ServerEdit = Omit<EditType2, "senderName">;

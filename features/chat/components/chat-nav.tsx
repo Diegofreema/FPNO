@@ -11,7 +11,6 @@ import {Trash} from 'lucide-react-native';
 import React from 'react';
 import {Alert, StyleSheet, View} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
-import {useDeleteMessages} from '../api/use-delete-messages';
 import {Menu} from "@/components/dropdown-menu";
 import {Id} from "@/convex/_generated/dataModel";
 
@@ -47,20 +46,20 @@ export const ChatNav = ({
   const clearMessages = useSelected((state) => state.clear);
   const messageIsSelected = selectedMessages.length > 0;
   const selectedMessageLength = selectedMessages.length;
-  const { mutateAsync, isPending } = useDeleteMessages();
+
   const loggedInUser = useAuth((state) => state.user?.id!);
   const onHandleDelete = async () => {
-    await mutateAsync(
-      {
-        messageIds: selectedMessages.map((m) => m.messageId),
-        userId: loggedInUser,
-      },
-      {
-        onSuccess: () => {
-          clearMessages();
-        },
-      }
-    );
+    // await mutateAsync(
+    //   {
+    //     messageIds: selectedMessages.map((m) => m.messageId),
+    //     userId: loggedInUser,
+    //   },
+    //   {
+    //     onSuccess: () => {
+    //       clearMessages();
+    //     },
+    //   }
+    // );
   };
 
   const onPress = () => {
@@ -127,7 +126,7 @@ export const ChatNav = ({
           <View style={{ flexDirection: 'row', gap: 5 }}>
             {messageIsSelected && (
               <CustomPressable
-                disabled={isPending}
+               
                 onPress={() => onDeleteMessages(onHandleDelete)}
               >
                 <Trash />

@@ -23,7 +23,8 @@
         "EXPO_PUBLIC_PENDING_ID": "682414b30036d8553cce",
         "EXPO_PUBLIC_MEMBER_ID": "6825e890003cbc62bba8",
         "EXPO_PUBLIC_BUCKET_ID": "682472b9002fe0b9b8b7",
-        "EXPO_PUBLIC_REACTIONS_ID": "682ae8a7000e9acbb57f"
+        "EXPO_PUBLIC_REACTIONS_ID": "682ae8a7000e9acbb57f",
+        "EXPO_PUBLIC_CONVEX_URL": "https://descriptive-ibis-753.convex.cloud"
       },
       "channel": "preview"
     },

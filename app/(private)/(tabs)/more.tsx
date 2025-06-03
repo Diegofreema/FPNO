@@ -10,19 +10,21 @@ import {usePassCode} from '@/lib/zustand/usePasscode';
 
 import {AntDesign, Entypo, EvilIcons} from '@expo/vector-icons';
 import {openURL} from 'expo-linking';
-import {router} from 'expo-router';
+import {Href, router, usePathname} from 'expo-router';
 import {useState} from 'react';
 import {Platform, StyleSheet, Switch, Text, TouchableOpacity} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
 import {toast} from 'sonner-native';
 import {Flex} from "@/components/ui/flex";
+import {usePath} from "@/lib/zustand/usePath";
 
 export const mail = 'mailto:student.ictsupport@fpno.edu.ng';
 const More = () => {
   const toggleLock = useFingerPrint((state) => state.toggleLock);
   const [visible, setVisible] = useState(false);
   const passCode = usePassCode((state) => state.passCode);
-
+  const pathname = usePathname()
+  const setPath = usePath(state => state.setPath)
   const lock = useFingerPrint((state) => state.lock);
   const onLock = async () => {
     const isAvailable = await LocalAuthentication.hasHardwareAsync();
@@ -53,6 +55,7 @@ const More = () => {
 
   const onEdit = () => {
     router.push('/check-passcode?action=change');
+    setPath(pathname as Href)
   };
 
   // const onTerms = () => {};
@@ -93,7 +96,7 @@ const More = () => {
             <Title text={'Change Pin'} textStyle={styles.title} />
             <EvilIcons
               name="pencil"
-              size={RFPercentage(2.5)}
+              size={RFPercentage(4)}
               color={colors.black}
             />
           </TouchableOpacity>
@@ -128,7 +131,7 @@ const More = () => {
           <Entypo
             name="help-with-circle"
             color={colors.black}
-            size={RFPercentage(2.5)}
+            size={RFPercentage(4)}
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -141,7 +144,7 @@ const More = () => {
           <AntDesign
             name="logout"
             color={colors.red}
-            size={RFPercentage(2.5)}
+            size={RFPercentage(3)}
           />
         </TouchableOpacity>
       </Stack>

@@ -14,6 +14,7 @@ import {RenderBubble} from './render-bubble';
 import {RenderImage} from './render-image';
 import ReplyMessageBar from './render-message';
 import {RenderSend} from './render-send';
+import {Id} from "@/convex/_generated/dataModel";
 
 type Props = {
   messages: IMessage[];
@@ -38,7 +39,7 @@ type Props = {
     callback: (i?: number) => void | Promise<void>
   ) => void;
   onEdit: (value: EditType2) => Promise<void>;
-  onDelete: (messageId: string) => Promise<void>;
+  onDelete: (messageId: Id<'messages'>) => Promise<void>;
   onCopy: (textToCopy: string) => Promise<void>;
   handlePhotTaken: (message: IMessage) => void;
   onPickDocument: () => void;

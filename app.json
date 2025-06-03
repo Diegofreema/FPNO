@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "fpno",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.diegodark.FPNO",
@@ -20,7 +20,7 @@
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": false,
+      "edgeToEdgeEnabled": true,
       "package": "com.diegodark.FPNO",
 
       "permissions": [

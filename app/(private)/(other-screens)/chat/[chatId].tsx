@@ -1,11 +1,9 @@
 import {LoadingModal} from "@/components/typography/loading-modal";
 import {Loading} from "@/components/ui/loading";
 import {Wrapper} from "@/components/ui/wrapper";
-import {useDeleteMessage} from "@/features/chat/api/use-delete-message";
-import {useEditMessage} from "@/features/chat/api/use-edit-message";
 import ChatComponent from "@/features/chat/components/chat-component";
 import {ChatNav} from "@/features/chat/components/chat-nav";
-import {formatNumber, generateErrorMessage, uploadProfilePicture} from "@/helper";
+import {formatNumber, generateErrorMessage, uploadProfilePicture,} from "@/helper";
 import {useAuth} from "@/lib/zustand/useAuth";
 import {EditType, EditType2, FileType, IMessage, ReplyType, SendIMessage,} from "@/types";
 import {useActionSheet} from "@expo/react-native-action-sheet";
@@ -33,18 +31,18 @@ const ChatId = () => {
   const [isAttachImage, setIsAttachImage] = useState(false);
   const [editText, setEditText] = useState<EditType | null>(null);
   const [edit, setEdit] = useState<{
-    messageId: string;
-    senderId: string;
+    messageId: Id<"messages">;
+    senderId: Id<"users">;
   } | null>(null);
   const [replyMessage, setReplyMessage] = useState<IMessage | null>(null);
 
   const { showActionSheetWithOptions } = useActionSheet();
-const generateUploadUrl = useMutation(api.user.generateUploadUrl)
+  const generateUploadUrl = useMutation(api.user.generateUploadUrl);
+  const deleteMessage = useMutation(api.message.deleteMessage);
   const onOpenCamera = useCallback(() => {
     router.push(`/camera?path=${pathname}`);
   }, [router, pathname]);
-  const { mutateAsync: deleteAsync, isPending: isPendingDelete } =
-    useDeleteMessage();
+
   const [sending, setSending] = useState(false);
 
   const room = useConvexQuery(api.room.room, { room_id: chatId });
@@ -62,18 +60,19 @@ const generateUploadUrl = useMutation(api.user.generateUploadUrl)
     { initialNumItems: 50 },
   );
 
-  const { mutateAsync: editAsync, isPending: isPendingEdit } = useEditMessage();
   const isCreator = room?.creator_id === convexIdOfLoggedInUser;
 
   const leaveRoom = useMutation(api.member.leaveRoom);
+  const editMessage = useMutation(api.message.editMessage);
   const onSend = useCallback(
     async (messages: SendIMessage[]) => {
       try {
         if (edit) {
-          await editAsync({
-            messageId: edit.messageId,
-            senderId: convexIdOfLoggedInUser,
-            textToEdit: text,
+          setProcessing(true)
+          await editMessage({
+            message_id: edit.messageId,
+            sender_id: convexIdOfLoggedInUser,
+            text,
           });
           setEdit(null);
           setEditText(null);
@@ -95,6 +94,8 @@ const generateUploadUrl = useMutation(api.user.generateUploadUrl)
         }
       } catch (e) {
         console.log("Error message", e);
+      }finally {
+        setProcessing(false)
       }
     },
     [
@@ -103,7 +104,7 @@ const generateUploadUrl = useMutation(api.user.generateUploadUrl)
       sendMessage,
       replyMessage,
       edit,
-      editAsync,
+      editMessage,
       text,
     ],
   );
@@ -126,7 +127,7 @@ const generateUploadUrl = useMutation(api.user.generateUploadUrl)
     }
   }, []);
   const onDelete = useCallback(
-    async (messageId: string) => {
+    async (messageId: Id<"messages">) => {
       Alert.alert("This is irreversible", "Delete this message for everyone?", [
         {
           text: "Cancel",
@@ -135,13 +136,25 @@ const generateUploadUrl = useMutation(api.user.generateUploadUrl)
         },
         {
           text: "Delete",
-          onPress: () =>
-            deleteAsync({ messageId, userId: convexIdOfLoggedInUser }),
+          onPress: () => {
+            setProcessing(true);
+            try {
+              deleteMessage({
+                message_id: messageId,
+                sender_id: convexIdOfLoggedInUser,
+              });
+              toast.success("Message deleted");
+            } catch (e) {
+              toast.error(generateErrorMessage(e, "Failed to delete message"));
+            } finally {
+              setProcessing(false);
+            }
+          },
           style: "destructive",
         },
       ]);
     },
-    [convexIdOfLoggedInUser, deleteAsync],
+    [convexIdOfLoggedInUser, deleteMessage],
   );
   const handlePhotoTaken = useCallback((message: IMessage) => {
     console.log(message);
@@ -158,12 +171,9 @@ const generateUploadUrl = useMutation(api.user.generateUploadUrl)
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const { assets } = result;
         const filePromises = assets.map(async (asset) => {
-
-
-          const res = await uploadProfilePicture(generateUploadUrl, asset.uri)
+          const res = await uploadProfilePicture(generateUploadUrl, asset.uri);
           return {
             id: res?.storageId as Id<"_storage">,
-
           };
         });
 
@@ -199,10 +209,9 @@ const generateUploadUrl = useMutation(api.user.generateUploadUrl)
         const { assets } = result;
 
         const filePromises = assets.map(async (asset) => {
-          const res = await uploadProfilePicture(generateUploadUrl, asset.uri)
+          const res = await uploadProfilePicture(generateUploadUrl, asset.uri);
           return {
             id: res?.storageId as Id<"_storage">,
-
           };
         });
 
@@ -287,8 +296,7 @@ const generateUploadUrl = useMutation(api.user.generateUploadUrl)
       setProcessing(false);
     }
   };
-  console.log({replyMessage})
-  console.log({messages: results})
+
   return (
     <Wrapper>
       <ChatNav
@@ -301,7 +309,7 @@ const generateUploadUrl = useMutation(api.user.generateUploadUrl)
         isInPending={pendingMember}
         leaveRoom={onLeave}
       />
-      <LoadingModal visible={processing || isPendingDelete} />
+      <LoadingModal visible={processing} />
       {isMember && (
         <ChatComponent
           replyMessage={replyMessage}
@@ -314,7 +322,7 @@ const generateUploadUrl = useMutation(api.user.generateUploadUrl)
           onLoadMore={onLoadMore}
           onSend={handleSend}
           setText={setText}
-          sending={sending || isPendingEdit}
+          sending={sending || processing}
           setSending={setSending}
           isAttachImage={isAttachImage}
           setIsAttachImage={setIsAttachImage}

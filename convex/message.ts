@@ -1,4 +1,4 @@
-import {mutation, query, QueryCtx} from "@/convex/_generated/server";
+import {mutation, MutationCtx, query, QueryCtx,} from "@/convex/_generated/server";
 import {paginationOptsValidator} from "convex/server";
 import {ConvexError, v} from "convex/values";
 import {checkIfPendingMember, getUserProfile} from "@/convex/user";
@@ -99,9 +99,9 @@ export const sendMessage = mutation({
       throw new ConvexError("You are not a member of this room");
     }
 
-    let file_url = '';
-    if(args.file_id) {
-      file_url = await ctx.storage.getUrl(args.file_id) as string
+    let file_url = "";
+    if (args.file_id) {
+      file_url = (await ctx.storage.getUrl(args.file_id)) as string;
     }
 
     await ctx.db.insert("messages", {
@@ -113,5 +113,140 @@ export const sendMessage = mutation({
       last_message: args.message || "file",
       last_message_time: new Date().getTime(),
     });
+  },
+});
+
+export const editMessage = mutation({
+  args: {
+    text: v.string(),
+    message_id: v.id("messages"),
+    sender_id: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const messageToEdit = await ctx.db.get(args.message_id);
+    if (!messageToEdit) {
+      throw new ConvexError("Message not found");
+    }
+    if (messageToEdit.sender_id !== args.sender_id) {
+      throw new ConvexError("You are not authorized to edit this text");
+    }
+    await ctx.db.patch(messageToEdit._id, {
+      message: args.text,
+    });
+  },
+});
+
+export const deleteMessage = mutation({
+  args: {
+    sender_id: v.id("users"),
+    message_id: v.id("messages"),
+  },
+  handler: async (ctx, args) => {
+    await deleteMessageHelpFn(ctx, args.message_id, args.sender_id);
+  },
+});
+
+// helpers
+
+export const deleteMessageHelpFn = async (
+  ctx: MutationCtx,
+  message_id: Id<"messages">,
+  logged_in_user: Id<"users">,
+) => {
+  const messageToDelete = await ctx.db.get(message_id);
+  if (!messageToDelete) {
+    throw new ConvexError("Message not found");
+  }
+  const room = await ctx.db.get(messageToDelete.room_id);
+  if (!room) {
+    throw new ConvexError("Room not found");
+  }
+  if (messageToDelete.sender_id !== logged_in_user) {
+    throw new ConvexError("Unauthorized");
+  }
+  if (messageToDelete.file_id) {
+    await ctx.storage.delete(messageToDelete.file_id);
+  }
+  await findAndDeleteReplies(ctx, message_id);
+  await ctx.db.delete(message_id);
+  const messages = await ctx.db
+    .query("messages")
+    .withIndex("by_room_id", (q) => q.eq("room_id", messageToDelete.room_id))
+    .order("asc")
+    .collect();
+  await ctx.db.patch(room?._id, {
+    last_message: messages[messages.length - 1]?.message || "file",
+    last_message_time: messages[messages.length - 1]?._creationTime,
+  });
+};
+
+export const findAndDeleteReplies = async (
+  ctx: MutationCtx,
+  message_id: Id<"messages">,
+) => {
+  const isReplyTo = await ctx.db
+    .query("messages")
+    .withIndex("by_reply_to", (q) => q.eq("reply_to", message_id))
+    .collect();
+  if (isReplyTo.length > 0) {
+    for (const reply of isReplyTo) {
+      await ctx.db.patch(reply._id, {
+        reply_to: undefined,
+      });
+    }
+  }
+};
+
+export const reactToMessage = mutation({
+  args: {
+    messageId: v.id("messages"),
+    senderId: v.id("users"),
+    emoji: v.union(
+      v.literal("LIKE"),
+      v.literal("SAD"),
+      v.literal("LOVE"),
+      v.literal("WOW"),
+      v.literal("ANGRY"),
+      v.literal("LAUGH"),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const messageToReactTo = await ctx.db.get(args.messageId);
+    if (!messageToReactTo) {
+      throw new ConvexError("Message not found");
+    }
+
+    const isSenderAMember = await checkIfPendingMember(ctx, {
+      status: "ACCEPTED",
+      room_id: messageToReactTo.room_id,
+      member_to_join: args.senderId,
+    });
+
+    if (!isSenderAMember) {
+      throw new ConvexError("You are not a member of this group");
+    }
+
+    const reactionExists = await ctx.db
+      .query("reactions")
+      .withIndex("by_sender_message_id", (q) =>
+        q.eq("message_id", args.messageId).eq("user_id", args.senderId),
+      )
+      .first();
+
+    const isSameReaction = reactionExists?.emoji === args.emoji
+    if(reactionExists && isSameReaction) {
+      await ctx.db.delete(reactionExists._id,)
+      return
+    }
+
+    if(reactionExists) {
+      await ctx.db.delete(reactionExists._id)
+    }
+
+    await ctx.db.insert('reactions', {
+      emoji: args.emoji,
+      message_id: args.messageId,
+      user_id: args.senderId
+    })
   },
 });

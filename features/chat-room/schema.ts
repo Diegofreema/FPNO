@@ -1,4 +1,3 @@
-import {Models} from 'react-native-appwrite';
 import {z} from 'zod';
 // Custom validator for ImagePickerAsset
 export const imagePickerAssetSchema = z
@@ -30,6 +29,6 @@ export const joinRoomSchema = z.object({
   member_to_join: z.string(),
 });
 
-export type JoinType = z.infer<typeof joinRoomSchema>;
 
-export type JoinModelType = Models.Document & JoinType;
+
+

@@ -6,9 +6,9 @@ import {colors} from '@/constants';
 // import { emojis } from '@/data';
 import {emojis} from '@/data';
 import {SelectedMessage, useSelected,} from '@/features/chat-room/hook/use-selected';
-import {onReactToMessage} from '@/features/chat-room/server';
+
 import {useFileUrlStore} from '@/hooks/use-file-url';
-import {EditType2, FileType, IMessage, Reaction_Enum} from '@/types';
+import {EditType2, FileType, IMessage} from '@/types';
 import {Image} from 'expo-image';
 import {useRouter} from 'expo-router';
 import {CircleChevronDown, Reply} from 'lucide-react-native';
@@ -21,6 +21,8 @@ import {EmojiPickerModal} from './emoji-modal';
 import {RenderReply} from './render-reply';
 import {ChatMenu} from "@/features/chat/components/chat-menu";
 import {Id} from "@/convex/_generated/dataModel";
+import {useMutation} from "convex/react";
+import {api} from "@/convex/_generated/api";
 
 const { width } = Dimensions.get('window');
 type Props = BubbleProps<IMessage> & {
@@ -32,7 +34,7 @@ type Props = BubbleProps<IMessage> & {
     callback: (i?: number) => void | Promise<void>
   ): void;
   onEdit: (value: EditType2) => void;
-  onDelete: (messageId: string) => void;
+  onDelete: (messageId: Id<'messages'>) => void;
   loggedInUserId: Id<'users'>;
 };
 
@@ -67,7 +69,7 @@ export const RenderBubble = ({
 }: Props) => {
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
-
+  const onReactToMessage = useMutation(api.message.reactToMessage)
   const { selected, setSelected, removeSelected } = useSelected();
   const messageIsSelected = !!selected.find(
     (message) => message.messageId === currentMessage._id
@@ -110,9 +112,9 @@ export const RenderBubble = ({
   const handleEmojiSelect = async (emoji: string) => {
     try {
       await onReactToMessage({
-        messageId: currentMessage._id as string,
-        reaction: emoji as Reaction_Enum,
-        senderId: loggedInUserId as string,
+        messageId: currentMessage._id as Id<'messages'>,
+        emoji: emoji as any,
+        senderId: loggedInUserId as Id<'users'>,
       });
     } catch (error) {
       console.error('Error adding reaction:', error);
@@ -230,7 +232,7 @@ export const RenderBubble = ({
       ? [
           {
             text: 'Delete',
-            onSelect: () => onDelete(currentMessage._id as string),
+            onSelect: () => onDelete(currentMessage._id as Id<'messages'>),
           },
         ]
       : []),
@@ -248,7 +250,7 @@ export const RenderBubble = ({
             text: 'Edit',
             onSelect: () =>
               onEdit({
-                messageId: currentMessage._id as string,
+                messageId: currentMessage._id as Id<'messages'>,
                 textToEdit: currentMessage.text,
                 senderId: currentMessage.user._id,
                 senderName: currentMessage.user.name,

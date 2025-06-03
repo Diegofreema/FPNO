@@ -7,11 +7,12 @@ import {HStack} from '@/components/ui/h-stack';
 import {colors} from '@/constants';
 import {useAuth} from '@/lib/zustand/useAuth';
 import {router} from 'expo-router';
+import {trimText} from "@/helper";
 
 export const ProfileHeader = () => {
   const { user } = useAuth();
 
-  const name = user?.name ?? 'N/A'
+  const name = trimText(user?.name || 'N/A', 12)
   const matricNumber = user?.matricnumber ?? 'N/A'!;
   return (
     <HStack

@@ -67,7 +67,6 @@
     "react-dom": "19.0.0",
     "react-hook-form": "^7.56.3",
     "react-native": "0.79.2",
-    "react-native-appwrite": "^0.7.3",
     "react-native-blob-util": "^0.21.2",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-get-random-values": "~1.11.0",
@@ -101,11 +100,6 @@
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0"
   },
-  "overrides": {
-    "react-native-appwrite": {
-      "expo-file-system": "18.*.*",
-      "react-native": ">=0.76.7 <1.0.0"
-    }
-  },
+  
   "private": true
 }

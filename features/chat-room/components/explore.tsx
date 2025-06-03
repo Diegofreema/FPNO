@@ -33,7 +33,7 @@ export const Explore = () => {
     status: searchStatus,
     results: searchResults,
   } = searchRooms;
-  const pending = isLoading || isLoadingSearch;
+  const pending = isLoading || results === undefined;
   if (pending) {
     return <Loading />;
   }

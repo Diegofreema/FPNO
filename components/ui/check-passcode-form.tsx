@@ -1,38 +1,31 @@
-import { useAuth } from '@/lib/zustand/useAuth';
-import { useFingerPrint } from '@/lib/zustand/useFingerPrint';
-import { usePassCode } from '@/lib/zustand/usePasscode';
-import { useIsLocked, usePath } from '@/lib/zustand/usePath';
-import * as Haptics from 'expo-haptics';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
-import {
-  Dimensions,
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {useAuth} from "@/lib/zustand/useAuth";
+import {useFingerPrint} from "@/lib/zustand/useFingerPrint";
+import {usePassCode} from "@/lib/zustand/usePasscode";
+import {useIsLocked, usePath} from "@/lib/zustand/usePath";
+import * as Haptics from "expo-haptics";
+import {router, useLocalSearchParams} from "expo-router";
+import {useCallback, useEffect, useState} from "react";
+import {Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
   withSequence,
   withTiming,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
-import { colors } from '@/constants';
-import { useShowToast } from '@/lib/zustand/useShowToast';
-import { IconBackspace } from '@tabler/icons-react-native';
-import { MotiView } from 'moti';
-import { RFPercentage } from 'react-native-responsive-fontsize';
-import { AnimatedContainerCheckPasscode } from '../animated/animated-container';
-import { Title } from '../typography/title';
+import {colors} from "@/constants";
+import {useShowToast} from "@/lib/zustand/useShowToast";
+import {IconBackspace} from "@tabler/icons-react-native";
+import {MotiView} from "moti";
+import {RFPercentage} from "react-native-responsive-fontsize";
+import {AnimatedContainerCheckPasscode} from "../animated/animated-container";
+import {Title} from "../typography/title";
 
 const OFFSET = 20;
 const TIME = 80;
-const dialPads = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, 'del'];
-const { width } = Dimensions.get('window');
+const dialPads = [1, 2, 3, 4, 5, 6, 7, 8, 9, "", 0, "del"];
+const { width } = Dimensions.get("window");
 const pinLength = 4;
 const pinContainerSize = width / 2;
 const pinMaxSize = pinContainerSize / pinLength;
@@ -44,9 +37,11 @@ const dialPadItemSize = dialPadSize * 0.3;
 export const CheckPasscodeForm = () => {
   const [pin, setPin] = useState<number[]>([]);
   const storedPath = usePath((state) => state.currentPath);
-  const { action } = useLocalSearchParams<{ action: 'delete' | 'change' }>();
+  const { action } = useLocalSearchParams<{ action: "delete" | "change" }>();
+  const actionIsChange = action === "change";
+  const actionIsDelete = action === "delete";
   const code = usePassCode((state) => state.passCode);
-  const formattedCode = code.replace(/,/g, '');
+  const formattedCode = code.replace(/,/g, "");
   const getPassCode = usePassCode((state) => state.getPassCode);
   const turnOffPassCode = usePassCode((state) => state.togglePassCode);
   const isLock = useFingerPrint((state) => state.lock);
@@ -59,9 +54,9 @@ export const CheckPasscodeForm = () => {
 
   const offSet = useSharedValue(0);
   const onPress = (item: (typeof dialPads)[number]) => {
-    if (item === 'del' && code.length > 0) {
+    if (item === "del" && code.length > 0) {
       setPin((prev) => prev?.slice(0, prev?.length - 1));
-    } else if (typeof item === 'number') {
+    } else if (typeof item === "number") {
       if (code.length === pinLength) return;
       setPin((prev) => [...prev, item]);
     }
@@ -79,14 +74,16 @@ export const CheckPasscodeForm = () => {
           offSet.value = withSequence(
             withTiming(-OFFSET, { duration: TIME / 2 }),
             withRepeat(withTiming(OFFSET, { duration: TIME }), 4, true),
-            withTiming(0, { duration: TIME / 2 })
+            withTiming(0, { duration: TIME / 2 }),
           );
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          void Haptics.notificationAsync(
+            Haptics.NotificationFeedbackType.Error,
+          );
           setPin([]);
           onShowToast({
-            message: 'Error',
-            description: 'Pin does not match',
-            type: 'error',
+            message: "Error",
+            description: "Pin does not match",
+            type: "error",
           });
         } else {
           setIsCorrect(true);
@@ -107,7 +104,7 @@ export const CheckPasscodeForm = () => {
       unlock,
       unlockDevice,
       unlockDeviceWithPin,
-    ]
+    ],
   );
   //   const displayText = action === 'change' ? 'Enter'
   const onDelete = useCallback(
@@ -115,87 +112,89 @@ export const CheckPasscodeForm = () => {
       setTimeout(() => {
         if (text === formattedCode) {
           turnOffPassCode(false);
-          getPassCode('');
+          getPassCode("");
           router.back();
 
           onShowToast({
-            message: 'Success',
-            description: 'Pass code deleted successfully',
-            type: 'success',
+            message: "Success",
+            description: "Pass code deleted successfully",
+            type: "success",
           });
         } else {
           offSet.value = withSequence(
             withTiming(-OFFSET, { duration: TIME / 2 }),
             withRepeat(withTiming(OFFSET, { duration: TIME }), 4, true),
-            withTiming(0, { duration: TIME / 2 })
+            withTiming(0, { duration: TIME / 2 }),
           );
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          void Haptics.notificationAsync(
+            Haptics.NotificationFeedbackType.Error,
+          );
 
           onShowToast({
-            message: 'Error',
-            description: 'Pass code does not match',
-            type: 'error',
+            message: "Error",
+            description: "Pass code does not match",
+            type: "error",
           });
         }
       }, 500);
     },
-    [formattedCode, getPassCode, offSet, turnOffPassCode, onShowToast]
+    [formattedCode, getPassCode, offSet, turnOffPassCode, onShowToast],
   );
   const onEdit = useCallback(
     (text: string) => {
       if (text === formattedCode) {
-        router.push('/passcode?action=change');
+        router.push("/passcode?action=change");
 
         setTimeout(() => setPin([]), 500);
       } else {
         offSet.value = withSequence(
           withTiming(-OFFSET, { duration: TIME / 2 }),
           withRepeat(withTiming(OFFSET, { duration: TIME }), 4, true),
-          withTiming(0, { duration: TIME / 2 })
+          withTiming(0, { duration: TIME / 2 }),
         );
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         setTimeout(() => setPin([]), 500);
 
         onShowToast({
-          message: 'Error',
-          description: 'Pass code does not match',
-          type: 'error',
+          message: "Error",
+          description: "Pass code does not match",
+          type: "error",
         });
       }
     },
-    [formattedCode, offSet, onShowToast]
+    [formattedCode, offSet, onShowToast],
   );
   const onVerifyPin = useCallback(
     (text: string) => {
-      if (action === 'change') {
+      if (actionIsChange) {
         onEdit(text);
-      } else if (action === 'delete') {
+      } else if (actionIsDelete) {
         onDelete(text);
       } else {
         onLogBackIn(text);
       }
     },
-    [action, onDelete, onEdit, onLogBackIn]
+    [actionIsChange, actionIsDelete, onDelete, onEdit, onLogBackIn],
   );
   const onPasswordLogin = () => {
     removeUser();
-    router.replace('/login');
+    router.replace("/login");
   };
 
   useEffect(() => {
     const isValidLength = pin.length === pinLength;
     if (isValidLength) {
-      onVerifyPin(pin.join(''));
+      onVerifyPin(pin.join(""));
     }
   }, [pin, onVerifyPin]);
-  const hide = action !== 'change' && action !== 'delete';
-
+  const hide = !actionIsChange && !actionIsDelete;
+  const isAction = actionIsChange && actionIsDelete;
   return (
     <AnimatedContainerCheckPasscode>
       <View
         style={{
-          alignItems: 'center',
-          justifyContent: 'center',
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <Animated.View style={[styles.pinContainer, animatedStyle]}>
@@ -207,10 +206,10 @@ export const CheckPasscodeForm = () => {
                 style={[
                   styles.pin,
                   {
-                    backgroundColor: isCorrect ? 'green' : colors.black,
+                    backgroundColor: isCorrect ? "green" : colors.black,
                   },
                 ]}
-                transition={{ type: 'timing', duration: 100 }}
+                transition={{ type: "timing", duration: 100 }}
                 animate={{
                   height: isSelected ? pinSize : 2,
                   marginBottom: isSelected ? pinSize / 2 : 0,
@@ -219,17 +218,19 @@ export const CheckPasscodeForm = () => {
             );
           })}
         </Animated.View>
-        <Text
-          style={{
-            color: 'red',
-            fontSize: RFPercentage(1.7),
-            fontFamily: 'NunitoBold',
-            marginBottom: 10,
-          }}
-          onPress={() => router.push('/forgot-pin')}
-        >
-          Forgot your pin?
-        </Text>
+        {!actionIsChange && (
+          <Text
+            style={{
+              color: "red",
+              fontSize: RFPercentage(1.7),
+              fontFamily: "NunitoBold",
+              marginBottom: 10,
+            }}
+            onPress={() => router.push("/forgot-pin")}
+          >
+            Forgot your pin?
+          </Text>
+        )}
         <FlatList
           style={{ flexGrow: 0 }}
           showsVerticalScrollIndicator={false}
@@ -237,16 +238,16 @@ export const CheckPasscodeForm = () => {
           data={dialPads}
           renderItem={({ item }) => (
             <TouchableOpacity
-              disabled={item === ''}
+              disabled={item === ""}
               onPress={() => onPress(item)}
             >
               <View
                 style={[
                   styles.container,
-                  { borderWidth: item === '' || item === 'del' ? 0 : 1 },
+                  { borderWidth: item === "" || item === "del" ? 0 : 1 },
                 ]}
               >
-                {item === 'del' ? (
+                {item === "del" ? (
                   <IconBackspace
                     color={colors.black}
                     size={dialPadItemSize * 2}
@@ -263,12 +264,12 @@ export const CheckPasscodeForm = () => {
           columnWrapperStyle={{ gap: spacing }}
           ListFooterComponent={() => (
             <View
-              style={{ flexDirection: 'row', gap: 5, justifyContent: 'center' }}
+              style={{ flexDirection: "row", gap: 5, justifyContent: "center" }}
             >
-              {isLock && (
+              {isLock && !isAction && (
                 <TouchableOpacity
-                  onPress={() => router.push('/lock')}
-                  style={{ alignItems: 'center' }}
+                  onPress={() => router.push("/lock")}
+                  style={{ alignItems: "center" }}
                 >
                   <Title
                     text="Login with fingerprint"
@@ -292,14 +293,14 @@ export const CheckPasscodeForm = () => {
                 <TouchableOpacity
                   onPress={onPasswordLogin}
                   style={{
-                    marginTop: 'auto',
-                    alignItems: 'center',
+                    marginTop: "auto",
+                    alignItems: "center",
                     marginBottom: 50,
                   }}
                 >
                   <Title
                     text="Login with password"
-                    textStyle={{ color: 'red', fontSize: RFPercentage(1.6) }}
+                    textStyle={{ color: "red", fontSize: RFPercentage(1.6) }}
                   />
                 </TouchableOpacity>
               )}
@@ -317,20 +318,20 @@ const styles = StyleSheet.create({
     width: dialPadSize,
     height: dialPadSize,
     borderRadius: dialPadSize,
-    borderColor: 'black',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderColor: "black",
+    justifyContent: "center",
+    alignItems: "center",
   },
   text: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: dialPadItemSize,
-    fontFamily: 'NunitoRegular',
+    fontFamily: "NunitoRegular",
     color: colors.black,
   },
   pinContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: pinSpacing * 2,
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
     marginBottom: spacing * 2,
     height: pinSize * 2,
   },
@@ -342,10 +343,10 @@ const styles = StyleSheet.create({
   },
   resendContainer: {
     marginBottom: 20,
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   resend: {
     color: colors.lightblue,
-    fontFamily: 'NunitoBold',
+    fontFamily: "NunitoBold",
   },
 });

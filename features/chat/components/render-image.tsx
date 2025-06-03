@@ -1,18 +1,19 @@
-import { Image } from 'expo-image';
-import { useCallback, useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { IMessage, MessageImageProps } from 'react-native-gifted-chat';
+import {Image} from 'expo-image';
+import {useCallback, useState} from 'react';
+import {StyleSheet} from 'react-native';
+import {IMessage, MessageImageProps} from 'react-native-gifted-chat';
 
-import { CustomPressable } from '@/components/ui/custom-pressable';
-import { ActionSheetOptions } from '@expo/react-native-action-sheet';
-import { PreviewModal } from './preview-modal';
+import {CustomPressable} from '@/components/ui/custom-pressable';
+import {ActionSheetOptions} from '@expo/react-native-action-sheet';
+import {PreviewModal} from './preview-modal';
+import {Id} from "@/convex/_generated/dataModel";
 
 type Props = MessageImageProps<IMessage> & {
   showActionSheetWithOptions(
     options: ActionSheetOptions,
     callback: (i?: number) => void | Promise<void>
   ): void;
-  onDelete: (messageId: string) => void;
+  onDelete: (messageId: Id<'messages'>) => void;
 };
 export const RenderImage = ({
   onDelete,
@@ -36,7 +37,7 @@ export const RenderImage = ({
         console.log(selectedIndex);
         switch (selectedIndex) {
           case destructiveButtonIndex:
-            onDelete(props.currentMessage._id as string);
+            onDelete(props.currentMessage._id as Id<'messages'>);
             break;
 
           case cancelButtonIndex:
