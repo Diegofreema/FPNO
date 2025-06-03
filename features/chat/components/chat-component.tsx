@@ -66,7 +66,8 @@ const ChatComponent = ({
   editText,
   setEditText,
 }: Props) => {
-  const loggedInUserId = useAuth((state) => state.user?.id!);
+  const loggedInUserId = useAuth((state) => state.user?.convexId!);
+  console.log({convex: loggedInUserId})
   const insets = useSafeAreaInsets();
   const [visible, setVisible] = useState(false);
   const disabled = sending || text.length === 0;

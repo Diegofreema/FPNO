@@ -1,7 +1,6 @@
 import {LoadingModal} from "@/components/typography/loading-modal";
 import {Loading} from "@/components/ui/loading";
 import {Wrapper} from "@/components/ui/wrapper";
-import {useSendMessage} from "@/features/chat-room/api/use-send-message";
 import {useDeleteMessage} from "@/features/chat/api/use-delete-message";
 import {useEditMessage} from "@/features/chat/api/use-edit-message";
 import ChatComponent from "@/features/chat/components/chat-component";
@@ -30,7 +29,7 @@ const ChatId = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const { mutateAsync, isPending: isSendingMessage } = useSendMessage();
+  const sendMessage = useMutation(api.message.sendMessage);
   const [isAttachImage, setIsAttachImage] = useState(false);
   const [editText, setEditText] = useState<EditType | null>(null);
   const [edit, setEdit] = useState<{
@@ -83,14 +82,14 @@ const ChatId = () => {
             setReplyMessage(null);
           }
           for (const message of messages) {
-            await mutateAsync({
+            await sendMessage({
               message: message.text,
-              channel_id: chatId,
-              senderId: convexIdOfLoggedInUser,
-              fileType: message.fileType,
-              fileUrl: message.fileUrl,
-              fileId: message.fileId,
-              replyTo: message.replyTo,
+              room_id: chatId,
+              sender_id: convexIdOfLoggedInUser,
+              file_type: message.fileType,
+              file_url: message.fileUrl,
+              file_id: message.fileId,
+              reply_to: message.replyTo,
             });
           }
         }
@@ -101,7 +100,7 @@ const ChatId = () => {
     [
       chatId,
       convexIdOfLoggedInUser,
-      mutateAsync,
+      sendMessage,
       replyMessage,
       edit,
       editAsync,
@@ -113,7 +112,7 @@ const ChatId = () => {
       const message = {
         text,
         user: { _id: convexIdOfLoggedInUser },
-        replyTo: replyMessage?._id as string,
+        replyTo: replyMessage?._id as Id<"messages">,
       };
       await onSend([message]);
       setText("");
@@ -173,7 +172,7 @@ const ChatId = () => {
           const { id, link } = await generateImageUrl(file);
 
           return {
-            id,
+            id: id as Id<"_storage">,
             link,
           };
         });
@@ -221,7 +220,7 @@ const ChatId = () => {
           const { id, link } = await generateImageUrl(file);
 
           return {
-            id,
+            id: id as Id<"_storage">,
             link,
           };
         });
@@ -291,8 +290,6 @@ const ChatId = () => {
     return <Redirect href={"/chat"} />;
   }
 
-
-
   const followersText = `${formatNumber(room?.member_count)} ${
     room?.member_count > 1 ? "members" : "member"
   }`;
@@ -310,7 +307,8 @@ const ChatId = () => {
       setProcessing(false);
     }
   };
-
+  console.log({replyMessage})
+  console.log({messages: results})
   return (
     <Wrapper>
       <ChatNav
@@ -336,7 +334,7 @@ const ChatId = () => {
           onLoadMore={onLoadMore}
           onSend={handleSend}
           setText={setText}
-          sending={sending || isSendingMessage || isPendingEdit}
+          sending={sending || isPendingEdit}
           setSending={setSending}
           isAttachImage={isAttachImage}
           setIsAttachImage={setIsAttachImage}

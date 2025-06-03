@@ -20,6 +20,7 @@ import {toast} from 'sonner-native';
 import {EmojiPickerModal} from './emoji-modal';
 import {RenderReply} from './render-reply';
 import {ChatMenu} from "@/features/chat/components/chat-menu";
+import {Id} from "@/convex/_generated/dataModel";
 
 const { width } = Dimensions.get('window');
 type Props = BubbleProps<IMessage> & {
@@ -32,7 +33,7 @@ type Props = BubbleProps<IMessage> & {
   ): void;
   onEdit: (value: EditType2) => void;
   onDelete: (messageId: string) => void;
-  loggedInUserId: string;
+  loggedInUserId: Id<'users'>;
 };
 
 function LeftAction(
@@ -103,7 +104,7 @@ export const RenderBubble = ({
   const findEmojiISelected = currentMessage.reactions?.find(
     (reaction) => reaction.user_id === loggedInUserId
   );
-
+  console.log({loggedInUserId})
   const isSent = currentMessage.user._id === loggedInUserId;
 
   const handleEmojiSelect = async (emoji: string) => {

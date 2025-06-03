@@ -254,8 +254,8 @@ export interface SendIMessage {
   fileType?: FileType;
   audio?: string;
   fileUrl?: string;
-  fileId?: string;
-  replyTo?: string;
+  fileId?: Id<'_storage'>;
+  replyTo?: Id<'messages'>;
 }
 
 export type FileType = 'pdf' | 'image' | 'audio';
