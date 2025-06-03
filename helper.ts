@@ -6,9 +6,10 @@ import * as Sharing from 'expo-sharing';
 import {ID, Query} from 'react-native-appwrite';
 import {BUCKET_ID, CHAT_COLLECTION_ID, CHAT_MESSAGES_COLLECTION_ID, DATABASE_ID, PROJECT_ID,} from './config';
 import {databases, storage} from './db/appwrite';
-import {ChannelType, ChatMessageType, MemberType, userData} from './types';
+import {ChannelType, ChatMessageType, MemberType, RoomMemberType, userData} from './types';
 import {Platform} from "react-native";
 import {Id} from "@/convex/_generated/dataModel";
+import {ConvexError} from "convex/values";
 
 export const sendEmail = async (email: string, otp: string) => {
   const { data } = await axios.get(
@@ -314,13 +315,8 @@ export const formatNumber = (num: number): string => {
 
 
 
-export const generateErrorMessage = (
-  error: unknown,
-  message: string
-): string => {
-  return error instanceof Error ? error.message : message;
-
-
+export const generateErrorMessage = (error: unknown, message: string): string => {
+  return error instanceof ConvexError ? (error.data as string) : message;
 };
 
 
@@ -446,3 +442,14 @@ export const uploadProfilePicture = async (
 
   return { storageId, uploadUrl };
 };
+
+
+export const sortMembersByRole = (members: RoomMemberType[]): RoomMemberType[] => {
+  return [...members].sort((a, b) => {
+    if (a.access_role === "ADMIN" && b.access_role !== "ADMIN") return -1;
+    if (a.access_role !== "ADMIN" && b.access_role === "ADMIN") return 1;
+    return 0;
+  });
+};
+
+

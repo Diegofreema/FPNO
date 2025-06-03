@@ -5,7 +5,6 @@ import {PendingMemberBanner} from "@/features/chat-room/components/pending-membe
 import {RoomInfo} from "@/features/chat/components/room-info";
 import {RoomInfoTop} from "@/features/chat/components/room-info-top";
 import {useAuth} from "@/lib/zustand/useAuth";
-import {MemberAccessRole} from "@/types";
 import {Redirect, useLocalSearchParams, useRouter} from "expo-router";
 import React from "react";
 import {Menu} from "@/components/dropdown-menu";
@@ -17,7 +16,7 @@ import {toast} from "sonner-native";
 const RoomInfoScreen = () => {
   const { roomId } = useLocalSearchParams<{ roomId: Id<"rooms"> }>();
 
-  const id = useAuth((state) => state.user?.convexId);
+  const id = useAuth((state) => state.user?.convexId!);
   const room = useQuery(api.room.room, { room_id: roomId });
   const membersData = usePaginatedQuery(
     api.room.getRoomMembers,
@@ -27,12 +26,13 @@ const RoomInfoScreen = () => {
   const pendingMemberCount = useQuery(api.room.getRoomPendingMembersCount, {
     room_id: roomId,
   });
+  const isMember = useQuery(api.room.isMember, {room_id: roomId,member_id: id})
 
   const router = useRouter();
 
   const { status, isLoading, loadMore, results } = membersData;
 
-  const isPending = room === undefined || pendingMemberCount === undefined;
+  const isPending = room === undefined || pendingMemberCount === undefined || isMember === undefined;
 
   if (isPending) {
     return <Loading />;
@@ -41,6 +41,11 @@ const RoomInfoScreen = () => {
     toast("Room does not exist!!!");
     return <Redirect href="/chat" />;
   }
+  if(!isMember) {
+    toast("You are not a member of this room!!!");
+    return <Redirect href="/chat" />;
+  }
+
   const onSelect = () => {
     router.push(`/chat/edit?roomId=${roomId}`);
   };
@@ -51,12 +56,8 @@ const RoomInfoScreen = () => {
   };
 
   const isCreator = room.creator_id === id;
-  // to fix
-  const loggedInMember = results.find((member) => member.member_id === id);
 
-  const isLoggedInUserAdmin = !!(
-    loggedInMember && loggedInMember.access_role === MemberAccessRole.ADMIN
-  );
+  const isLoggedInUserAdmin = room.adminMembers.includes(id!);
 
   const showBanner = isCreator || isLoggedInUserAdmin;
   return (

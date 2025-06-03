@@ -1,58 +1,89 @@
-import { LoadingModal } from '@/components/typography/loading-modal';
-import { useAccept } from '@/features/chat-room/api/use-accept';
-import { useDecline } from '@/features/chat-room/api/use-decline';
-import { MemberWithUserProfile } from '@/types';
-import { LegendList } from '@legendapp/list';
-import React from 'react';
-import { View } from 'react-native';
-import { ChatMenu } from './chat-menu';
-import { User } from './user';
+import {LoadingModal} from "@/components/typography/loading-modal";
+import {RoomMemberType} from "@/types";
+import {LegendList} from "@legendapp/list";
+import React, {useState} from "react";
+import {View} from "react-native";
+import {ChatMenu} from "./chat-menu";
+import {User} from "./user";
+import {Id} from "@/convex/_generated/dataModel";
+import {useMutation} from "convex/react";
+import {api} from "@/convex/_generated/api";
+import {toast} from "sonner-native";
+import {generateErrorMessage} from "@/helper";
 
 type Props = {
-  users: MemberWithUserProfile[];
+  users: RoomMemberType[];
   handleMore: () => void;
-  onRefresh: () => void;
-  refreshing: boolean;
-  roomId: string;
+
+  roomId: Id<"rooms">;
 };
 
 export const PendingMembers = ({
   users,
   handleMore,
-  onRefresh,
-  refreshing,
+
   roomId,
 }: Props) => {
-  const { mutateAsync: accept, isPending: isAccepting } = useAccept();
-  const { mutateAsync: decline, isPending: isDeclining } = useDecline();
-  const isVisible = isAccepting || isDeclining;
+  const [sending, setSending] = useState(false);
 
+
+
+  const acceptRequest = useMutation(api.room.acceptRequest);
+  const declineRequest = useMutation(api.room.declineRequest);
+
+  const onAccept = async (roomId: Id<"rooms">, memberId: Id<"users">) => {
+    setSending(true);
+    try {
+      await acceptRequest({
+        room_id: roomId,
+        member_to_join: memberId,
+      });
+      toast.success("Request accepted");
+    } catch (e) {
+      const errorMessage = generateErrorMessage(e, "Failed to accept request");
+      toast.error(errorMessage);
+    } finally {
+      setSending(false);
+    }
+  };
+  const onDecline = async (roomId: Id<"rooms">, memberId: Id<"users">) => {
+    setSending(true);
+    try {
+      await declineRequest({
+        room_id: roomId,
+        member_to_join: memberId,
+      });
+      toast.success("Request declined");
+    } catch (e) {
+      const errorMessage = generateErrorMessage(e, "Failed to decline request");
+      toast.error(errorMessage);
+    } finally {
+      setSending(false);
+    }
+  };
   return (
     <View style={{ flex: 1 }}>
       <LegendList
         data={users}
-        keyExtractor={(item) => item.$id}
+        keyExtractor={(item) => item._id}
         recycleItems
-        refreshing={refreshing}
-        onRefresh={onRefresh}
         onEndReached={handleMore}
         onEndReachedThreshold={0.5}
         renderItem={({ item }) => (
           <User
-            user={item.user}
+            user={item.user!}
             rightContent={
               <ChatMenu
-                disable={isAccepting || isDeclining}
+                disable={sending}
                 menuItems={[
                   {
-                    text: 'Accept',
-                    onSelect: () =>
-                      accept({ roomId, memberId: item.member_id }),
+                    text: "Accept",
+                    onSelect: () => onAccept(roomId, item.member_id),
                   },
                   {
-                    text: 'Decline',
+                    text: "Decline",
                     onSelect: () =>
-                      decline({ roomId, memberId: item.member_id }),
+                        onDecline( roomId, item.member_id ),
                   },
                 ]}
               />
@@ -61,7 +92,7 @@ export const PendingMembers = ({
         )}
         contentContainerStyle={{ gap: 15 }}
       />
-      <LoadingModal visible={isVisible} />
+      <LoadingModal visible={sending} />
     </View>
   );
 };

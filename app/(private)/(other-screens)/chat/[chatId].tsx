@@ -1,33 +1,32 @@
-import {LoadingModal} from '@/components/typography/loading-modal';
-import {Loading} from '@/components/ui/loading';
-import {Wrapper} from '@/components/ui/wrapper';
-import {useLeave} from '@/features/chat-room/api/use-leave';
-import {useSendMessage} from '@/features/chat-room/api/use-send-message';
-import {useDeleteMessage} from '@/features/chat/api/use-delete-message';
-import {useEditMessage} from '@/features/chat/api/use-edit-message';
-import ChatComponent from '@/features/chat/components/chat-component';
-import {ChatNav} from '@/features/chat/components/chat-nav';
-import {formatNumber, generateImageUrl} from '@/helper';
-import {useAuth} from '@/lib/zustand/useAuth';
-import {EditType, EditType2, FileType, IMessage, ReplyType, SendIMessage} from '@/types';
-import {useActionSheet} from '@expo/react-native-action-sheet';
-import * as Clipboard from 'expo-clipboard';
-import * as DocumentPicker from 'expo-document-picker';
-import {usePaginatedQuery, useQuery as useConvexQuery} from 'convex/react'
-import * as ImagePicker from 'expo-image-picker';
-import {Redirect, useLocalSearchParams, usePathname, useRouter} from 'expo-router';
-import React, {useCallback, useState} from 'react';
-import {Alert} from 'react-native';
-import {toast} from 'sonner-native';
+import {LoadingModal} from "@/components/typography/loading-modal";
+import {Loading} from "@/components/ui/loading";
+import {Wrapper} from "@/components/ui/wrapper";
+import {useSendMessage} from "@/features/chat-room/api/use-send-message";
+import {useDeleteMessage} from "@/features/chat/api/use-delete-message";
+import {useEditMessage} from "@/features/chat/api/use-edit-message";
+import ChatComponent from "@/features/chat/components/chat-component";
+import {ChatNav} from "@/features/chat/components/chat-nav";
+import {formatNumber, generateErrorMessage, generateImageUrl} from "@/helper";
+import {useAuth} from "@/lib/zustand/useAuth";
+import {EditType, EditType2, FileType, IMessage, ReplyType, SendIMessage,} from "@/types";
+import {useActionSheet} from "@expo/react-native-action-sheet";
+import * as Clipboard from "expo-clipboard";
+import * as DocumentPicker from "expo-document-picker";
+import {useMutation, usePaginatedQuery, useQuery as useConvexQuery,} from "convex/react";
+import * as ImagePicker from "expo-image-picker";
+import {Redirect, useLocalSearchParams, usePathname, useRouter,} from "expo-router";
+import React, {useCallback, useState} from "react";
+import {Alert} from "react-native";
+import {toast} from "sonner-native";
 import {api} from "@/convex/_generated/api";
 import {Id} from "@/convex/_generated/dataModel";
 
 const ChatId = () => {
-  const { chatId } = useLocalSearchParams<{ chatId: Id<'rooms'> }>();
-  const loggedInUser = useAuth((state) => state.user?.id!);
+  const { chatId } = useLocalSearchParams<{ chatId: Id<"rooms"> }>();
+  // const convexIdOfLoggedInUser = useAuth((state) => state.user?.convexId!);
   const convexIdOfLoggedInUser = useAuth((state) => state.user?.convexId!);
-
-  const [text, setText] = useState('');
+  const [processing, setProcessing] = useState(false);
+  const [text, setText] = useState("");
   const router = useRouter();
   const pathname = usePathname();
 
@@ -42,7 +41,6 @@ const ChatId = () => {
 
   const { showActionSheetWithOptions } = useActionSheet();
 
-
   const onOpenCamera = useCallback(() => {
     router.push(`/camera?path=${pathname}`);
   }, [router, pathname]);
@@ -50,91 +48,110 @@ const ChatId = () => {
     useDeleteMessage();
   const [sending, setSending] = useState(false);
 
- const room = useConvexQuery(api.room.room, {room_id: chatId})
-  const isMember = useConvexQuery(api.room.isMember, {room_id: chatId, member_id: convexIdOfLoggedInUser})
-  const pendingMember = useConvexQuery(api.room.isInPending, {room_id: chatId, member_id: convexIdOfLoggedInUser})
-  const messages = usePaginatedQuery(api.message.getMessages,  {room_id: chatId}, {initialNumItems: 50})
+  const room = useConvexQuery(api.room.room, { room_id: chatId });
+  const isMember = useConvexQuery(api.room.isMember, {
+    room_id: chatId,
+    member_id: convexIdOfLoggedInUser,
+  });
+  const pendingMember = useConvexQuery(api.room.isInPending, {
+    room_id: chatId,
+    member_id: convexIdOfLoggedInUser,
+  });
+  const messages = usePaginatedQuery(
+    api.message.getMessages,
+    { room_id: chatId },
+    { initialNumItems: 50 },
+  );
 
   const { mutateAsync: editAsync, isPending: isPendingEdit } = useEditMessage();
-  const isCreator = room?.creator_id === convexIdOfLoggedInUser
+  const isCreator = room?.creator_id === convexIdOfLoggedInUser;
 
-  const { mutateAsync: leaveRoom, isPending: isLeaving } = useLeave();
+  const leaveRoom = useMutation(api.member.leaveRoom);
   const onSend = useCallback(
     async (messages: SendIMessage[]) => {
-    try {
-      if (edit) {
-        await editAsync({
-          messageId: edit.messageId,
-          senderId: loggedInUser,
-          textToEdit: text,
-        });
-        setEdit(null);
-        setEditText(null);
-      } else {
-        if (replyMessage) {
-          setReplyMessage(null);
-        }
-        for (const message of messages) {
-          await mutateAsync({
-            message: message.text,
-            channel_id: chatId,
-            senderId: loggedInUser,
-            fileType: message.fileType,
-            fileUrl: message.fileUrl,
-            fileId: message.fileId,
-            replyTo: message.replyTo,
+      try {
+        if (edit) {
+          await editAsync({
+            messageId: edit.messageId,
+            senderId: convexIdOfLoggedInUser,
+            textToEdit: text,
           });
+          setEdit(null);
+          setEditText(null);
+        } else {
+          if (replyMessage) {
+            setReplyMessage(null);
+          }
+          for (const message of messages) {
+            await mutateAsync({
+              message: message.text,
+              channel_id: chatId,
+              senderId: convexIdOfLoggedInUser,
+              fileType: message.fileType,
+              fileUrl: message.fileUrl,
+              fileId: message.fileId,
+              replyTo: message.replyTo,
+            });
+          }
         }
+      } catch (e) {
+        console.log("Error message", e);
       }
-    }catch (e) {
-      console.log('Error message', e)
-    }
     },
-    [chatId, loggedInUser, mutateAsync, replyMessage, edit, editAsync, text]
+    [
+      chatId,
+      convexIdOfLoggedInUser,
+      mutateAsync,
+      replyMessage,
+      edit,
+      editAsync,
+      text,
+    ],
   );
   const handleSend = async () => {
     if (text.trim()) {
       const message = {
         text,
-        user: { _id: loggedInUser },
+        user: { _id: convexIdOfLoggedInUser },
         replyTo: replyMessage?._id as string,
       };
       await onSend([message]);
-      setText('');
+      setText("");
     }
   };
 
   const copyToClipboard = useCallback(async (textToCopy: string) => {
     const copied = await Clipboard.setStringAsync(textToCopy);
     if (copied) {
-      toast.success('Copied to clipboard');
+      toast.success("Copied to clipboard");
     }
   }, []);
   const onDelete = useCallback(
     async (messageId: string) => {
-      Alert.alert('This is irreversible', 'Delete this message for everyone?', [
+      Alert.alert("This is irreversible", "Delete this message for everyone?", [
         {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
         },
         {
-          text: 'Delete',
-          onPress: () => deleteAsync({ messageId, userId: loggedInUser }),
-          style: 'destructive',
+          text: "Delete",
+          onPress: () =>
+            deleteAsync({ messageId, userId: convexIdOfLoggedInUser }),
+          style: "destructive",
         },
       ]);
     },
-    [loggedInUser, deleteAsync]
+    [convexIdOfLoggedInUser, deleteAsync],
   );
   const handlePhotoTaken = useCallback((message: IMessage) => {
-    console.log(message)
+    console.log(message);
   }, []);
   const handleFilePick = async () => {
     setSending(true);
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: ['application/pdf'],
+        type: ["application/pdf"],
         copyToCacheDirectory: true,
         multiple: true,
       });
@@ -144,11 +161,11 @@ const ChatId = () => {
         const filePromises = assets.map(async (asset) => {
           const file = {
             uri: asset.uri,
-            type: asset.mimeType || 'application/octet-stream',
+            type: asset.mimeType || "application/octet-stream",
             name:
               asset.name ||
               `file_${Date.now()}.${
-                asset.mimeType?.split('/').pop() || 'file'
+                asset.mimeType?.split("/").pop() || "file"
               }`,
             size: asset.size || 0,
           };
@@ -165,17 +182,17 @@ const ChatId = () => {
 
         const messages = fileUrls.map((file) => {
           return {
-            text: '',
-            user: { _id: loggedInUser },
+            text: "",
+            user: { _id: convexIdOfLoggedInUser },
             fileId: file.id,
             fileUrl: file.link,
-            fileType: 'pdf' as FileType,
+            fileType: "pdf" as FileType,
           };
         });
-       void onSend(messages);
+        void onSend(messages);
       }
     } catch (error) {
-      console.error('Error picking file:', error);
+      console.error("Error picking file:", error);
     } finally {
       setSending(false);
     }
@@ -184,11 +201,10 @@ const ChatId = () => {
     setSending(true);
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
+        mediaTypes: ["images"],
         quality: 0.5,
         allowsMultipleSelection: true,
         base64: false,
-
       });
 
       if (!result.canceled) {
@@ -196,7 +212,7 @@ const ChatId = () => {
 
         const filePromises = assets.map(async (asset) => {
           const file = {
-            type: asset.mimeType || 'image/jpeg',
+            type: asset.mimeType || "image/jpeg",
             uri: asset.uri,
             name: new Date().toISOString(),
             size: asset.fileSize || 0,
@@ -214,28 +230,28 @@ const ChatId = () => {
 
         const messages = fileUrls.map((file) => {
           return {
-            text: '',
-            user: { _id: loggedInUser },
+            text: "",
+            user: { _id: convexIdOfLoggedInUser },
             fileId: file.id,
             fileUrl: file.link,
-            fileType: 'image' as FileType,
+            fileType: "image" as FileType,
           };
         });
-       await onSend(messages);
+        await onSend(messages);
       }
     } catch (error) {
-      console.error('Error picking image:', error);
-      toast.error('Error picking image');
+      console.error("Error picking image:", error);
+      toast.error("Error picking image");
     } finally {
       setSending(false);
     }
   };
-  const {status,loadMore,isLoading,results} = messages
-  const loadEarlier = status === 'CanLoadMore' && !isLoading;
+  const { status, loadMore, isLoading, results } = messages;
+  const loadEarlier = status === "CanLoadMore" && !isLoading;
   const onLoadMore = useCallback(async () => {
-   if(loadEarlier) {
-     loadMore(100)
-   }
+    if (loadEarlier) {
+      loadMore(100);
+    }
   }, [loadEarlier, loadMore]);
   const formattedMessages = results.map((message) => ({
     _id: message?._id,
@@ -243,7 +259,10 @@ const ChatId = () => {
     createdAt: new Date(message?._creationTime),
     user: {
       _id: message?.user?._id!,
-      name: message.sender_id === convexIdOfLoggedInUser ? 'You' : message?.user?.name as string,
+      name:
+        message.sender_id === convexIdOfLoggedInUser
+          ? "You"
+          : (message?.user?.name as string),
     },
     reactions: message.reactions,
     fileType: message.file_type,
@@ -256,29 +275,41 @@ const ChatId = () => {
       setEdit({ messageId, senderId });
       setText(textToEdit);
     },
-    []
+    [],
   );
 
-
-
-
   if (
-      room === undefined || isMember === undefined || pendingMember === undefined
+    room === undefined ||
+    isMember === undefined ||
+    pendingMember === undefined
   ) {
     return <Loading />;
   }
 
-  if(room === null) {
-    toast('Room does not exist!!!')
-    return <Redirect href={'/chat'} />
+  if (room === null) {
+    toast("Room does not exist!!!");
+    return <Redirect href={"/chat"} />;
   }
 
+
+
   const followersText = `${formatNumber(room?.member_count)} ${
-    room?.member_count > 1 ? 'members' : 'member'
+    room?.member_count > 1 ? "members" : "member"
   }`;
 
-
-
+  const onLeave = async () => {
+    setProcessing(true);
+    try {
+      await leaveRoom({ member_id: convexIdOfLoggedInUser, room_id: chatId });
+      toast.success("You have left the room");
+    } catch (e) {
+      const errorMessage = generateErrorMessage(e, "Error leaving room");
+      router.replace("/chat");
+      toast.error(errorMessage);
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   return (
     <Wrapper>
@@ -290,9 +321,9 @@ const ChatId = () => {
         isCreator={isCreator}
         isMember={isMember}
         isInPending={pendingMember}
-        leaveRoom={() => leaveRoom({ memberId: loggedInUser, roomId: chatId })}
+        leaveRoom={onLeave}
       />
-      <LoadingModal visible={isLeaving || isPendingDelete} />
+      <LoadingModal visible={processing || isPendingDelete} />
       {isMember && (
         <ChatComponent
           replyMessage={replyMessage}

@@ -1,12 +1,13 @@
-import {formatMessageTime} from '@/helper';
-import {Text, View} from 'react-native';
-import {RFPercentage} from 'react-native-responsive-fontsize';
-import {JoinBtn} from './join-room-btn';
+import {formatMessageTime} from "@/helper";
+import {Text, View} from "react-native";
+import {RFPercentage} from "react-native-responsive-fontsize";
+import {JoinBtn} from "./join-room-btn";
 import {colors} from "@/constants";
+import {Id} from "@/convex/_generated/dataModel";
 
 type OuterRightProps = {
   isMember: boolean;
-  roomId: string;
+  roomId: Id<"rooms">;
   isInPending: boolean;
   lastMessageTime: number;
 };
@@ -20,7 +21,11 @@ export const OuterRight = ({
     return (
       <View>
         <Text
-          style={{ fontSize: RFPercentage(1.3), fontFamily: 'NunitoLight', color: colors.black }}
+          style={{
+            fontSize: RFPercentage(1.3),
+            fontFamily: "NunitoLight",
+            color: colors.black,
+          }}
         >
           {formatMessageTime(new Date(lastMessageTime))}
         </Text>

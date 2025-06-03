@@ -2,7 +2,8 @@ import {mutation, query} from "@/convex/_generated/server";
 import {ConvexError, v} from "convex/values";
 import {paginationOptsValidator} from "convex/server";
 import {filter} from "convex-helpers/server/filter";
-import {getUserProfile} from "@/convex/user";
+import {checkIfPendingMember, getUserProfile} from "@/convex/user";
+import {Id} from "@/convex/_generated/dataModel";
 
 export const getTopRooms = query({
   args: {},
@@ -130,7 +131,7 @@ export const getRoomMembers = query({
       .withIndex("by_room_id", (q) =>
         q.eq("room_id", args.room_id).eq("status", args.status),
       )
-      .order("desc")
+      .order("asc")
       .paginate(args.paginationOpts);
     const page = await Promise.all(
       members.page.map(async (member) => {
@@ -210,4 +211,123 @@ export const createRoom = mutation({
     });
     return roomId;
   },
+});
+
+export const editRoom = mutation({
+  args: {
+    room_name: v.string(),
+    description: v.optional(v.string()),
+    creator_id: v.id("users"),
+    image_id: v.optional(v.id("_storage")),
+    room_id: v.id("rooms"),
+    previous_image_id: v.optional(v.id("_storage")),
+  },
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get(args.room_id);
+    if (!room) {
+      throw new ConvexError("Room not found");
+    }
+
+    if (room.creator_id !== args.creator_id) {
+      throw new ConvexError("Unauthorized");
+    }
+
+    if (args.image_id) {
+      const imageUrl = await ctx.storage.getUrl(args.image_id);
+      await ctx.storage.delete(args.previous_image_id as Id<"_storage">);
+      if (!imageUrl) return;
+      await ctx.db.patch(room._id, {
+        image_url: imageUrl as string,
+        room_name: args.room_name,
+        description: args.description,
+        image_id: args.image_id,
+      });
+    }
+
+    await ctx.db.patch(room._id, {
+      room_name: args.room_name,
+      description: args.description,
+    });
+  },
+});
+
+export const joinRoom = mutation({
+  args: { room_id: v.id("rooms"), member_to_join: v.id("users") },
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get(args.room_id);
+    if (!room) {
+      throw new ConvexError("Room not found");
+    }
+
+    const checkIfMemberIsInPending = await checkIfPendingMember(ctx, {
+      member_to_join: args.member_to_join,
+      room_id: args.room_id,
+    });
+    if (checkIfMemberIsInPending) {
+      throw new ConvexError(
+        "You have already sent a request to join this room",
+      );
+    }
+    await ctx.db.insert("members", {
+      room_id: args.room_id,
+      member_id: args.member_to_join,
+      status: "PENDING",
+      access_role: "MEMBER",
+    });
+  },
+});
+
+export const acceptRequest = mutation({
+  args: {
+    room_id: v.id("rooms"),
+    member_to_join: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get(args.room_id);
+
+    if (!room) {
+      throw new ConvexError("Room not found!!!");
+    }
+
+    const isPendingMember = await checkIfPendingMember(ctx, {
+      member_to_join: args.member_to_join,
+      room_id: args.room_id,
+    });
+    if (!isPendingMember) {
+      throw new ConvexError("Pending member does not exist");
+    }
+
+    await ctx.db.patch(isPendingMember._id, {
+      status: "ACCEPTED",
+    });
+    await ctx.db.patch(room._id, {
+      members: [...room.members, args.member_to_join],
+      member_count: room.member_count + 1,
+    });
+  },
+});
+
+
+export const declineRequest = mutation({
+  args: {
+    room_id: v.id("rooms"),
+    member_to_join: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get(args.room_id);
+
+    if (!room) {
+      throw new ConvexError("Room not found!!!");
+    }
+
+    const isPendingMember = await checkIfPendingMember(ctx, {
+      member_to_join: args.member_to_join,
+      room_id: args.room_id,
+    });
+    if (!isPendingMember) {
+      throw new ConvexError("Pending member does not exist");
+    }
+
+    await ctx.db.delete(isPendingMember._id,);
+  }
 });

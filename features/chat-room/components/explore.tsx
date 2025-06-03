@@ -8,6 +8,7 @@ import {RenderRooms} from "./render-rooms";
 import {usePaginatedQuery} from "convex/react";
 import {api} from "@/convex/_generated/api";
 import {useAuth} from "@/lib/zustand/useAuth";
+import {Spacer} from "@/components/ui/divider";
 
 export const Explore = () => {
   const [value, setValue] = useState("");
@@ -56,6 +57,7 @@ export const Explore = () => {
         value={value}
         onChangeText={setValue}
       />
+      <Spacer space={20} />
 
       {search ? (
         <RenderRooms rooms={searchResults} handleLoadMore={handleMoreSearch} />

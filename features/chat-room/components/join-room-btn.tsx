@@ -1,22 +1,39 @@
-import { CustomPressable } from '@/components/ui/custom-pressable';
-import { colors } from '@/constants';
-import { useAuth } from '@/lib/zustand/useAuth';
-import React from 'react';
-import { StyleSheet, Text } from 'react-native';
-import { useJoinGroup } from '../api/use-join-group';
+import {CustomPressable} from "@/components/ui/custom-pressable";
+import {colors} from "@/constants";
+import {useAuth} from "@/lib/zustand/useAuth";
+import React, {useState} from "react";
+import {StyleSheet, Text} from "react-native";
+import {useMutation} from "convex/react";
+import {api} from "@/convex/_generated/api";
+import {Id} from "@/convex/_generated/dataModel";
+import {generateErrorMessage} from "@/helper";
+import {toast} from "sonner-native";
 
 type Props = {
-  roomId: string;
+  roomId: Id<"rooms">;
   isInPending: boolean;
 };
 
 export const JoinBtn = ({ roomId, isInPending }: Props) => {
-  const userId = useAuth((state) => state.user?.id!);
-  const { mutateAsync, isPending } = useJoinGroup();
+  const userId = useAuth((state) => state.user?.convexId!);
+  const [isPending, setIsPending] = useState(false);
+  const joinRoom = useMutation(api.room.joinRoom);
   const onPress = async () => {
-    await mutateAsync({ channel_id: roomId, member_to_join: userId });
+    setIsPending(true);
+    try {
+      await joinRoom({
+        room_id: roomId,
+        member_to_join: userId!,
+      });
+      toast.success("Request has been sent");
+    } catch (e) {
+      const errorMessage = generateErrorMessage(e, "Failed to send request");
+      toast.error(errorMessage);
+    } finally {
+      setIsPending(false);
+    }
   };
-  const text = isInPending ? 'Pending' : 'Join';
+  const text = isInPending ? "Pending" : "Join";
   return (
     <CustomPressable
       style={styles.followBtn}

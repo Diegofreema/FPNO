@@ -1,46 +1,35 @@
-import { ErrorComponent } from '@/components/ui/error-component';
-import { Loading } from '@/components/ui/loading';
-import { NavHeader } from '@/components/ui/nav-header';
-import { Wrapper } from '@/components/ui/wrapper';
-import { useGetPendingMembers } from '@/features/chat-room/api/use-get-members';
-import { PendingMembers } from '@/features/chat/components/pending-members';
+import {Loading} from '@/components/ui/loading';
+import {NavHeader} from '@/components/ui/nav-header';
+import {Wrapper} from '@/components/ui/wrapper';
+import {PendingMembers} from '@/features/chat/components/pending-members';
 
-import { useLocalSearchParams } from 'expo-router';
-import React, { useState } from 'react';
+import {useLocalSearchParams} from 'expo-router';
+import React from 'react';
+import {usePaginatedQuery} from "convex/react";
+import {api} from "@/convex/_generated/api";
+import {Id} from "@/convex/_generated/dataModel";
 
 const PendingMembersScreen = () => {
-  const { roomId } = useLocalSearchParams<{ roomId: string }>();
-  const [more, setMore] = useState(0);
-  const {
-    data,
-    isPending,
-    isError,
-    error,
-    refetch,
-    isRefetchError,
-    isRefetching,
-  } = useGetPendingMembers({ channel_id: roomId, more });
+  const { roomId } = useLocalSearchParams<{ roomId: Id<'rooms'> }>();
 
-  if (isError || isRefetchError) {
-    return <ErrorComponent onPress={refetch} title={error.message} />;
-  }
+  const pendingMembersData = usePaginatedQuery(api.room.getRoomMembers, {room_id: roomId, status: "PENDING"}, { initialNumItems: 30})
 
-  if (isPending) {
+const {isLoading,loadMore,status,results} = pendingMembersData;
+  if (results === undefined) {
     return <Loading />;
   }
 
   const handleMore = () => {
-    if (data.documents.length >= data.total) return;
-    setMore((prev) => prev + 10);
+   if(status === "CanLoadMore" && !isLoading){
+      loadMore(20)
+    }
   };
   return (
     <Wrapper>
       <NavHeader title="Pending members" />
       <PendingMembers
-        users={data.documents}
+        users={results}
         handleMore={handleMore}
-        onRefresh={refetch}
-        refreshing={isRefetching}
         roomId={roomId}
       />
     </Wrapper>
