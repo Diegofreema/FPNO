@@ -5,7 +5,7 @@ import {useDeleteMessage} from "@/features/chat/api/use-delete-message";
 import {useEditMessage} from "@/features/chat/api/use-edit-message";
 import ChatComponent from "@/features/chat/components/chat-component";
 import {ChatNav} from "@/features/chat/components/chat-nav";
-import {formatNumber, generateErrorMessage, generateImageUrl} from "@/helper";
+import {formatNumber, generateErrorMessage, uploadProfilePicture} from "@/helper";
 import {useAuth} from "@/lib/zustand/useAuth";
 import {EditType, EditType2, FileType, IMessage, ReplyType, SendIMessage,} from "@/types";
 import {useActionSheet} from "@expo/react-native-action-sheet";
@@ -39,7 +39,7 @@ const ChatId = () => {
   const [replyMessage, setReplyMessage] = useState<IMessage | null>(null);
 
   const { showActionSheetWithOptions } = useActionSheet();
-
+const generateUploadUrl = useMutation(api.user.generateUploadUrl)
   const onOpenCamera = useCallback(() => {
     router.push(`/camera?path=${pathname}`);
   }, [router, pathname]);
@@ -158,22 +158,12 @@ const ChatId = () => {
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const { assets } = result;
         const filePromises = assets.map(async (asset) => {
-          const file = {
-            uri: asset.uri,
-            type: asset.mimeType || "application/octet-stream",
-            name:
-              asset.name ||
-              `file_${Date.now()}.${
-                asset.mimeType?.split("/").pop() || "file"
-              }`,
-            size: asset.size || 0,
-          };
 
-          const { id, link } = await generateImageUrl(file);
 
+          const res = await uploadProfilePicture(generateUploadUrl, asset.uri)
           return {
-            id: id as Id<"_storage">,
-            link,
+            id: res?.storageId as Id<"_storage">,
+
           };
         });
 
@@ -184,7 +174,6 @@ const ChatId = () => {
             text: "",
             user: { _id: convexIdOfLoggedInUser },
             fileId: file.id,
-            fileUrl: file.link,
             fileType: "pdf" as FileType,
           };
         });
@@ -210,18 +199,10 @@ const ChatId = () => {
         const { assets } = result;
 
         const filePromises = assets.map(async (asset) => {
-          const file = {
-            type: asset.mimeType || "image/jpeg",
-            uri: asset.uri,
-            name: new Date().toISOString(),
-            size: asset.fileSize || 0,
-          };
-
-          const { id, link } = await generateImageUrl(file);
-
+          const res = await uploadProfilePicture(generateUploadUrl, asset.uri)
           return {
-            id: id as Id<"_storage">,
-            link,
+            id: res?.storageId as Id<"_storage">,
+
           };
         });
 
@@ -232,7 +213,6 @@ const ChatId = () => {
             text: "",
             user: { _id: convexIdOfLoggedInUser },
             fileId: file.id,
-            fileUrl: file.link,
             fileType: "image" as FileType,
           };
         });

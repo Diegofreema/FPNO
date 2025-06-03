@@ -99,8 +99,14 @@ export const sendMessage = mutation({
       throw new ConvexError("You are not a member of this room");
     }
 
+    let file_url = '';
+    if(args.file_id) {
+      file_url = await ctx.storage.getUrl(args.file_id) as string
+    }
+
     await ctx.db.insert("messages", {
       ...args,
+      file_url,
       seen_ids: [args.sender_id],
     });
     await ctx.db.patch(room._id, {

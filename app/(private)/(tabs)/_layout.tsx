@@ -6,22 +6,15 @@ import {useAuth} from '@/lib/zustand/useAuth';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {HapticTab} from '@/components/HapticTab';
-import {ErrorComponent} from '@/components/ui/error-component';
-import {Loading} from '@/components/ui/loading';
-import {useGetUserByUserId} from '@/features/auth/api/use-get-user-by-user-id';
 import {AntDesign} from '@expo/vector-icons';
 import {RFPercentage} from 'react-native-responsive-fontsize';
 
 export default function TabLayout() {
   const variant = useAuth((state) => state.user?.variant);
-  const { isPending, isError, refetch } = useGetUserByUserId();
 
-  if (isError) {
-    return <ErrorComponent onPress={refetch} />;
-  }
-  if (isPending) {
-    return <Loading />;
-  }
+
+
+
   const tabs: {
     name: string;
     title: string;
@@ -91,7 +84,7 @@ export default function TabLayout() {
               options={{
                 title: tab.title,
                 href: tab.href,
-                tabBarIcon: ({ size, focused }) => (
+                tabBarIcon: ({  focused }) => (
                   <AntDesign
                     // @ts-ignore
                     name={tab.icon}
