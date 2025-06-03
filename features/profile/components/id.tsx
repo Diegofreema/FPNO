@@ -1,28 +1,29 @@
-import { borderRadius, colors, spacing } from '@/constants';
-import { StyleSheet, View } from 'react-native';
+import {borderRadius, colors, spacing} from '@/constants';
+import {StyleSheet, View} from 'react-native';
 
-import { RFPercentage } from 'react-native-responsive-fontsize';
+import {RFPercentage} from 'react-native-responsive-fontsize';
 
-import { Title } from '@/components/typography/title';
-import { FlexText } from '@/components/ui/flex-text';
-import { getStudentData } from '@/helper';
-import { useAuth } from '@/lib/zustand/useAuth';
+import {Title} from '@/components/typography/title';
+import {FlexText} from '@/components/ui/flex-text';
+import {useAuth} from '@/lib/zustand/useAuth';
 
 export const IDCard = () => {
   const { user } = useAuth();
-  const studentData = getStudentData(user!);
+
   const {
-    fname,
-    lname,
+
     matricnumber,
     email,
     phone,
     birthday,
     Faculty,
-    mname,
+   name,
     Department,
     programtype,
-  } = studentData!;
+  } = user!;
+  const fname = name?.split(' ')[0] ?? 'N/A';
+  const mname = name?.split(' ')[1] ?? 'N/A';
+  const lname = name?.split(' ')[2] ?? 'N/A';
   const userArray = [
     { title: 'First name', value: fname },
     { title: 'Middle name', value: mname },

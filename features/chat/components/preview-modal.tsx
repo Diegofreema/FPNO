@@ -1,10 +1,10 @@
-import { ImageZoom } from '@likashefqet/react-native-image-zoom';
-import { Dimensions, Modal, StyleSheet, View } from 'react-native';
+import {ImageZoom} from '@likashefqet/react-native-image-zoom';
+import {Dimensions, Modal, StyleSheet, View} from 'react-native';
 
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-import { ActionIcon } from '@/components/ui/action-icon';
-import { DownloadBlurView } from './download-blur';
+import {ActionIcon} from '@/components/ui/action-icon';
+import {DownloadBlurView} from './download-blur';
 
 type Props = {
   url: string;
@@ -36,7 +36,7 @@ export const PreviewModal = ({ hideModal, visible, url, type }: Props) => {
           isSingleTapEnabled
           resizeMode="cover"
         />
-        <DownloadBlurView url={url} onClose={hideModal} />
+        <DownloadBlurView url={url} onClose={hideModal} type={type} />
         <ActionIcon name="times" onPress={hideModal} style={styles.abs} />
       </View>
     </Modal>

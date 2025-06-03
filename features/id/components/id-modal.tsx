@@ -1,25 +1,23 @@
-import { useStoreId } from '@/lib/zustand/useStoreId';
-import { StyleSheet, View } from 'react-native';
+import {StyleSheet, View} from 'react-native';
 
-import { Image } from 'expo-image';
+import {Image} from 'expo-image';
 
-import { RFPercentage } from 'react-native-responsive-fontsize';
+import {RFPercentage} from 'react-native-responsive-fontsize';
 
-import { colors } from '@/constants';
+import {colors} from '@/constants';
 
-import { Title } from '@/components/typography/title';
-import { Avatar } from '@/components/ui/avatar';
-import { FlexText } from '@/components/ui/flex-text';
-import { getStudentData } from '@/helper';
-import { useAuth } from '@/lib/zustand/useAuth';
-import { Barcode } from './barcode';
+import {Title} from '@/components/typography/title';
+import {Avatar} from '@/components/ui/avatar';
+import {FlexText} from '@/components/ui/flex-text';
+import {useAuth} from '@/lib/zustand/useAuth';
+import {Barcode} from './barcode';
 
 export const IDModal = () => {
-  const details = useStoreId((state) => state.details);
+ 
   const data = useAuth((state) => state.user);
-  console.log({ details, data });
-  const studentDetails = getStudentData(data!);
-  const fullName = `${studentDetails?.fname} ${studentDetails?.lname}`;
+
+
+  const fullName = data?.name
   return (
     <View style={styles.modal}>
       <View style={styles.top}>
@@ -44,32 +42,32 @@ export const IDModal = () => {
           paddingBottom: 20,
         }}
       >
-        <FlexText color="white" text="Full name" text2={fullName} />
+        <FlexText color="white" text="Full name" text2={fullName!} />
         <FlexText
           color="white"
           text="Matric Number"
-          text2={studentDetails?.matricnumber!}
+          text2={data?.matricnumber!}
         />
         <FlexText
           color="white"
           text="Department"
-          text2={studentDetails?.Department!}
+          text2={data?.Department!}
         />
         <FlexText
           color="white"
           text="Program"
-          text2={studentDetails?.programtype!}
+          text2={data?.programtype!}
         />
         {/*<FlexText color="white" text="Expiring Date" text2={details.exp} />*/}
         <FlexText
           color="white"
           text="Matric Number"
-          text2={studentDetails?.matricnumber!}
+          text2={data?.matricnumber!}
         />
         <FlexText
           color="white"
           text="Faculty"
-          text2={studentDetails?.Faculty!}
+          text2={data?.Faculty!}
         />
       </View>
       <Barcode />

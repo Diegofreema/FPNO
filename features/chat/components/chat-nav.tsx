@@ -13,13 +13,14 @@ import {Alert, StyleSheet, View} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
 import {useDeleteMessages} from '../api/use-delete-messages';
 import {Menu} from "@/components/dropdown-menu";
+import {Id} from "@/convex/_generated/dataModel";
 
 
 type Props = {
   imageUrl: string;
   name: string;
   subText?: string;
-  channelId: string;
+  channelId: Id<'rooms'>;
   isCreator: boolean;
   isMember: boolean;
   isInPending: boolean;

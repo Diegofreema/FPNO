@@ -8,7 +8,6 @@ import {colors} from '@/constants';
 import {RFPercentage} from 'react-native-responsive-fontsize';
 
 import {ProfileDetail} from '@/features/profile/components/profile-details';
-import {getLecturerData, getStudentData} from '@/helper';
 import {useAuth} from '@/lib/zustand/useAuth';
 import {useFingerPrint} from '@/lib/zustand/useFingerPrint';
 import {usePassCode} from '@/lib/zustand/usePasscode';
@@ -69,9 +68,8 @@ export const LockComponent = () => {
     }
   };
 
-  const student = getStudentData(user!);
-  const lecturer = getLecturerData(user!);
-  const name = lecturer?.fullname || student?.fname + ' ' + student?.lname;
+
+  const name = user?.name
   return (
     <AnimatedContainer>
       <View style={{ alignSelf: 'center' }}>

@@ -1,19 +1,18 @@
 // import { IconBell } from "@tabler/icons-react-native";
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { RFPercentage } from 'react-native-responsive-fontsize';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {RFPercentage} from 'react-native-responsive-fontsize';
 
-import { Avatar } from '@/components/ui/avatar';
-import { HStack } from '@/components/ui/h-stack';
-import { colors } from '@/constants';
-import { getName, getStudentData } from '@/helper';
-import { useAuth } from '@/lib/zustand/useAuth';
-import { router } from 'expo-router';
+import {Avatar} from '@/components/ui/avatar';
+import {HStack} from '@/components/ui/h-stack';
+import {colors} from '@/constants';
+import {useAuth} from '@/lib/zustand/useAuth';
+import {router} from 'expo-router';
 
 export const ProfileHeader = () => {
   const { user } = useAuth();
 
-  const name = getName(user!);
-  const matricNumber = getStudentData(user!)?.matricnumber!;
+  const name = user?.name ?? 'N/A'
+  const matricNumber = user?.matricnumber ?? 'N/A'!;
   return (
     <HStack
       justifyContent="space-between"

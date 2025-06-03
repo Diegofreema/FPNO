@@ -71,7 +71,7 @@ export type GroupMessageType = {
 
 export type SingleMessageType = Omit<GroupMessageType, 'senderName'>;
 export type NewConversationType = {
-  id: string;
+  id: Id<'users'>;
   name: string;
   image: string;
   userId: string;
