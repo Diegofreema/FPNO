@@ -1,32 +1,32 @@
-import { BoxSkeleton } from "@/components/skeletons/box-skeleton";
-import { ErrorComponent } from "@/components/ui/error-component";
-import { colors } from "@/constants";
-import * as Linking from "expo-linking";
-import { textToRender } from "@/helper";
+import { BoxSkeleton } from '@/components/skeletons/box-skeleton';
+import { ErrorComponent } from '@/components/ui/error-component';
+import { colors } from '@/constants';
+import { generateLink, textToRender } from '@/helper';
+import * as Linking from 'expo-linking';
 
-import { useAuth } from "@/lib/zustand/useAuth";
+import { useAuth } from '@/lib/zustand/useAuth';
 
-import { AnimatedCard } from "@/components/animated/animated-card";
-import * as Haptics from "expo-haptics";
-import { Image } from "expo-image";
+import { AnimatedCard } from '@/components/animated/animated-card';
+import * as Haptics from 'expo-haptics';
+import { Image } from 'expo-image';
 import {
   FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
-import { RFPercentage } from "react-native-responsive-fontsize";
-import { useGetDashboard } from "../api/use-get-dashboard";
+} from 'react-native';
+import { RFPercentage } from 'react-native-responsive-fontsize';
+import { useGetDashboard } from '../api/use-get-dashboard';
 
 const images = [
-  require("@/assets/images/study4.png"),
+  require('@/assets/images/study4.png'),
 
-  require("@/assets/images/study3.png"),
+  require('@/assets/images/study3.png'),
 
-  require("@/assets/images/study2.png"),
+  require('@/assets/images/study2.png'),
 
-  require("@/assets/images/study.png"),
+  require('@/assets/images/study.png'),
 ];
 export const Boxes = () => {
   const user = useAuth((state) => state.user);
@@ -76,7 +76,7 @@ const Box = ({
 }) => {
   const onPress = async () => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    await Linking.openURL("https://fpn.netpro.software/login");
+    await Linking.openURL(generateLink(item.key));
   };
 
   const img = images[index];
@@ -87,7 +87,7 @@ const Box = ({
         source={img}
         contentFit="contain"
       />
-      <View style={[styles.flex, { alignItems: "center" }]}>
+      <View style={[styles.flex, { alignItems: 'center' }]}>
         <Text style={styles.title}>{textToRender(item.key)}</Text>
         <Text style={styles.value}>{item.value}</Text>
       </View>
@@ -98,7 +98,7 @@ const Box = ({
 const styles = StyleSheet.create({
   box: {
     flex: 1,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 4,
@@ -112,20 +112,20 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   flex: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 10,
-    marginTop: "auto",
+    marginTop: 'auto',
   },
   title: {
     fontSize: RFPercentage(2),
-    fontFamily: "NunitoRegular",
+    fontFamily: 'NunitoRegular',
     flex: 1,
     color: colors.black,
   },
   value: {
     fontSize: RFPercentage(2.5),
-    textAlign: "center",
-    fontFamily: "NunitoBold",
+    textAlign: 'center',
+    fontFamily: 'NunitoBold',
     color: colors.black,
   },
 });
