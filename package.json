@@ -22,7 +22,7 @@
     "@expo/vector-icons": "^14.1.0",
     "@gorhom/bottom-sheet": "^5.1.4",
     "@hookform/resolvers": "^5.0.1",
-    "@legendapp/list": "^1.0.11",
+    "@legendapp/list": "^1.0.15",
     "@likashefqet/react-native-image-zoom": "^4.3.0",
     "@react-native-async-storage/async-storage": "^2.1.2",
     "@react-native-menu/menu": "^1.2.3",
@@ -100,6 +100,5 @@
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0"
   },
-  
   "private": true
 }
