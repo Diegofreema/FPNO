@@ -1,20 +1,26 @@
-import {colors} from '@/constants';
-import {useAuth} from '@/lib/zustand/useAuth';
-import {EditType, EditType2, IMessage} from '@/types';
-import {ActionSheetOptions} from '@expo/react-native-action-sheet';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {KeyboardAvoidingView, Platform, StyleSheet, Text, View,} from 'react-native';
-import {GiftedChat, SystemMessage, Time} from 'react-native-gifted-chat';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { colors } from '@/constants';
+import { useAuth } from '@/lib/zustand/useAuth';
+import { EditType, EditType2, IMessage } from '@/types';
+import { ActionSheetOptions } from '@expo/react-native-action-sheet';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { GiftedChat, SystemMessage, Time } from 'react-native-gifted-chat';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {SwipeableMethods} from 'react-native-gesture-handler/lib/typescript/components/ReanimatedSwipeable';
-import {RenderComposer} from './message-input';
-import {RenderActions} from './render-action';
-import {RenderBubble} from './render-bubble';
-import {RenderImage} from './render-image';
+import { Id } from '@/convex/_generated/dataModel';
+import { SwipeableMethods } from 'react-native-gesture-handler/lib/typescript/components/ReanimatedSwipeable';
+import { RenderComposer } from './message-input';
+import { RenderActions } from './render-action';
+import { RenderBubble } from './render-bubble';
+import { RenderImage } from './render-image';
 import ReplyMessageBar from './render-message';
-import {RenderSend} from './render-send';
-import {Id} from "@/convex/_generated/dataModel";
+import { RenderSend } from './render-send';
 
 type Props = {
   messages: IMessage[];
@@ -68,7 +74,7 @@ const ChatComponent = ({
   setEditText,
 }: Props) => {
   const loggedInUserId = useAuth((state) => state.user?.convexId!);
-  console.log({convex: loggedInUserId})
+
   const insets = useSafeAreaInsets();
   const [visible, setVisible] = useState(false);
   const disabled = sending || text.length === 0;
