@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.diegodark.FPNO",
       "infoPlist": {
-        "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera"
+        "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -22,7 +23,6 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.diegodark.FPNO",
-
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"

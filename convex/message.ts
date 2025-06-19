@@ -8,8 +8,18 @@ export const getMessages = query({
   args: {
     room_id: v.id("rooms"),
     paginationOpts: paginationOptsValidator,
+    loggedInUserId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    const member = await ctx.db
+      .query("members")
+      .withIndex("by_room_member", (q) =>
+        q.eq("room_id", args.room_id).eq("member_id", args.loggedInUserId),
+      )
+      .first();
+    if (!member) {
+      throw new ConvexError("You are not a member of this group");
+    }
     const messages = await ctx.db
       .query("messages")
       .withIndex("by_room_id", (q) => q.eq("room_id", args.room_id))
@@ -17,20 +27,22 @@ export const getMessages = query({
       .paginate(args.paginationOpts);
 
     const page = await Promise.all(
-      messages.page.map(async (m) => {
-        const sender = await getUserProfile(ctx, m.sender_id);
-        const reactions = await messageReactions(ctx, m._id);
-        let reply;
-        if (m.reply_to) {
-          reply = await messageHelper(ctx, m.reply_to);
-        }
-        return {
-          ...m,
-          user: sender,
-          reactions,
-          reply,
-        };
-      }),
+      messages.page
+        .filter((m) => m._creationTime > member._creationTime)
+        .map(async (m) => {
+          const sender = await getUserProfile(ctx, m.sender_id);
+          const reactions = await messageReactions(ctx, m._id);
+          let reply;
+          if (m.reply_to) {
+            reply = await messageHelper(ctx, m.reply_to);
+          }
+          return {
+            ...m,
+            user: sender,
+            reactions,
+            reply,
+          };
+        }),
     );
     return {
       ...messages,
@@ -233,20 +245,20 @@ export const reactToMessage = mutation({
       )
       .first();
 
-    const isSameReaction = reactionExists?.emoji === args.emoji
-    if(reactionExists && isSameReaction) {
-      await ctx.db.delete(reactionExists._id,)
-      return
+    const isSameReaction = reactionExists?.emoji === args.emoji;
+    if (reactionExists && isSameReaction) {
+      await ctx.db.delete(reactionExists._id);
+      return;
     }
 
-    if(reactionExists) {
-      await ctx.db.delete(reactionExists._id)
+    if (reactionExists) {
+      await ctx.db.delete(reactionExists._id);
     }
 
-    await ctx.db.insert('reactions', {
+    await ctx.db.insert("reactions", {
       emoji: args.emoji,
       message_id: args.messageId,
-      user_id: args.senderId
-    })
+      user_id: args.senderId,
+    });
   },
 });
