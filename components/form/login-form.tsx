@@ -1,25 +1,25 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { openURL } from 'expo-linking';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import {zodResolver} from "@hookform/resolvers/zod";
+import {openURL} from "expo-linking";
+import {useState} from "react";
+import {useForm} from "react-hook-form";
+import {z} from "zod";
 
-import { AnimatedContainer } from '@/components/animated/animated-container';
-import { CustomInput } from '@/components/form/custom-input';
-import { Button } from '@/components/ui/button';
-import { Stack } from '@/components/ui/stack';
-import { loginSchema } from '@/lib/hookform/validators';
+import {AnimatedContainer} from "@/components/animated/animated-container";
+import {CustomInput} from "@/components/form/custom-input";
+import {Button} from "@/components/ui/button";
+import {Stack} from "@/components/ui/stack";
+import {loginSchema} from "@/lib/hookform/validators";
 
 // import { generateFromRandomNumbersOtp, sendEmail } from "@/helper";
-import { mail } from '@/constants';
-import { useLogin } from '@/features/auth/api/use-login';
-import { AccountSwitcher } from '@/features/auth/components/account-switcher';
-import { Helper } from '@/features/auth/components/helper';
-import { Variants } from '@/types';
+import {mail} from "@/constants";
+import {useLogin} from "@/features/auth/api/use-login";
+import {AccountSwitcher} from "@/features/auth/components/account-switcher";
+import {Helper} from "@/features/auth/components/helper";
+import {Variants} from "@/types";
 
 export const LoginForm = () => {
   const [secure, setSecure] = useState<boolean>(true);
-  const [variant, setVariant] = useState<Variants>('LECTURER');
+  const [variant, setVariant] = useState<Variants>("LECTURER");
   const toggleSecure = () => setSecure(!secure);
   const { mutateAsync } = useLogin(variant);
 
@@ -30,8 +30,8 @@ export const LoginForm = () => {
     control,
   } = useForm<z.infer<typeof loginSchema>>({
     defaultValues: {
-      password: '',
-      email: '',
+      password: "",
+      email: "",
     },
     resolver: zodResolver(loginSchema),
   });
@@ -39,9 +39,8 @@ export const LoginForm = () => {
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     await mutateAsync(values, {
       onSuccess: () => {
-
         reset();
-      }
+      },
     });
   };
   const onPress = async () => {
@@ -68,10 +67,11 @@ export const LoginForm = () => {
           password
           secureTextEntry={secure}
           toggleSecure={toggleSecure}
+          autoCapitalize="none"
         />
         <AccountSwitcher variant={variant} setVariant={setVariant} />
         <Button
-          text={'Login'}
+          text={"Login"}
           onPress={handleSubmit(onSubmit)}
           isLoading={isSubmitting}
           isDisabled={isSubmitting}

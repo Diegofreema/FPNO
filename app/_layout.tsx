@@ -23,7 +23,7 @@ export default function RootLayout() {
   const segment = useSegments();
   const user = useAuth((state) => state.user);
   const isLoggedIn = !!user;
-  console.log(segment, isLoggedIn);
+  console.log({ segment, isLoggedIn });
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     NunitoLight: require("../assets/fonts/NunitoLight.ttf"),
@@ -58,7 +58,15 @@ export default function RootLayout() {
       <ConvexProvider client={convex}>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <MenuProvider>
-            <Stack screenOptions={{ headerShown: false }} />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Protected guard={isLoggedIn}>
+                <Stack.Screen name="(private)" />
+              </Stack.Protected>
+              <Stack.Protected guard={!isLoggedIn}>
+                <Stack.Screen name="(public)" />
+
+              </Stack.Protected>
+            </Stack>
           </MenuProvider>
           <Toaster />
         </GestureHandlerRootView>

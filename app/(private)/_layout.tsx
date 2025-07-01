@@ -1,13 +1,12 @@
-import {useAuth} from '@/lib/zustand/useAuth';
 import {useFingerPrint} from '@/lib/zustand/useFingerPrint';
 import {usePassCode} from '@/lib/zustand/usePasscode';
 import {useIsLocked, usePath} from '@/lib/zustand/usePath';
-import {Href, Redirect, Stack, usePathname, useRouter} from 'expo-router';
+import {Href, Stack, usePathname, useRouter} from 'expo-router';
 import {useEffect, useRef} from 'react';
 import {AppState, AppStateStatus} from 'react-native';
 
 const PrivateLayout = () => {
-  const id = useAuth((state) => state.user?.id);
+
 
   const router = useRouter();
 
@@ -85,7 +84,7 @@ const PrivateLayout = () => {
     passCode,
     pathToStore,
   ]);
-  if (!id) return <Redirect href="/login" />;
+
   return <Stack screenOptions={{ headerShown: false }} />;
 };
 export default PrivateLayout;
